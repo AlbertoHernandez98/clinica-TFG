@@ -1,0 +1,65 @@
+
+@import 'src/assets/theme/_variables.scss';
+
+.grid-container {
+  margin-top: $gap-form;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+
+  &__col3 {
+    display: grid;
+    width: 100%;
+    gap: 20px;
+  }
+
+  app-button-base {
+    justify-self: center;
+  }
+}
+
+.dot {
+  height: 20px;
+  width: 20px;
+  background-color: aqua;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dota {
+  height: 20px;
+  width: 20px;
+  background-color: #003c71;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.wrap {
+  text-align: center;
+  position: relative;
+  padding: 10px;
+}
+
+.wrap:before {
+  content: "";
+  width: 72%;
+  position: absolute;
+  background-color: grey;
+  left: 0;
+  top: 50%;
+  border-top: 2px solid lightgray;
+  transform: translateY(-50%) translateX(20%);
+}
+
+.links {
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+}
+
+.p-paso {
+  text-align: center;
+}

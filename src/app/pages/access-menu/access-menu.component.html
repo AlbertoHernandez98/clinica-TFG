@@ -1,0 +1,44 @@
+<div class="card-container">
+    <!-- <img [src]="clinicaLogo" class="image-logo" /> -->
+    <div class="card-container__logo">
+        <p class="card-container__logo__text">{{'ACCESS_MENU.CLINICA' | translate }}</p>
+    </div>
+    <article class="grid">
+      <section class="card-child a"
+      routerLink="/reserva-cita"
+      >
+        <figure>
+          <!-- <img [src]="identitiesIcon" class="card-image" /> -->
+          <figcaption class="card-text">
+            {{ 'ACCESS_MENU.RESERVA' | translate }}
+          </figcaption>
+        </figure>
+      </section>
+      <section routerLink="/serviciosMenu" class="card-child b">
+        <figure>
+          <!-- <img [src]="productsIcon" class="card-image" /> -->
+          <figcaption class="card-text">
+            {{ 'ACCESS_MENU.SERVICIOS' | translate }}
+          </figcaption>
+        </figure>
+      </section>
+      <section routerLink="/personal" class="card-child c">
+        <figure>
+          <!-- <img [src]="applicationsIcon" class="card-image" /> -->
+          <figcaption class="card-text">
+            {{ 'ACCESS_MENU.PERSONAL' | translate }}
+          </figcaption>
+        </figure>
+      </section>
+      <p class="text d">
+        {{ 'ACCESS_MENU.IDENTITIES_TEXT' | translate }}
+      </p>
+      <p class="text e">
+        {{ 'ACCESS_MENU.PRODUCTS_TEXT' | translate }}
+      </p>
+      <p class="text f">
+        {{ 'ACCESS_MENU.APPLICATIONS_TEXT' | translate }}
+      </p>
+    </article>
+  </div>
+  

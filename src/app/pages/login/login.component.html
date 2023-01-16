@@ -1,0 +1,46 @@
+<img [src]="clinicaLogo" class="image" />
+
+<div class="card">
+
+  <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="card__form">
+    <div>
+      <app-input-text
+        label="{{ 'LOGIN.USERNAME_LABEL' | translate }}"
+        placeholder="{{ 'LOGIN.USERNAME_PLACEHOLDER' | translate }}"
+        formControlName="username"
+      ></app-input-text>
+      <em
+        *ngIf="
+          loginForm.controls.username?.errors?.required &&
+          loginForm.controls.username?.dirty
+        "
+        class="card__form__validation-error"
+        >{{ 'LOGIN.OBLIGATORY_FIELD' | translate }}</em
+      >
+    </div>
+
+    <div>
+      <app-input-password
+        label="{{ 'LOGIN.PASSWORD_LABEL' | translate }}"
+        placeholder="{{ 'LOGIN.PASSWORD_PLACEHOLDER' | translate }}"
+        formControlName="password"
+      ></app-input-password>
+      <em
+        *ngIf="
+          loginForm.controls.password?.errors?.required &&
+          loginForm.controls.password?.dirty
+        "
+        class="card__form__validation-error"
+        >{{ 'LOGIN.OBLIGATORY_FIELD' | translate }}</em
+      >
+    </div>
+
+    <hr />
+
+    <app-button-base
+      btnStyle="btn--large"
+      label="{{ 'LOGIN.BUTTON_LABEL' | translate }}"
+      [disabled]="loginForm.invalid"
+    ></app-button-base>
+  </form>
+</div>

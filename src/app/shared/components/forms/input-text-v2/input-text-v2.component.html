@@ -1,0 +1,20 @@
+<label class="cnt" [ngClass]="{'error': error && !disabled, 'disabled': disabled}">
+    <div class="cnt__label">
+        <span>{{ label }}</span>
+        <span class="cnt__label__asterisco" *ngIf="required && !disabled"> *</span>
+    </div>
+
+    <div class="cnt__input">
+        <input
+            [type]="type"
+            [value]="value"
+            (input)="inputHaCambiado($event)"
+            [placeholder]="placeholder"
+            [disabled]="disabled"
+            (blur)="onTouched(); comprobarErrores()">
+    </div>
+
+    <div class="cnt__msg-error">
+        <span *ngIf="error && !disabled">{{ error }}</span>
+    </div>
+</label>

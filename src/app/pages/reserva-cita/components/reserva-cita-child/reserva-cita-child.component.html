@@ -1,0 +1,36 @@
+<div class="datos-wrapper">
+    <form [formGroup]="form">
+        <div class="panel">
+            <div class="panel__datos-div">
+                <div>
+                    <app-input-text formControlName="nombre" label="{{ 'RESERVA_CITA.NOMBRE' | translate }}"
+                        [invalid]="getTouchedAndError('nombre')" [required]="true"> </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('nombre')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text formControlName="apellidos" label="{{ 'RESERVA_CITA.APELLIDOS' | translate }}"
+                        [invalid]="getTouchedAndError('apellidos')" [required]="true"> </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('apellidos')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text formControlName="telefono" label="{{ 'RESERVA_CITA.TELEFONO' | translate }}"
+                        [invalid]="getTouchedAndError('telefono')" [required]="true"> </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('telefono')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text formControlName="email" label="{{ 'RESERVA_CITA.EMAIL' | translate }}"
+                        [invalid]="getTouchedAndError('email')" [required]="false"> </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('email')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

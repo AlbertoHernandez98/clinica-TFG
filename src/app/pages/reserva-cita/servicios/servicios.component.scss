@@ -1,0 +1,250 @@
+@import "src/assets/theme/_variables.scss";
+
+.dot {
+  height: 20px;
+  width: 20px;
+  background-color: aqua;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dota {
+  height: 20px;
+  width: 20px;
+  background-color: #003c71;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.wrap {
+  text-align: center;
+  position: relative;
+  padding: 10px;
+}
+
+.wrap:before {
+  content: "";
+  width: 72%;
+  position: absolute;
+  background-color: grey;
+  left: 0;
+  top: 50%;
+  border-top: 2px solid lightgray;
+  transform: translateY(-50%) translateX(20%);
+}
+
+.links {
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+}
+
+.p-paso {
+  text-align: center;
+}
+
+.ejemplos {
+  height: fit-content;
+}
+
+app-button-base {
+  margin: $gap-form 0;
+}
+
+.grid-container {
+  margin-top: $gap-form;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+
+  &__lista {
+    display: flex;
+    gap: $gap-form;
+    flex-wrap: wrap;
+
+    &__nombre {
+      display: flex;
+      flex-direction: column;
+      max-width: 160px;
+    }
+  }
+}
+
+.botones-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+@import "/src/assets/theme/form";
+
+.custom-select__wrapper {
+  position: relative;
+  background-color: $color-tertiary;
+  // width: 100%;
+  &.open {
+    .custom-select__btn-img {
+      transform: scaleY(-1);
+    }
+  }
+}
+
+.custom-select {
+  &__btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 251px;
+    padding: $padding-inputs - 1.5px $padding-inputs;
+    border: 1px solid $color-secondary;
+    border-radius: $radius-default;
+    font-size: var(--font-label-multiselect, 14px);
+    color: var(--color-label-multiselect, $color-secondary);
+    &--light-gray {
+      background-color: $color-light-gray;
+      border-color: $color-light-gray;
+    }
+    &-img {
+      transition: 0.3s;
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 32px;
+    left: 0;
+    right: 0;
+    padding: 4px 0;
+    z-index: 3;
+    width: 100%;
+    max-height: 60vh;
+    background-color: $color-tertiary;
+    border: 1px solid $color-secondary;
+    border-width: 0 1px 1px 1px;
+    border-radius: 0px 0px $padding-inputs $padding-inputs;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: all 0.3s ease-out;
+
+    .locale {
+      display: grid;
+      grid-auto-flow: column;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
+      padding: $padding-inputs * 0.5 $padding-inputs;
+      cursor: pointer;
+
+      .checked {
+        width: 16px;
+        height: 16px;
+        border: 1px solid $color-primary;
+        padding: 2px;
+        border-radius: 2px;
+        position: relative;
+        &::before {
+          content: "";
+          display: block;
+          width: 12px;
+          height: 12px;
+          border-radius: inherit;
+          position: absolute;
+          top: 1px;
+          left: 1px;
+          background-color: $color-tertiary;
+          transition: background-color 0.2s linear;
+        }
+      }
+      &.active {
+        .checked {
+          &::before {
+            transition: background-color 0.2s linear;
+            background-color: $color-primary;
+          }
+        }
+      }
+      // esto es para anular desde el compomente chips
+      // que no se pueda hacer "des-check" si está activo
+      &.selected {
+        pointer-events: none;
+        background-color: rgba(0, 0, 0, 0.08);
+      }
+      .text {
+        font-weight: 700;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      --scroll-bar-width: 7px;
+    }
+  }
+}
+
+.input-group {
+  display: flex;
+  gap: 2px $padding-inputs;
+  padding: $padding-inputs;
+  border: 1px solid $color-secondary;
+  border-radius: $radius-default;
+  background-color: $color-tertiary;
+  transition: filter 0.2s linear;
+  &:focus-within {
+    filter: drop-shadow($shadow-default);
+    transition: filter 0.2s linear;
+  }
+}
+.input {
+  font-size: 14px;
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+.button {
+  font-size: 14px;
+  color: $color-tertiary;
+  background-color: $color-primary;
+  border-radius: 4px;
+  height: 100%;
+  width: 21px;
+  aspect-ratio: 1/1;
+  text-align: center;
+  outline: 1px solid transparent;
+  outline-offset: -2px;
+  transition: outline 0.2s linear;
+  &:focus,
+  &:hover {
+    outline: 1px solid $color-tertiary;
+    transition: outline 0.2s linear;
+  }
+}
+
+label {
+  display: inline-grid;
+  grid-auto-flow: column;
+  place-items: center;
+  justify-content: center;
+  gap: 5px 15px;
+
+  max-width: 100%;
+  min-width: 163px;
+  padding: 13px 17px;
+  background: $color-primary;
+  border: 1px solid $color-primary;
+  border-radius: 8px;
+  color: $color-tertiary;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  text-align: left; //overrided with place-items center, but util when text break lines and has icon
+  transition: outline 0.2s linear, outline-offset 0.2s linear;
+  outline: 0 solid transparent;
+
+  &:hover,
+  &:focus {
+    outline: 2px solid #fff;
+    outline-offset: -3px;
+  }
+}

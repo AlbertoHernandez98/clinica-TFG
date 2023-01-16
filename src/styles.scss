@@ -1,0 +1,170 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+// @import "~@ionic/angular/css/core.css";
+
+// /* Basic CSS for apps built with Ionic */
+// @import "~@ionic/angular/css/normalize.css";
+// @import "~@ionic/angular/css/structure.css";
+// @import "~@ionic/angular/css/typography.css";
+// @import '~@ionic/angular/css/display.css';
+
+// /* Optional CSS utils that can be commented out */
+// @import "~@ionic/angular/css/padding.css";
+// @import "~@ionic/angular/css/float-elements.css";
+// @import "~@ionic/angular/css/text-alignment.css";
+// @import "~@ionic/angular/css/text-transformation.css";
+// @import "~@ionic/angular/css/flex-utils.css";
+@import '../src/theme/variables.scss';
+@import '../src/assets/theme/form.scss';
+
+.mat-spinner circle {
+  stroke: $color-primary;
+}
+
+// START reset styles
+//   Remove all the styles of the "User-Agent-Stylesheet", except for the 'display' property
+//    - The "symbol *" part is to solve Firefox SVG sprite bug
+//
+*:where(:not(iframe, canvas, img, svg, video, ngx-editor-menu *, ngx-editor
+      *):not(svg *, symbol *)) {
+  all: unset;
+  display: revert;
+}
+// Preferred box-sizing value
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  accent-color: $color-primary;
+}
+body {
+  color: $color-black;
+  font-family: $font-family-primary;
+  line-height: 1.5;
+  background-color: $color-tertiary;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+// Set pointer cursor
+a,
+button {
+  cursor: pointer;
+}
+// Remove list styles (bullets/numbers)
+ol,
+ul,
+menu {
+  list-style: none;
+}
+ngx-editor {
+  ol,
+  ul,
+  menu {
+    list-style: initial;
+  }
+}
+// For images to not be able to exceed their container
+img {
+  max-width: 100%;
+}
+// removes spacing between cells in tables
+table {
+  border-collapse: collapse;
+}
+// revert the 'white-space' property for textarea elements on Safari
+textarea {
+  white-space: revert;
+}
+// minimum style to allow to style meter element
+meter {
+  -webkit-appearance: revert;
+  appearance: revert;
+}
+// reset default text opacity of input placeholder
+::placeholder {
+  font-size: 14px;
+  color: $color-secondary;
+}
+// fix the feature of 'hidden' attribute.
+//   display:revert; revert to element instead of attribute
+:where([hidden]) {
+  display: none;
+}
+// revert for bug in Chromium browsers
+//   - fix for the content editable attribute will work properly.
+:where([contenteditable]) {
+  -moz-user-modify: read-write;
+  -webkit-user-modify: read-write;
+  overflow-wrap: break-word;
+  -webkit-line-break: after-white-space;
+}
+// apply back the draggable feature - exist only in Chromium and Safari
+:where([draggable='true']) {
+  -webkit-user-drag: element;
+}
+// END reset styles
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    scroll-behavior: smooth;
+  }
+}
+
+:root {
+  --scroll-bar-width: 10px;
+}
+* {
+  // Firefox
+  scrollbar-color: #585d61;
+  scrollbar-width: thin;
+}
+// Chrome Edge Safary
+::-webkit-scrollbar {
+  width: var(--scroll-bar-width);
+  height: var(--scroll-bar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: #e0dee8; // color of the tracking area
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #585d61; // color of the scroll thumb
+  border-radius: 20px; // roundness of the scroll thumb
+}
+
+.form-error {
+  color: red;
+  font-size: 12px;
+}
+.success_snack {
+  background: #bdecb6;
+  color: black;
+  font-weight: 600;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+.error_snack {
+  background: #ff6961;
+  color: black;
+  font-weight: 600;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

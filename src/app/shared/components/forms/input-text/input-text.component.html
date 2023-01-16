@@ -1,0 +1,21 @@
+<label class="label-text" [class]="inputStyle">
+    <div class="label-text__tag">
+      <span [ngClass]="{ errorLabel: invalid }">{{ label }}</span>
+      <span *ngIf="required" class="label-text__tag__asterisk"> *</span>
+    </div>
+  
+    <input
+      *ngIf="!colorPicker"
+      class="label-text__input"
+      type="text"
+      [class]="secondary"
+      [value]="setValue"
+      [placeholder]="placeholder"
+      [ngClass]="{ error: invalid }"
+      [disabled]="disabled"
+      (focusout)="onInput($any($event.target).value)"
+      (input)="onInput($any($event.target).value)"
+    />
+  </label>
+  <!-- <em class="label-text__alert" hidden>{{ alert }}</em> -->
+  

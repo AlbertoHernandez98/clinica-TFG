@@ -1,0 +1,83 @@
+@import 'src/assets/theme/_variables.scss';
+
+$color-input-disabled: #a6a6a6;
+
+.btn {
+  display: inline-grid;
+  grid-auto-flow: column;
+  place-items: center;
+  justify-content: center;
+  gap: 5px 15px;
+
+  max-width: 100%;
+  min-width: 163px;
+  padding: 13px 17px;
+  background: $color-primary;
+  border: 1px solid $color-primary;
+  border-radius: 8px;
+  color: $color-tertiary;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  text-align: left; //overrided with place-items center, but util when text break lines and has icon
+  transition: outline 0.2s linear, outline-offset 0.2s linear;
+  outline: 0 solid transparent;
+
+  &:hover,
+  &:focus {
+    outline: 2px solid #fff;
+    outline-offset: -3px;
+  }
+
+  // flow orientation icons modifiers
+  &--vertical {
+    grid-auto-flow: row;
+  }
+
+  // sizes modifiers
+  &--large {
+    min-width: 251px;
+  }
+  &--block {
+    width: 100%;
+  }
+  &--thin {
+    padding: 7px 17px;
+  }
+  &--align-left {
+    justify-content: flex-start;
+  }
+
+  // colors modifiers
+  &--primary-outline {
+    color: $color-primary;
+    background-color: $color-tertiary;
+    &:hover,
+    &:focus {
+      outline-color: $color-primary;
+      outline-offset: -4px;
+    }
+  }
+  &--black {
+    border-color: $color-black;
+    background: $color-black;
+  }
+  &--secondary {
+    background-color: $color-secondary;
+    border-color: $color-secondary;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    &:hover,
+    &:focus {
+      outline: 0 solid transparent;
+      outline-offset: 0;
+    }
+  }
+
+  &-img {
+    max-height: 30px;
+  }
+}

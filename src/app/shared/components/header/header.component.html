@@ -1,0 +1,29 @@
+<header class="content">
+    <div *ngIf="!login" class="logged-out">
+        <img class="clinica-logo" src="../../../../assets/icons/logo_clinica.png">
+        <!-- <img class="mapfre-logo" (click)="ngToggleheader()" src="../../../../assets/images/AF_Logo_MAPFRE_desktop.png"> -->
+    </div>
+
+    <div *ngIf="login" class="logged-in">
+        <img class="clinica-logo" src="../../../../assets/icons/logo_clinica.png">
+        <div class="settings-user">
+            <div class="contact">
+                <a href="/contacto" >{{ 'HEADER.CONTACTO' | translate }}</a>
+            </div>
+            <div class="block">
+                <a href="/perfil" class="name">Lara Suárez</a>
+                <a href="/role-management">Administrador</a>
+            </div>
+            <img class="user" src="">
+            <i></i>
+        </div>
+    </div>
+</header>
+
+<!-- NOTAS REFACTORIZAR:
+
+METER UNA LISTA EN HORIZONTAL
+1. EN ESA LISTA METER MAS ELEMENTOS: INICIO, CLINICA, SERVICIOS, EQUIPO, CONTACTO...
+2.EN LA OPCION SERVICIOS METER UN MENU EMERGENTE CUANDO MOUSE OVER QUE DESPLIEGUE 
+LOS SERVICIOS DE LA CLINICA.
+3.REFACTORIZAR EL HEADER CON UN POSIBLE TOKEN PARA QUE NO PETE, YA VERÉ -->

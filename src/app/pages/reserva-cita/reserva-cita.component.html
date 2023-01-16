@@ -1,0 +1,34 @@
+<div class="fondo">
+  <div class="wrap">
+    <div class="links">
+      <div class="dota"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <div>
+    <p class="p-paso"> {{ 'RESERVA_CITA.PASO' | translate }} 1</p>
+  </div>
+
+<div class="grid-container">
+    <div class="grid-container__col3">
+      <app-form-card
+        [isCollapsed]="true"
+        [isCollapsible]="true"
+        title="{{ 'RESERVA_CITA.TITLE' | translate }}"
+      >
+      <app-reserva-cita-child
+      (formReserva)="formReserva($event)"
+      ></app-reserva-cita-child>
+      </app-form-card>
+      <app-button-base
+      btnStyle="btn--large"
+      label="{{ 'RESERVA_CITA.BUTTON_SIGUIENTE' | translate }}"
+      [disabled] = 'reserva.invalid'
+      (click)="goTo()"
+      ></app-button-base>
+    </div>
+  </div>
+  

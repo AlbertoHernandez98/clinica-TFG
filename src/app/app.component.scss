@@ -1,0 +1,24 @@
+.contenido{
+    width: 100%;
+    padding-top: 24px;
+    padding-right: 24px;
+    &__menu{
+        display: flex;
+        padding: 0 24px;
+    }
+    &__router{
+        width: 100%;
+    }
+}
+.paddingLeft{
+    padding-left: 24px;
+}
+
+*{
+    font-family: Karla;
+}
+
+@font-face {
+    font-family: Karla;
+    src: url(../assets/fonts/Karla/Karla-VariableFont_wght.ttf);
+  }

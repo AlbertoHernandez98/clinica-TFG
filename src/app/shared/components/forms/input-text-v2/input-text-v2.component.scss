@@ -1,0 +1,83 @@
+@use '/src/assets/theme/form' as *;
+
+:host {
+    width: 100%;
+}
+
+.cnt {
+    display: flex;
+    flex-direction: column;
+
+    &__label {
+        font-size: 16px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        min-height: 24px;  // Para alineamiento entre campos si no se incluye al label
+
+        // &__asterisco {
+        //     // color: $color-error;
+        // }
+    }
+
+    &__input {
+        color: $color-black;
+        font-size: 14px;
+        border: 1px solid $color-secondary;
+        border-radius: $radius-default;
+        padding: $padding-inputs;
+        background-color: #fff;
+        transition: filter 0.2s linear;
+        
+        input {
+            width: 100%;
+        }
+
+        &:focus {
+            filter: drop-shadow(0 0 3px rgba($color-black, 0.2));
+            transition: filter 0.2s linear;
+        }
+
+    }
+
+    &__msg-error {
+        font-size: 12px;
+        min-height: 18px;
+        // color: $color-error;
+    }
+}
+
+
+// Muestra el componente como selector de color
+.modo-selector-color {
+    .cnt__input {
+        position: relative;
+        display: flex;
+
+        input {
+            width: 100%;
+        }
+    }
+}
+
+// Muestra el componente con aspecto de error de validación
+// .error {
+//     .cnt__label {
+//         // color: $color-error;
+//     }
+
+//     .cnt__input {
+//         // border-color: $color-error;
+//     }
+
+//     .cnt__input__colorBall {
+//         // border-color: $color-error;
+//     }
+// }
+
+// Muestra el componente como deshabilitado
+.disabled {
+    .cnt__input {
+        background-color: $color-light-gray;
+        border-color: $color-light-gray;
+    }
+}

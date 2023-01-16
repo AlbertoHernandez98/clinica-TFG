@@ -1,0 +1,49 @@
+{
+    "reportes": [
+        {
+            "nombre": "Quiropodia",
+            "ejemplos": [
+                "Corte de uñas",
+                "Tratamiento de durezas",
+                "Helómas (Ojo de pollo)",
+                "Uña encarnada",
+                "Hongos en las uñas",
+                "Verrugas plantares",
+                "Ortesis de silicona"
+            ]
+        },
+        {
+            "nombre": "Biomecánica",
+            "ejemplos": [
+                "Estudio de la marcha",
+                "Plantillas personalizadas",
+                "Vendaje terapeutico",
+                "Fascitis plantar",
+                "Espolón calcáneo",
+                "Infiltraciones"
+            ]
+        },
+        {
+            "nombre": "Cirugía Ungeal"
+        },
+        {
+            "nombre": "Cirugía Ósea"
+        },
+        {
+            "nombre": "Pié diabético",
+            "ejemplos": [
+                "Úlceras",
+                "Prevención de pie diabético"
+            ]
+        },
+        {
+            "nombre": "Podología infantil"
+        },
+        {
+            "nombre": "Podología geriátrica"
+        },
+        {
+            "nombre": "Servicio a domicilio"
+        }
+    ]
+}

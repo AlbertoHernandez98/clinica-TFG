@@ -1,0 +1,115 @@
+@import "src/assets/theme/_variables.scss";
+
+.card-container {
+    background: $color-tertiary;
+    box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    margin: 8vh auto;
+    padding: 7vh 0;
+    width: 80vw;
+    min-width: 55em;
+
+    &__logo {
+        display: flex;
+        justify-content: center;
+
+        &__text {
+            font-size: 20px;
+            color: $color-secondary;
+        }
+    }
+}
+
+.image-logo {
+    display: block;
+    margin: 0 auto;
+    width: 70px;
+    height: 70px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 27% 10% 26% 10% 27%;
+    justify-content: center;
+    padding: 0 5vw;
+}
+
+.card-child {
+    @extend .card-container;
+    &:hover {
+        box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.5);
+        -webkit-transition: box-shadow 0.2s ease-in;
+    }
+    cursor: pointer;
+    width: 12em;
+    height: 12em;
+    min-width: 8em;
+    min-height: 8em;
+    margin: 5vh auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-child-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    &:hover {
+        box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.25);
+    }
+}
+
+.card-image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+}
+
+.card-text {
+    font-style: normal;
+    font-size: 1.6em;
+    text-align: center;
+    color: $color-primary;
+}
+
+.text {
+    width: 15em;
+    margin: 0 auto;
+    font-size: 1em;
+    line-height: 1.3em;
+    color: #666666;
+    text-align: justify;
+    text-justify: inter-word;
+    text-align-last: center;
+}
+
+.a {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+}
+
+.b {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+}
+
+.c {
+    grid-column: 5 / 6;
+    grid-row: 1 / 2;
+}
+
+.d {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+}
+
+.e {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+}
+
+.f {
+    grid-column: 5 / 6;
+    grid-row: 2 / 3;
+}

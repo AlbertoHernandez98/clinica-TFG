@@ -1,0 +1,53 @@
+<div class="page">
+    <div class="page__container">
+      <i (click)="close()" class="page__container__close">
+        <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
+      </i>
+      <div class="page__container__content">
+        <h1>{{ data.title }}</h1>
+        <mat-dialog-content
+          appDragDrop
+          (fileDropped)="onFileDropped($event)"
+          class="page__container__content__dnd-content"
+        >
+          <input
+            type="file"
+            accept="image/*"
+            #fileDropRef
+            id="fileDropRef"
+            multiple
+            (change)="fileBrowseHandler($any($event.target).files)"
+            class="page__container__content__dnd-content__input"
+          />
+          <h3>{{ 'SHARED.POPUPS.DRAGDROP.TEXT_1' | translate }}</h3>
+          <h3>{{ 'SHARED.POPUPS.DRAGDROP.TEXT_2' | translate }}</h3>
+          <label
+            for="fileDropRef"
+            class="page__container__content__dnd-content__label"
+            >{{ 'SHARED.POPUPS.DRAGDROP.SELECT_FILE_LABEL' | translate }}</label
+          >
+        </mat-dialog-content>
+        <app-button-base
+          *ngIf="!edit"
+          (click)="continue()"
+          label="{{ 'SHARED.POPUPS.DRAGDROP.BUTTON_LABEL' | translate }}"
+        ></app-button-base>
+  
+        <div *ngIf="edit" class="page__container__content__button-base-noPic">
+          <app-button-base
+            (click)="deleteFile()"
+            label="{{
+              'SHARED.POPUPS.DRAGDROP.BUTTON_LABEL_ELIMINAR' | translate
+            }}"
+          ></app-button-base>
+          <app-button-base
+            (click)="continue()"
+            label="{{
+              'SHARED.POPUPS.DRAGDROP.BUTTON_LABEL_REEMPLAZAR' | translate
+            }}"
+          ></app-button-base>
+        </div>
+      </div>
+    </div>
+  </div>
+  

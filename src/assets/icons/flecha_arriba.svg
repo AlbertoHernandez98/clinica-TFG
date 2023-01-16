@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectángulo_84" data-name="Rectángulo 84" width="24" height="24"/>
+    </clipPath>
+  </defs>
+  <g id="Icon_Arrow_Simple_arrow_up_24" data-name="Icon/Arrow/Simple arrow up 24" clip-path="url(#clip-path)">
+    <g id="Icon_Arrow_Simple_arrow_up_24-2" data-name="Icon/Arrow/Simple arrow up 24" transform="translate(0 0.001)">
+      <g id="Icon-Arrow-Simple_arrow_up_24" data-name="Icon-Arrow-Simple arrow up 24">
+        <g id="Icon_Arrow_Simple_arrow_up_24-3" data-name="Icon_Arrow_Simple_arrow_up_24" clip-path="url(#clip-path)">
+          <g id="Icon_Arrow_Simple_arrow_up_24-2-2" data-name="Icon_Arrow_Simple_arrow_up_24-2" transform="translate(8 9.501)">
+            <g id="arrow" transform="translate(16 -9.5) rotate(90)">
+              <g id="Path_2">
+                <path id="Trazado_2106" data-name="Trazado 2106" d="M14.2,8a.764.764,0,0,1-.2.5L10.6,12l3.5,3.5A.778.778,0,0,1,13,16.6l-4-4a.785.785,0,0,1,0-1.1l4-4a.785.785,0,0,1,1.1,0A.749.749,0,0,1,14.2,8Z"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

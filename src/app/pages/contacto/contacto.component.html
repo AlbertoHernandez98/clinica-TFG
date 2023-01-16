@@ -1,0 +1,81 @@
+
+<div class="content">
+    <div class="wrap">
+        <div class="form-wrap">
+            <div class="label">Contactáctanos</div>
+            <div class="detalle">Déjanos un mensaje y te responderemos lo más pronto posible.</div>
+            <form class="form" action="" [formGroup]="form">
+                <!-- <label for="Name" class="label">Nombre</label> -->
+                <div>
+                    <app-input-text 
+                    formControlName="nombre" 
+                    label="{{ 'CONTACTO.NOMBRE' | translate }}"
+                    [invalid]="getTouchedAndError('nombre')" 
+                    [required]="true">
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('nombre')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text 
+                    label="{{ 'CONTACTO.EMAIL' | translate }}"
+                    [invalid]="getTouchedAndError('email')" 
+                    [required]="true"
+                    formControlName="email">
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('email')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text 
+                    formControlName="msj" 
+                    label="{{ 'CONTACTO.MSJ' | translate }}"
+                    [invalid]="getTouchedAndError('msj')" 
+                    [required]="true">
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('msj')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div class="button">
+                    <app-button-base
+                        label="{{'CONTACTO.ENVIAR' | translate }}"
+                        (click)="emailValida()"
+                    ></app-button-base>
+                </div>
+            </form>
+        </div>
+        <div class="contact">
+            <div class="whats">
+                <div class="label">Llámanos</div>
+                <a href="https://wa.me/123456789" class="info">(+34) 651429641</a>
+            </div>
+            <div class="email">
+                <div class="label">Envíanos un e-mail</div>
+                <div class="info">clinicalarasuarezdiaz@email.com</div>
+            </div>
+            <div class="redes">
+                <div class="label">Síguenos en nuestras redes sociales</div>
+                <div class="listaRedes">
+                    <img src="../../../assets/img/whatsapp.png" href="https://wa.me/123456789" alt="Whats App">
+                    <img src="../../../assets/img/facebook.png" href="https://www.facebook.es" alt="Facebook">
+                    <img src="../../../assets/img/gorjeo.png" href="https://www.twitter.com" alt="Twitter">
+                    <img src="../../../assets/img/instagram.png" href="https://www.instagram.com" alt="Instagram">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="
+-webkit-filter: grayscale(100%);
+filter: grayscale(100%);">
+    <div class="mapouter">
+        <div class="gmap_canvas"><iframe width="1550" height="400" id="gmap_canvas"
+                src="https://maps.google.com/maps?q=Carrer%20Major,%2091,%2046940%20Manises,%20Valencia&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+        </div>
+    </div>
+</div>

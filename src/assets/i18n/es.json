@@ -1,0 +1,149 @@
+{
+  "BUTTONS": {
+    "ANTERIOR": "Anterior",
+    "SIGUIENTE": "Siguiente"
+  },
+  "RESERVA_CITA": {
+    "TITLE": "Reservar cita",
+    "NOMBRE": "Nombre",
+    "APELLIDOS": "Apellidos",
+    "TELEFONO": "Telefono",
+    "EMAIL": "E-mail",
+    "BUTTON_SIGUIENTE": "Siguiente",
+    "PASO": "Paso"
+  },
+  "LISTA_PRODUCTOS": {
+    "TITLE": "Listado de Productos",
+    "BNT_NUEVO": "+ Nuevo",
+    "FILTROS": {
+      "SEARCH_LABEL": "Buscar por:",
+      "SEARCH_PLACEHOLDER": "Producto",
+      "SELECT_LINEA": "Línea",
+      "SELECT_PAIS": "País"
+    }
+  },
+  "PERSONAL": {
+    "PERSONAL_A": "Lara Suárez"
+  },
+  "SERVICES_MENU": {
+    "SERVICES": "Nuestros servicios",
+    "QUIROPODIA": "Quiropodia",
+    "QUIROPODIA_SERV": {
+      "CORTE": "Corte de uñas",
+      "DUREZA": "Tratamiento de durezas",
+      "HELOMA": "Helómas (Ojo de pollo)",
+      "UÑA": "Uña encarnada",
+      "HONGOS": "Hongos",
+      "VERRUGAS": "Verrugas plantares",
+      "ORTESIS": "Ortesis de silicona"
+    },
+    "BIOMECANICA": "Biomecánica",
+    "BIOMECANICA_SERV": {
+      "MARCHA": "Estudio de la marcha",
+      "PLANTILLAS": "Plantillas personalizadas",
+      "VENDAJE": "Vendaje terapeutico",
+      "FASCITIS": "Fascitis plantar",
+      "ESPOLON": "Espolón calcáneo",
+      "INFILTRACIONES": "Infiltraciones"
+    },
+    "CIRUGIA_UNGEAL": "Cirugía Ungeal",
+    "CIRUGIA_OSEA": "Cirugía ósea",
+    "PIE_DIABETICO": "Pié diabético",
+    "PODOLOGIA_INFANTIL": "Podología infantil",
+    "PODOLOGIA_GERIATRICA": "Podología geriátrica",
+    "SERVICIO_DOM": "Servicio a domicilio"
+  },
+  "BREADCUMTEXT": {
+    "MENU": "Menú",
+    "RESERVA_CITA": "Reserva Cita",
+    "SERVICIOS": "Servicios",
+    "DISPONIBILIDAD": "Disponibilidad",
+    "PERSONAL": "Personal",
+    "PERSONAL-A": "Personal A",
+    "CONTACTO": "Contacto",
+    "CORTE": "Corte de uñas",
+    "DUREZA": "Tratamiento de durezas",
+    "HELOMA": "Helómas (Ojo de pollo)",
+    "UÑA": "Uña encarnada",
+    "HONGOS": "Hongos",
+    "VERRUGAS": "Verrugas plantares",
+    "ORTESIS": "Ortesis de silicona",
+    "MARCHA": "Estudio de la marcha",
+    "PLANTILLAS": "Plantillas personalizadas",
+    "VENDAJE": "Vendaje terapeutico",
+    "FASCITIS": "Fascitis plantar",
+    "ESPOLON": "Espolón calcáneo",
+    "INFILTRACIONES": "Infiltraciones"
+  },
+  "MAIN_MENU": {
+    "ACCESO_PWA": "Carga y acceso a la PWA",
+    "IDENTIFICACION_USUARIO": "Identificación de usuario",
+    "MENU_LINEA": "Menú en línea",
+    "SOLICITUD_ASISTENCIA": "Solicitud de asistencia",
+    "SOLICITUD_REEMBOLSO": "Solicitud de reembolso",
+    "ORIGEN": "Origen",
+    "DESTINO": "Destino",
+    "SEGUIMIENTO": "Seguimiento",
+    "HISTORICO": "Histórico",
+    "TRADUCCION": "Traducción",
+    "ADD": "Añadir nueva linea",
+    "ERROR": "Errores",
+    "TRIGGERS": "Desencadenante",
+    "WARNING_MESSAGE": "Mensaje aviso",
+    "SERVICES": "Servicios"
+  },
+  "404": {
+    "TITLE": "Hay un problema",
+    "TEXT": "Página no encontrada",
+    "LINK": "Ir a la página de inicio de sesión"
+  },
+  "LOGIN": {
+    "USERNAME_LABEL": "Usuario",
+    "USERNAME_PLACEHOLDER": "Nombre / Usuario",
+    "OBLIGATORY_FIELD": "Campo obligatorio",
+    "PASSWORD_LABEL": "Contraseña",
+    "PASSWORD_PLACEHOLDER": "Contraseña",
+    "BUTTON_LABEL": "Entrar",
+    "POPUP_ERROR_TEXT": "El nombre de usuario o contraseña son incorrectos.",
+    "POPUP_BUTTON_LABEL": "Cerrar"
+  },
+  "ACCESS_MENU": {
+    "RESERVA": "Reservar cita",
+    "SERVICIOS": "Servicios",
+    "CLINICA": "Clinica podologica Lara Suárez Díaz",
+    "PERSONAL": "Personal",
+    "IDENTITIES_TEXT": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nibh sit etiam tortor proin varius fringilla. Lorem nisl quisque risus pellentesque.",
+    "PRODUCTS_TEXT": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nibh sit etiam tortor proin varius fringilla. Lorem nisl quisque risus pellentesque.",
+    "APPLICATIONS_TEXT": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nibh sit etiam tortor proin varius fringilla. Lorem nisl quisque risus pellentesque."
+  },
+  "SHARED": {
+    "POPUPS": {
+      "DRAGDROP": {
+        "TITLE": "Subida de archivos",
+        "TEXT_1": "Arrastra los archivos aquí",
+        "TEXT_2": "o",
+        "SELECT_FILE_LABEL": "Selecciona archivo",
+        "BUTTON_LABEL": "Continuar",
+        "BUTTON_LABEL_ELIMINAR": "Eliminar",
+        "BUTTON_LABEL_REEMPLAZAR": "Reemplazar"
+      }
+    }
+  },
+  "HEADER": {
+    "CONTACTO": "Contacta",
+    "PERFIL": "Perfil"
+  },
+  "CONTACTO": {
+    "NOMBRE": "Nombre",
+    "EMAIL": "E-mail",
+    "MSJ": "Tu mensaje",
+    "ENVIAR": "Enviar"
+  },
+  "PERFIL": {
+    "TELEFONO": "Telefono",
+    "DOMICILIO": "Domicilio",
+    "FOTO_PERFIL": "Foto de perfil",
+    "CITAS": "Ver historial de citas",
+    "HISTORIAL": "Ver historial clínico"
+  }
+}

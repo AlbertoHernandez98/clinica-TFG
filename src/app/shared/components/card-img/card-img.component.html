@@ -1,0 +1,26 @@
+<div class="container">
+    <div
+    (click)="abrirSelectorImagen()"
+     class="container__card">
+      <div class="container__card__square">
+        <!-- <p class="container__card__square__text">{{dimensiones}}</p> -->
+        <ng-container>
+            <img
+              [src]="file"
+              alt=""
+            />
+          </ng-container>
+      </div>
+      <p *ngFor="let logo of logoDataService.$logos | async" class="container__card__title">{{logo.name}}</p>
+      <p *ngFor="let logo of logoDataService.$logos | async" class="container__card__subtitle">Size: {{logo.size}} KB</p>
+      <p class="container__card__sub-subtitle">{{size}}</p>
+
+      <div class="container__card__wrap">
+        <div class="container__card__wrap__links">
+          <div class="container__card__wrap__links__dot"></div>
+          <div class="container__card__wrap__links__dot"></div>
+          <div class="container__card__wrap__links__dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>

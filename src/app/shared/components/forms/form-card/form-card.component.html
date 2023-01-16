@@ -1,0 +1,17 @@
+<div class="card-title">
+    <div class="card-title__title">
+      {{ title }}
+    </div>
+    <div>
+      <button
+        *ngIf="isCollapsible"
+        (click)="this.isCollapsed = !this.isCollapsed"
+      >
+        <img [src]="isCollapsed ? collapseUpIcon : collapseDownIcon" />
+      </button>
+    </div>
+  </div>
+  <div *ngIf="isCollapsed" class="card-body">
+    <ng-content></ng-content>
+  </div>
+  

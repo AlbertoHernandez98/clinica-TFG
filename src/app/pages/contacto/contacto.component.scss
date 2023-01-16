@@ -1,0 +1,82 @@
+@import "src/assets/theme/_variables.scss";
+
+.content {
+    position: relative;
+    display: block;
+    overflow: hidden;
+}
+
+.wrap {
+    position: relative;
+    width: 940px;
+    margin-right: auto;
+    margin-left: auto;
+    z-index: 10;
+    display: flex;
+    padding: 60px;
+    align-items: stretch;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(210, 210, 213, 0.5);
+    background-color: #fff;
+}
+
+.form-wrap {
+    width: 65%;
+    margin-right: 60px;
+    padding-right: 60px;
+    flex-direction: column;
+    align-items: stretch;
+    border-right: 1px solid rgba(210, 210, 213, 0.3);
+}
+
+.label {
+    position: static;
+    display: block;
+    opacity: 0.6;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.detalle {
+    margin-bottom: 25px;
+    font-size: 18px;
+    line-height: 30px;
+}
+
+.form {
+    display: grid;
+    gap: $gap-form;
+}
+
+.info {
+    color: #1d1f2e;
+    font-size: 18px;
+    line-height: 30px;
+}
+
+.contact {
+    display: grid;
+    gap: $gap-form;
+    align-content: center;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+}
+
+.redes {
+    display: flex;
+    gap: $gap-form;
+    flex-direction: column;
+}
+
+.listaRedes {
+    display: flex;
+    max-width: 40px;
+    gap: $gap-form;
+}

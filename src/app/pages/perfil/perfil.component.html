@@ -1,0 +1,90 @@
+<div class="content">
+    <div class="wrap">
+        <div class="form-wrap">
+            <form class="" action="" [formGroup]="form">
+                <div class="label">Perfil de usuario</div>
+                <div>
+                    <app-input-text 
+                    formControlName="usuario" 
+                    label="{{ 'CONTACTO.NOMBRE' | translate }}"
+                    [invalid]="getTouchedAndError('usuario')" 
+                    >
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('usuario')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text 
+                    formControlName="contraseña" 
+                    label="{{ 'LOGIN.PASSWORD_LABEL' | translate }}"
+                    [invalid]="getTouchedAndError('contraseña')" 
+                    >
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('contraseña')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text 
+                    formControlName="email" 
+                    label="{{ 'CONTACTO.EMAIL' | translate }}"
+                    [invalid]="getTouchedAndError('email')" 
+                    >
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('email')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text 
+                    formControlName="telefono" 
+                    label="{{ 'PERFIL.TELEFONO' | translate }}"
+                    [invalid]="getTouchedAndError('telefono')" 
+                    >
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('telefono')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div>
+                    <app-input-text 
+                    formControlName="domicilio" 
+                    label="{{ 'PERFIL.DOMICILIO' | translate }}"
+                    [invalid]="getTouchedAndError('domicilio')" 
+                    >
+                    </app-input-text>
+                    <p class="form-error" *ngIf="getTouchedAndError('domicilio')">
+                        {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                    </p>
+                </div>
+                <div class="label-text__tag">
+                    <span>Foto de perfil</span>
+                </div>
+                <div class="img">
+                    <app-card-img></app-card-img>
+                </div>
+                <div class="button">
+                    <app-button-base
+                        label="{{'CONTACTO.ENVIAR' | translate }}"
+                        (click)="modificarPerfil()"
+                    ></app-button-base>
+                </div>
+            </form>
+        </div>
+        <div class="contact">
+            <div class="button">
+                <app-button-base
+                    label="{{'PERFIL.CITAS' | translate }}"
+                    (click)="historial()"
+                ></app-button-base>
+            </div>
+            <div class="button">
+                <app-button-base
+                    label="{{'PERFIL.HISTORIAL' | translate }}"
+                    (click)="historial()"
+                ></app-button-base>
+            </div>
+        </div>
+    </div>
+</div>
