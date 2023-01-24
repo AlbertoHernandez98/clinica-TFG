@@ -3,16 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: '',
-    loadChildren: () =>
-      import('./pages/login/login.module').then((m) => m.LoginModule)
-  },
-  {
     path: 'access-menu',
     loadChildren: () =>
-      import('./pages/access-menu/access-menu.module').then(
-        (m) => m.AccessMenuModule
-      )
+      import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () =>
+      import('./pages/login/login.module').then((m) => m.LoginModule)
   },
   {
     path: 'reserva-cita',
@@ -53,7 +51,12 @@ const routes: Routes = [
     path: 'perfil',
     loadChildren: () =>
       import('./pages/perfil/perfil.module').then((m) => m.PerfilModule)
-  }
+  },
+  {
+    path: 'clinica',
+    loadChildren: () =>
+      import('./pages/clinica/clinica.module').then((m) => m.ClinicaModule)
+  },
 ]
 
 @NgModule({

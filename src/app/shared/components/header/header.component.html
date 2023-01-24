@@ -1,14 +1,58 @@
 <header class="content">
-    <div *ngIf="!login" class="logged-out">
-        <img class="clinica-logo" src="../../../../assets/icons/logo_clinica.png">
-        <!-- <img class="mapfre-logo" (click)="ngToggleheader()" src="../../../../assets/images/AF_Logo_MAPFRE_desktop.png"> -->
+    <!-- <div *ngIf="!login" class="logged-out">
+        <img class="mapfre-logo" (click)="ngToggleheader()" src="../../../../assets/images/AF_Logo_MAPFRE_desktop.png"> 
+    </div> -->
+    <img class="clinica-logo" src="../../../../assets/icons/logo_clinica.png">
+
+    <div class="div-cabecera">
+
+        <div class="dropdown">
+            <button class="dropbtn">
+                <a href="/access-menu">Inicio</a>
+            </button>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Servicios</button>
+            <div class="dropdown-content">
+                <a href="/corte">Corte de uñas</a>
+                <a href="/unya">Uña encarnada</a>
+                <a href="/plantillas">Plantillas personalizadas</a>
+                <a href="/heloma">Helóma</a>
+                <a href="/serviciosMenu">Más servicios...</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">
+                <a href="/clinica">Clínica</a>
+            </button>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Quiénes somos</button>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">
+                <a href="/contacto">Contacto</a>
+            </button>
+        </div>
     </div>
 
-    <div *ngIf="login" class="logged-in">
+    <div class="login-option">
+        <div class="dropdown">
+            <button class="dropbtn">
+                <a href="/contacto">Login</a>
+            </button>
+        </div>
+    </div>
+
+    <!-- <div class="logged-in">
         <img class="clinica-logo" src="../../../../assets/icons/logo_clinica.png">
         <div class="settings-user">
             <div class="contact">
-                <a href="/contacto" >{{ 'HEADER.CONTACTO' | translate }}</a>
+                <a href="/contacto">{{ 'HEADER.CONTACTO' | translate }}</a>
             </div>
             <div class="block">
                 <a href="/perfil" class="name">Lara Suárez</a>
@@ -17,7 +61,7 @@
             <img class="user" src="">
             <i></i>
         </div>
-    </div>
+    </div> -->
 </header>
 
 <!-- NOTAS REFACTORIZAR:

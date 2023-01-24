@@ -4,27 +4,24 @@ import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
 
 @Component({
-  selector: 'app-cirugia-ungeal',
-  templateUrl: './cirugia-ungeal.component.html',
-  styleUrls: ['./cirugia-ungeal.component.scss']
+  selector: 'app-clinica',
+  templateUrl: './clinica.component.html',
+  styleUrls: ['./clinica.component.scss']
 })
-export class CirugiaUngealComponent implements OnInit {
-
+export class ClinicaComponent implements OnInit {
 
   constructor(
     private translate: TranslateService,
     private appService: AppStateService,
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getTranslate();
   }
 
-
-
   getTranslate() {
     this.appService
-      .traduccionesLoaded('BREADCUMTEXT.SERVICIOS')
+      .traduccionesLoaded('BREADCUMTEXT.CLINICA')
       .subscribe((res) => {
         this.initRoutes();
       });
@@ -39,18 +36,13 @@ export class CirugiaUngealComponent implements OnInit {
           route: '/access-menu'
         },
         {
-          active: true,
-          name: this.translate.instant('BREADCUMTEXT.SERVICIOS'),
-          route: '/serviciosMenu'
-        },
-        {
           active: false,
-          name: this.translate.instant('BREADCUMTEXT.CIRUGIA_UNGEAL'),
-          route: '/cirugia-ungeal'
+          name: this.translate.instant('BREADCUMTEXT.CLINICA'),
+          route: '/clinica'
         },
       ],
       isLogged: true,
-      idMenuActive: '2'
+      idMenuActive: '1'
     };
     this.appService.setBreadcumInfo(appInfo, 'appInfo');
   }

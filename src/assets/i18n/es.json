@@ -55,6 +55,7 @@
   },
   "BREADCUMTEXT": {
     "MENU": "Menú",
+    "CLINICA": "Clínica",
     "RESERVA_CITA": "Reserva Cita",
     "SERVICIOS": "Servicios",
     "DISPONIBILIDAD": "Disponibilidad",
@@ -73,7 +74,8 @@
     "VENDAJE": "Vendaje terapeutico",
     "FASCITIS": "Fascitis plantar",
     "ESPOLON": "Espolón calcáneo",
-    "INFILTRACIONES": "Infiltraciones"
+    "INFILTRACIONES": "Infiltraciones",
+    "CIRUGIA_UNGEAL": "Cirugía Ungeal"
   },
   "MAIN_MENU": {
     "ACCESO_PWA": "Carga y acceso a la PWA",

@@ -1,13 +1,11 @@
 <ion-app>
-  <div [hidden]="lisentToRoute()">
-    <app-header [login]="appInfo ? appInfo.isLogged : false"></app-header>
-    <app-breadcrumb *ngIf="showBreadCum()" [breadcrumbs]="listaBreadcum"></app-breadcrumb>
-  </div>
+  <!-- <div [hidden]="lisentToRoute()"> -->
+  <app-header></app-header>
+  <app-breadcrumb *ngIf="showBreadCum()" [breadcrumbs]="listaBreadcum"></app-breadcrumb>
+  <!-- </div> -->
   <div class="contenido">
-    <div class="contenido__menu" *ngIf="showProductsMenu()">
-      <app-main-menu [idMenu]="idMenu"></app-main-menu>
-    </div>
     <router-outlet></router-outlet>
   </div>
+  <app-footer></app-footer>
   <app-spinner *ngIf="showSpiner"></app-spinner>
 </ion-app>

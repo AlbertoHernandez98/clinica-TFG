@@ -1,0 +1,114 @@
+@import '/src/assets/theme/_variables';
+.content2 {
+    padding-bottom: 4em;
+    display: grid;
+    gap: $gap-form;
+
+    &__descripcion {
+        padding: 5vw;
+        font-size: 18px;
+    }
+
+    &__wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 50px;
+        padding-top: $gap-form;
+    
+        &__title {
+            margin-right: 15px;
+            margin-left: 15px;
+            position: static;
+            display: block;
+            opacity: 0.6;
+            line-height: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 16px;
+            display: flex;
+            color: $color-primary;
+            font-size: 26px;
+        }
+    
+        &__deco-line {
+            display: inline-block;
+            width: 30px;
+            height: 1.5px;
+            background-color: #ececed;
+            align-self: center;
+        }
+    }
+}
+.content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 100px;
+    padding-top: 2em;
+    background-color: $color-light-gray;
+
+    &__servicio {
+
+        &__item {
+            padding-top: 2em;
+            width: 330px;
+            height: 400px;
+            display: grid;
+            justify-items: center;
+
+            &__text {
+                display: flex;
+                justify-content: center;
+                margin-top: 30px;
+                margin-bottom: 50px;
+                font-size: 20px;
+
+                &__a {
+                    display: inline-block;
+                    position: relative;
+                    color: transparent;
+                    text-decoration: none;
+                    transition: all 0.5s ease;
+                    transform-style: preserve-3d;
+                }
+                &__a:after {
+                    content: "Clínica Lara Suarez Diaz";
+                    position: absolute;
+                    display: flex;
+                    justify-content: center;
+                    top: -100%;
+                    left: 0px;
+                    width: 100%;
+                    color: black;
+                    background: #ccc;
+                    transform-origin: left bottom;
+                    transform: rotateX(90deg);
+                }
+                &__a:hover {
+                    transform-origin: center bottom;
+                    transform: rotateX(-90deg) translateY(100%);
+                }
+            }
+
+            &__producto {
+                cursor: pointer;
+                width: 330px;
+                height: 300px;
+                &:hover {
+                    box-shadow: 0px 4px 40px rgb(0 0 0 / 50%);
+                    -webkit-transition: box-shadow 0.2s ease-in;
+                }
+                img {
+                    // display: block;
+                    width: 330px;
+                    height: 300px;
+                    // background-position: 50% 50%;
+                    // background-size: cover;
+                }
+            }
+        }
+    }
+}

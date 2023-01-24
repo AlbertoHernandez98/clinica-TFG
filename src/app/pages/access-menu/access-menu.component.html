@@ -1,44 +1,46 @@
-<div class="card-container">
-    <!-- <img [src]="clinicaLogo" class="image-logo" /> -->
-    <div class="card-container__logo">
-        <p class="card-container__logo__text">{{'ACCESS_MENU.CLINICA' | translate }}</p>
-    </div>
-    <article class="grid">
-      <section class="card-child a"
-      routerLink="/reserva-cita"
-      >
-        <figure>
-          <!-- <img [src]="identitiesIcon" class="card-image" /> -->
-          <figcaption class="card-text">
-            {{ 'ACCESS_MENU.RESERVA' | translate }}
-          </figcaption>
-        </figure>
-      </section>
-      <section routerLink="/serviciosMenu" class="card-child b">
-        <figure>
-          <!-- <img [src]="productsIcon" class="card-image" /> -->
-          <figcaption class="card-text">
-            {{ 'ACCESS_MENU.SERVICIOS' | translate }}
-          </figcaption>
-        </figure>
-      </section>
-      <section routerLink="/personal" class="card-child c">
-        <figure>
-          <!-- <img [src]="applicationsIcon" class="card-image" /> -->
-          <figcaption class="card-text">
-            {{ 'ACCESS_MENU.PERSONAL' | translate }}
-          </figcaption>
-        </figure>
-      </section>
-      <p class="text d">
-        {{ 'ACCESS_MENU.IDENTITIES_TEXT' | translate }}
-      </p>
-      <p class="text e">
-        {{ 'ACCESS_MENU.PRODUCTS_TEXT' | translate }}
-      </p>
-      <p class="text f">
-        {{ 'ACCESS_MENU.APPLICATIONS_TEXT' | translate }}
-      </p>
-    </article>
-  </div>
-  
+<img class="img-main" src="../../../assets/img/6d9901ed-2d16-414c-8aa6-beaeca1dadfc.jpg" alt="">
+
+<div class="contenido-main">
+  <p class="contenido-main__label">
+    "En la Clínica Podológica Lara Suárez Díaz se ubica en Riba-Roja del Túria, donde puedes
+    encontrar todos los servicios podológicos a su disposición. Ponte en contacto con nosotros
+    y encontraremos una solución a tus pies. ¿A qué estas esperando?"
+  </p>
+</div>
+
+<article class="grid">
+  <section class="card-child a" routerLink="/clinica">
+    <figure>
+      <figcaption class="card-text">
+        <!-- {{ 'ACCESS_MENU.RESERVA' | translate }} -->
+        Nuestra clínica podológica
+      </figcaption>
+    </figure>
+  </section>
+  <section routerLink="/serviciosMenu" class="card-child b">
+    <figure>
+      <!-- <img [src]="productsIcon" class="card-image" /> -->
+      <figcaption class="card-text">
+        <!-- {{ 'ACCESS_MENU.SERVICIOS' | translate }} -->
+        Nuestros servicios
+      </figcaption>
+    </figure>
+  </section>
+  <section routerLink="/personal" class="card-child c">
+    <figure>
+      <figcaption class="card-text">
+        <!-- {{ 'ACCESS_MENU.PERSONAL' | translate }} -->
+        Nuestro personal
+      </figcaption>
+    </figure>
+  </section>
+  <p class="text d">
+    {{ 'ACCESS_MENU.IDENTITIES_TEXT' | translate }}
+  </p>
+  <p class="text e">
+    {{ 'ACCESS_MENU.PRODUCTS_TEXT' | translate }}
+  </p>
+  <p class="text f">
+    {{ 'ACCESS_MENU.APPLICATIONS_TEXT' | translate }}
+  </p>
+</article>

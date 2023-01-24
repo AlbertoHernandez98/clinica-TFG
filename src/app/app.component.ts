@@ -75,21 +75,12 @@ export class AppComponent implements OnInit {
   }
 
   lisentToRoute() {
-    return this.router.url === '/' || this.router.url.includes('login');
-  }
-
-  showProductsMenu() {
-    return this.router.url.includes('products');
-  }
-
-  showApplicationsMenu() {
-    return this.router.url.includes('applications/');
+    return this.router.url === '/' || this.router.url.includes('access-menu');
   }
 
   showBreadCum() {
     return (
       this.router.url !== '/' &&
-      !this.router.url.includes('login') &&
       !this.router.url.includes('access-menu')
     );
   }

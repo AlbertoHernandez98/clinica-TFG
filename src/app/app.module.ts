@@ -18,6 +18,8 @@ import { PersonalModule } from './pages/personal/personal.module';
 import { ContactoModule } from './pages/contacto/contacto.module';
 import { PerfilModule } from './pages/perfil/perfil.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ClinicaComponent } from './pages/clinica/clinica.component';
+import { ClinicaModule } from './pages/clinica/clinica.module';
 
 
 export function httpLoaderFactory(httpClient: HttpClient) {
@@ -40,6 +42,7 @@ export function httpLoaderFactory(httpClient: HttpClient) {
     PersonalModule,
     ContactoModule,
     PerfilModule,
+    ClinicaModule,
     TranslateModule.forRoot({
       extend: true,
       defaultLanguage: 'es',

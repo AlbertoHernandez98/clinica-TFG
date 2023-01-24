@@ -1,4 +1,4 @@
-@import "src/assets/theme/_variables.scss";
+@import '/src/assets/theme/_variables';
 
 .content {
     padding-bottom: 4em;
@@ -59,8 +59,6 @@
 .img > img {
     max-width: 560px;
     max-height: 315px;
-
-    animation: mover 10s linear infinite;
 
 
     @keyframes mover {

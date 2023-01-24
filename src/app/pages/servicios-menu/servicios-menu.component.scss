@@ -88,14 +88,17 @@
     flex-wrap: wrap;
     align-items: flex-start;
     align-content: flex-start;
-    margin-left: 6em;
     &__servicio {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        justify-content: center;
+        gap: 100px;
+
         &__item {
             -webkit-animation: mover 2s;
             animation: mover 2s;
+            display: grid;
+            justify-items: center;
 
             @-webkit-keyframes mover {
                 0% {
@@ -119,22 +122,45 @@
                 margin-top: 30px;
                 margin-bottom: 50px;
                 font-size: 20px;
+
+                &__a {
+                    display: inline-block;
+                    position: relative;
+                    color: #333;
+                    text-decoration: none;
+                    transition: all 0.5s ease;
+                    transform-style: preserve-3d;
+                }
+                &__a:after {
+                    content: "Ver más...";
+                    position: absolute;
+                    display: flex;
+                    justify-content: center;
+                    top: -100%;
+                    left: 0px;
+                    width: 100%;
+                    background: #ccc;
+                    transform-origin: left bottom;
+                    transform: rotateX(90deg);
+                }
+                &__a:hover {
+                    transform-origin: center bottom;
+                    transform: rotateX(-90deg) translateY(100%);
+                }
             }
-            &__a {
-                height: 380px;
-                width: 300px;
-            }
+
             &__producto {
                 cursor: pointer;
-                height: 380px;
+                width: 330px;
+                height: 300px;
                 &:hover {
                     box-shadow: 0px 4px 40px rgb(0 0 0 / 50%);
                     -webkit-transition: box-shadow 0.2s ease-in;
                 }
                 img {
                     // display: block;
-                    width: 300px;
-                    height: 380px;
+                    width: 330px;
+                    height: 300px;
                     // background-position: 50% 50%;
                     // background-size: cover;
                 }
