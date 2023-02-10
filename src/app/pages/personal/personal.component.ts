@@ -53,4 +53,6 @@ export class PersonalComponent implements OnInit {
     };
     this.appService.setBreadcumInfo(appInfo, 'appInfo');
   }
+
+
 }

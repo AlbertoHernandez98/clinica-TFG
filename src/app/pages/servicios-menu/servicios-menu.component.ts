@@ -10,14 +10,14 @@ import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface'
 })
 export class ServiciosMenuComponent implements OnInit {
 
-  quiroBool= false;
-  bioBool= false;
-  ungBool= false;
-  oseaBool= false;
-  pieBool= false;
-  infBool= false;
-  gerBool= false;
-  domBool= false;
+  quiroBool = true;
+  bioBool = false;
+  ungBool = false;
+  oseaBool = false;
+  pieBool = false;
+  infBool = false;
+  gerBool = false;
+  domBool = false;
 
   constructor(
     private translate: TranslateService,
@@ -27,6 +27,8 @@ export class ServiciosMenuComponent implements OnInit {
   ngOnInit() {
     this.getTranslate();
   }
+
+ 
 
 
 
@@ -60,90 +62,90 @@ export class ServiciosMenuComponent implements OnInit {
 
   quiro() {
     this.quiroBool = true;
-    this.bioBool= false;
-    this.ungBool= false;
-    this.oseaBool= false;
-    this.pieBool= false;
-    this.infBool= false;
-    this.gerBool= false;
-    this.domBool= false;
+    this.bioBool = false;
+    this.ungBool = false;
+    this.oseaBool = false;
+    this.pieBool = false;
+    this.infBool = false;
+    this.gerBool = false;
+    this.domBool = false;
   }
 
   bio() {
     this.quiroBool = false;
-    this.bioBool= true;
-    this.ungBool= false;
-    this.oseaBool= false;
-    this.pieBool= false;
-    this.infBool= false;
-    this.gerBool= false;
-    this.domBool= false;
+    this.bioBool = true;
+    this.ungBool = false;
+    this.oseaBool = false;
+    this.pieBool = false;
+    this.infBool = false;
+    this.gerBool = false;
+    this.domBool = false;
   }
-  
+
   ung() {
     this.quiroBool = false;
-    this.bioBool= false;
-    this.ungBool= true;
-    this.oseaBool= false;
-    this.pieBool= false;
-    this.infBool= false;
-    this.gerBool= false;
-    this.domBool= false;
+    this.bioBool = false;
+    this.ungBool = true;
+    this.oseaBool = false;
+    this.pieBool = false;
+    this.infBool = false;
+    this.gerBool = false;
+    this.domBool = false;
   }
 
   osea() {
     this.quiroBool = false;
-    this.bioBool= false;
-    this.ungBool= false;
-    this.oseaBool= true;
-    this.pieBool= false;
-    this.infBool= false;
-    this.gerBool= false;
-    this.domBool= false;
+    this.bioBool = false;
+    this.ungBool = false;
+    this.oseaBool = true;
+    this.pieBool = false;
+    this.infBool = false;
+    this.gerBool = false;
+    this.domBool = false;
   }
 
   pie() {
     this.quiroBool = false;
-    this.bioBool= false;
-    this.ungBool= false;
-    this.oseaBool= false;
-    this.pieBool= true;
-    this.infBool= false;
-    this.gerBool= false;
-    this.domBool= false;
+    this.bioBool = false;
+    this.ungBool = false;
+    this.oseaBool = false;
+    this.pieBool = true;
+    this.infBool = false;
+    this.gerBool = false;
+    this.domBool = false;
   }
 
   inf() {
     this.quiroBool = false;
-    this.bioBool= false;
-    this.ungBool= false;
-    this.oseaBool= false;
-    this.pieBool= false;
-    this.infBool= true;
-    this.gerBool= false;
-    this.domBool= false;
+    this.bioBool = false;
+    this.ungBool = false;
+    this.oseaBool = false;
+    this.pieBool = false;
+    this.infBool = true;
+    this.gerBool = false;
+    this.domBool = false;
   }
 
-  ger(){
+  ger() {
     this.quiroBool = false;
-    this.bioBool= false;
-    this.ungBool= false;
-    this.oseaBool= false;
-    this.pieBool= false;
-    this.infBool= false;
-    this.gerBool= true;
-    this.domBool= false;
+    this.bioBool = false;
+    this.ungBool = false;
+    this.oseaBool = false;
+    this.pieBool = false;
+    this.infBool = false;
+    this.gerBool = true;
+    this.domBool = false;
   }
 
   serv() {
     this.quiroBool = false;
-    this.bioBool= false;
-    this.ungBool= false;
-    this.oseaBool= false;
-    this.pieBool= false;
-    this.infBool= false;
-    this.gerBool= false;
-    this.domBool= true;
+    this.bioBool = false;
+    this.ungBool = false;
+    this.oseaBool = false;
+    this.pieBool = false;
+    this.infBool = false;
+    this.gerBool = false;
+    this.domBool = true;
   }
 
 }

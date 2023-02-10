@@ -1,26 +1,27 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AccessMenuComponent } from './pages/access-menu/access-menu.component';
 
 const routes: Routes = [
+
+  {
+    path: '',
+    component: AccessMenuComponent
+  },
   {
     path: 'access-menu',
     loadChildren: () =>
-      import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
+    import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
   },
   {
-    path: 'login',
+    path: 'servicios',
     loadChildren: () =>
-      import('./pages/login/login.module').then((m) => m.LoginModule)
+    import('./pages/reserva-cita/servicios/servicios.module').then((m) => m.ServiciosModule)
   },
   {
     path: 'reserva-cita',
     loadChildren: () =>
       import('./pages/reserva-cita/reserva-cita.module').then((m) => m.ReservaCitaModule)
-  },
-  {
-    path: 'servicios',
-    loadChildren: () =>
-      import('./pages/reserva-cita/servicios/servicios.module').then((m) => m.ServiciosModule)
   },
   {
     path: 'serviciosMenu',
@@ -31,11 +32,6 @@ const routes: Routes = [
     path: 'personal',
     loadChildren: () =>
       import('./pages/personal/personal.module').then((m) => m.PersonalModule)
-  },
-  {
-    path: 'personalA',
-    loadChildren: () =>
-      import('./pages/personal/personal-a/personalA.module').then((m) => m.PersonalAModule)
   },
   {
     path: 'disponibilidad',

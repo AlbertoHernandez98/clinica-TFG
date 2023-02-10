@@ -56,7 +56,7 @@
                 cursor: pointer;
                 color: rgba(162, 95, 75, 0.6);
             }
-            &__a:active {
+            &__a:hover {
                 margin-left: 5px;
                 border-color: rgba(162, 95, 75, 0.4);
                 opacity: 1;
@@ -88,6 +88,12 @@
     flex-wrap: wrap;
     align-items: flex-start;
     align-content: flex-start;
+
+    &__wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 100px;
+    }
     &__servicio {
         display: grid;
         grid-template-columns: 50% 50%;
@@ -99,23 +105,6 @@
             animation: mover 2s;
             display: grid;
             justify-items: center;
-
-            @-webkit-keyframes mover {
-                0% {
-                    transform: translateY(0);
-                }
-                100% {
-                    transform: translateY(-20px);
-                }
-            }
-            @keyframes mover {
-                0% {
-                    transform: translateY(0);
-                }
-                100% {
-                    transform: translateY(-20px);
-                }
-            }
             &__text {
                 display: flex;
                 justify-content: center;

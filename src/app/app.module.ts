@@ -7,7 +7,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginModule } from './pages/login/login.module';
 import { SharedModule } from './shared/shared.module';
 import { AccessMenuModule } from './pages/access-menu/access-menu.module';
 import { ReservaCitaModule } from './pages/reserva-cita/reserva-cita.module';
@@ -30,7 +29,6 @@ export function httpLoaderFactory(httpClient: HttpClient) {
   declarations: [AppComponent],
   imports: [
     SharedModule,
-    LoginModule,
     BrowserModule,
     IonicModule,
     ReservaCitaModule,

@@ -21,17 +21,7 @@ export class AppComponent implements OnInit {
   isLogged = false;
   showSpiner = false;
   listaBreadcum: any = [];
-  appInfo: AppInfo = {
-    breadcum: [
-      {
-        active: false,
-        name: '',
-        route: ''
-      }
-    ],
-    isLogged: false,
-    idMenuActive: ''
-  };
+
   title = 'configurador-pwa-app';
   idMenu = '';
   constructor(
@@ -40,27 +30,25 @@ export class AppComponent implements OnInit {
     private cd: ChangeDetectorRef,
     private snackBar: MatSnackBar
   ) {
-    this.lisentAppState();
+    // this.lisentAppState();
     this.lisentToToastMsj();
     this.lisentToSpiner();
   }
 
   ngOnInit(): void {
-    this.appInfo = this.appInfo
-      ? this.appInfo
-      : this.appState.getState('appInfo');
+
   }
 
-  lisentAppState() {
-    this.appState.getBreadcumInfo().subscribe((result) => {
-      this.appInfo = result;
-      this.listaBreadcum = [...this.appInfo.breadcum];
-      if (this.appInfo.idMenuActive) {
-        this.idMenu = this.appInfo.idMenuActive;
-      }
-      this.cd.detectChanges();
-    });
-  }
+  // lisentAppState() {
+  //   this.appState.getBreadcumInfo().subscribe((result) => {
+  //     this.appInfo = result;
+  //     this.listaBreadcum = [...this.appInfo.breadcum];
+  //     if (this.appInfo.idMenuActive) {
+  //       this.idMenu = this.appInfo.idMenuActive;
+  //     }
+  //     this.cd.detectChanges();
+  //   });
+  // }
 
   lisentToToastMsj() {
     this.appState.getSnackbarMsj().subscribe((res: Toast) => {

@@ -1,13 +1,19 @@
-@import '/src/assets/theme/_variables';
+@import "/src/assets/theme/_variables";
 
 .content {
     padding-bottom: 4em;
     display: grid;
     gap: $gap-form;
+    &__boton-atras {
+        padding: 3em 5em 0;
+        letter-spacing: 1px;
+        &__boton:hover {
+            cursor: pointer;
+        }
+    }
     &__wrapper {
         display: flex;
         justify-content: center;
-        margin-top: 50px;
         padding-top: $gap-form;
 
         &__title {
@@ -59,7 +65,6 @@
 .img > img {
     max-width: 560px;
     max-height: 315px;
-
 
     @keyframes mover {
         0% {

@@ -1,5 +1,35 @@
 @import '/src/assets/theme/_variables';
 
+.wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 50px;
+    padding-top: $gap-form;
+
+    &__title {
+        margin-right: 15px;
+        margin-left: 15px;
+        position: static;
+        display: block;
+        opacity: 0.6;
+        line-height: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        font-size: 16px;
+        display: flex;
+        color: $color-primary;
+        font-size: 26px;
+    }
+
+    &__deco-line {
+        display: inline-block;
+        width: 30px;
+        height: 1.5px;
+        background-color: #ececed;
+        align-self: center;
+    }
+}
+
 .content {
     position: relative;
     display: block;
@@ -78,5 +108,8 @@
     display: flex;
     max-width: 40px;
     gap: $gap-form;
+    img {
+        cursor: pointer;
+    }
 }
 

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
@@ -12,6 +13,8 @@ export class VerrugaComponent implements OnInit {
   constructor(
     private translate: TranslateService,
     private appService: AppStateService,
+    private router: Router
+
   ) { }
 
   ngOnInit() {
@@ -51,5 +54,9 @@ export class VerrugaComponent implements OnInit {
       idMenuActive: '2'
     };
     this.appService.setBreadcumInfo(appInfo, 'appInfo');
+  }
+
+  volver() {
+    this.router.navigateByUrl('/serviciosMenu')
   }
 }

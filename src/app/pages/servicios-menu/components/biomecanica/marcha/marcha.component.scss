@@ -4,6 +4,13 @@
     padding-bottom: 4em;
     display: grid;
     gap: $gap-form;
+    &__boton-atras {
+        padding: 3em 5em 0;
+        letter-spacing: 1px;
+        &__boton:hover {
+            cursor: pointer;
+        }
+    }
     &__wrapper {
         display: flex;
         justify-content: center;
