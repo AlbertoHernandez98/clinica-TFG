@@ -8,11 +8,12 @@ const routes: Routes = [
     path: '',
     component: AccessMenuComponent
   },
+  
   {
     path: 'access-menu',
     loadChildren: () =>
     import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
-  },
+  }, 
   {
     path: 'servicios',
     loadChildren: () =>
