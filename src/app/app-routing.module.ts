@@ -2,6 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AccessMenuComponent } from './pages/access-menu/access-menu.component';
 
+
+// HOLA PACO OJALA HABER HECHO ALGO PERO T LO JURO QUE ESTOY CON LAS BASES DE DATOS Y TODO EL ROLLO 
+// Y COGIDO PUES POCO SABES PERO YO ESTOY HACIENDO COSAS TE QUIEROPACO NO ME JUZGUES
 const routes: Routes = [
 
   {
