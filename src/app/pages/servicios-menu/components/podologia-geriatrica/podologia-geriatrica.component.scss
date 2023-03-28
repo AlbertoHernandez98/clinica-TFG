@@ -1,0 +1,77 @@
+@import "/src/assets/theme/_variables";
+
+.content {
+    padding-bottom: 4em;
+    display: grid;
+    gap: $gap-form;
+    &__boton-atras {
+        padding: 3em 5em 0;
+        letter-spacing: 1px;
+        &__boton:hover {
+            cursor: pointer;
+        }
+    }
+    &__wrapper {
+        display: flex;
+        justify-content: center;
+        padding-top: $gap-form;
+
+        &__title {
+            margin-right: 15px;
+            margin-left: 15px;
+            position: static;
+            display: block;
+            opacity: 0.6;
+            line-height: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 16px;
+            display: flex;
+            color: $color-primary;
+            font-size: 26px;
+        }
+
+        &__deco-line {
+            display: inline-block;
+            width: 30px;
+            height: 1.5px;
+            background-color: #ececed;
+            align-self: center;
+        }
+    }
+
+    &__descripcion {
+        display: flex;
+        padding: $gap-form 8rem;
+        justify-content: center;
+        color: $color-dark-gray;
+        text-align: justify;
+        text-justify: inter-word;
+    }
+}
+
+.img {
+    margin-top: 40px;
+    margin-right: 5px;
+    margin-left: 5px;
+    padding: 10px 16px;
+    border: 2px solid #ececed;
+    opacity: 1;
+    cursor: pointer;
+    color: rgba(162, 95, 75, 0.6);
+    justify-self: center;
+}
+
+.img > img {
+    max-width: 560px;
+    max-height: 315px;
+
+    @keyframes mover {
+        0% {
+            transform: translateY(-20px);
+        }
+        100% {
+            transform: translateY(-20px);
+        }
+    }
+}

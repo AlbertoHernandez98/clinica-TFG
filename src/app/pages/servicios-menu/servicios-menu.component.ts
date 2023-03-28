@@ -28,8 +28,6 @@ export class ServiciosMenuComponent implements OnInit {
     this.getTranslate();
   }
 
- 
-
 
 
   getTranslate() {
@@ -69,6 +67,44 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = false;
     this.gerBool = false;
     this.domBool = false;
+
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+
+    if (bio !== null) {
+      bio.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (osea !== null) {
+      osea.style.color = '#a25f4b99';
+    }
+    if (pie !== null) {
+      pie.style.color = '#a25f4b99';
+    }
+    if (inf !== null) {
+      inf.style.color = '#a25f4b99';
+    }
+    if (ger !== null) {
+      ger.style.color = '#a25f4b99';
+    }
+    if (dom !== null) {
+      dom.style.color = '#a25f4b99';
+    }
+
+
+    if (quiro !== null) {
+      quiro.style.color = '#A25F4B';
+    }
   }
 
   bio() {
@@ -80,6 +116,45 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = false;
     this.gerBool = false;
     this.domBool = false;
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+    
+    if (quiro !== null) {
+      quiro.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (osea !== null) {
+      osea.style.color = '#a25f4b99';
+    }
+    if (pie !== null) {
+      pie.style.color = '#a25f4b99';
+    }
+    if (inf !== null) {
+      inf.style.color = '#a25f4b99';
+    }
+    if (ger !== null) {
+      ger.style.color = '#a25f4b99';
+    }
+    if (dom !== null) {
+      dom.style.color = '#a25f4b99';
+    }
+
+
+
+
+    if (bio !== null) {
+      bio.style.color = '#A25F4B';
+    }
   }
 
   ung() {
@@ -102,6 +177,45 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = false;
     this.gerBool = false;
     this.domBool = false;
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+    
+    if (quiro !== null) {
+      quiro.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (bio !== null) {
+      bio.style.color = '#a25f4b99';
+    }
+    if (pie !== null) {
+      pie.style.color = '#a25f4b99';
+    }
+    if (inf !== null) {
+      inf.style.color = '#a25f4b99';
+    }
+    if (ger !== null) {
+      ger.style.color = '#a25f4b99';
+    }
+    if (dom !== null) {
+      dom.style.color = '#a25f4b99';
+    }
+
+
+
+
+    if (osea !== null) {
+      osea.style.color = '#A25F4B';
+    }
   }
 
   pie() {
@@ -113,6 +227,46 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = false;
     this.gerBool = false;
     this.domBool = false;
+
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+    
+    if (quiro !== null) {
+      quiro.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (bio !== null) {
+      bio.style.color = '#a25f4b99';
+    }
+    if (osea !== null) {
+      osea.style.color = '#a25f4b99';
+    }
+    if (inf !== null) {
+      inf.style.color = '#a25f4b99';
+    }
+    if (ger !== null) {
+      ger.style.color = '#a25f4b99';
+    }
+    if (dom !== null) {
+      dom.style.color = '#a25f4b99';
+    }
+
+
+
+
+    if (pie !== null) {
+      pie.style.color = '#A25F4B';
+    }
   }
 
   inf() {
@@ -124,6 +278,46 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = true;
     this.gerBool = false;
     this.domBool = false;
+
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+    
+    if (quiro !== null) {
+      quiro.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (bio !== null) {
+      bio.style.color = '#a25f4b99';
+    }
+    if (pie !== null) {
+      pie.style.color = '#a25f4b99';
+    }
+    if (osea !== null) {
+      osea.style.color = '#a25f4b99';
+    }
+    if (ger !== null) {
+      ger.style.color = '#a25f4b99';
+    }
+    if (dom !== null) {
+      dom.style.color = '#a25f4b99';
+    }
+
+
+
+
+    if (inf !== null) {
+      inf.style.color = '#A25F4B';
+    }
   }
 
   ger() {
@@ -135,6 +329,46 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = false;
     this.gerBool = true;
     this.domBool = false;
+
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+    
+    if (quiro !== null) {
+      quiro.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (bio !== null) {
+      bio.style.color = '#a25f4b99';
+    }
+    if (pie !== null) {
+      pie.style.color = '#a25f4b99';
+    }
+    if (inf !== null) {
+      inf.style.color = '#a25f4b99';
+    }
+    if (osea !== null) {
+      osea.style.color = '#a25f4b99';
+    }
+    if (dom !== null) {
+      dom.style.color = '#a25f4b99';
+    }
+
+
+
+
+    if (ger !== null) {
+      ger.style.color = '#A25F4B';
+    }
   }
 
   serv() {
@@ -146,6 +380,46 @@ export class ServiciosMenuComponent implements OnInit {
     this.infBool = false;
     this.gerBool = false;
     this.domBool = true;
+
+
+    var quiro = document.getElementById('quiro');
+    var bio = document.getElementById('bio');
+    var ung = document.getElementById('ung');
+    var osea = document.getElementById('osea');
+    var pie = document.getElementById('pie');
+    var inf = document.getElementById('inf');
+    var ger = document.getElementById('ger');
+    var dom = document.getElementById('dom');
+
+    
+    if (quiro !== null) {
+      quiro.style.color = '#a25f4b99';
+    }
+    if (ung !== null) {
+      ung.style.color = '#a25f4b99';
+    }
+    if (bio !== null) {
+      bio.style.color = '#a25f4b99';
+    }
+    if (pie !== null) {
+      pie.style.color = '#a25f4b99';
+    }
+    if (inf !== null) {
+      inf.style.color = '#a25f4b99';
+    }
+    if (ger !== null) {
+      ger.style.color = '#a25f4b99';
+    }
+    if (osea !== null) {
+      osea.style.color = '#a25f4b99';
+    }
+
+
+
+
+    if (dom !== null) {
+      dom.style.color = '#A25F4B';
+    }
   }
 
 }

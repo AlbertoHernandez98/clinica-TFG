@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
 import { LogoDataService } from 'src/app/providers/mocked-services/logo-data.service';
 import { DragAndDropComponent, DragDropOutput } from '../popups/drag-and-drop/drag-and-drop.component';
 
@@ -14,6 +15,7 @@ export class CardImgComponent implements OnInit {
   @Input() dimensiones: string = '';
 
   @Output() messageEmitter: EventEmitter<string> = new EventEmitter();
+  @Output() ImagenSeleccionada = new Subject();
 
   imagenSelec = null; // Almacena datos de la imagen seleccionada
 
@@ -52,6 +54,7 @@ export class CardImgComponent implements OnInit {
     dialog.afterClosed().subscribe((res: DragDropOutput) => {
       if (!res) {
         // Se ha pulsado el botón de cerrar del modal
+        this.getFileName();
         return;
       }
       if (res?.btnDelete) {

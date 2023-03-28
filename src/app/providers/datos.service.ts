@@ -1,4 +1,4 @@
-import { Usuario } from "../providers/usuario";
+// import { Usuario } from "../providers/usuario";
 import { Injectable } from "@angular/core";
 
 @Injectable()
@@ -29,23 +29,23 @@ export class DatosProvider {
   private storage = window.localStorage;
 
   constructor(
-    private usuario: Usuario
+    // private usuario: Usuario
   ) {
   }
 
-  setUsuario(usuario: any) {
-    if (usuario.controls) {
-      this.usuario.nombre = usuario.controls.nombre.value;
-      this.usuario.apellidos = usuario.controls.apellidos.value;
-      this.usuario.telefono = usuario.controls.telefono.value;
-      if (usuario.controls.email.value) {
-        if (this.emailValida(usuario.controls.email.value))
-          this.usuario.email = usuario.controls.email.value;
-        else this.usuario.email = "";
-      }
-      this.storage.setItem("user", JSON.stringify(this.usuario));
-    } else this.storage.setItem("user", JSON.stringify(usuario));
-  }
+  // setUsuario(usuario: any) {
+  //   if (usuario.controls) {
+  //     this.usuario.nombre = usuario.controls.nombre.value;
+  //     this.usuario.apellidos = usuario.controls.apellidos.value;
+  //     this.usuario.telefono = usuario.controls.telefono.value;
+  //     if (usuario.controls.email.value) {
+  //       if (this.emailValida(usuario.controls.email.value))
+  //         this.usuario.email = usuario.controls.email.value;
+  //       else this.usuario.email = "";
+  //     }
+  //     this.storage.setItem("user", JSON.stringify(this.usuario));
+  //   } else this.storage.setItem("user", JSON.stringify(usuario));
+  // }
 
   /*Validacion mail */
   emailValida(email: any) {
@@ -58,15 +58,15 @@ export class DatosProvider {
     }
   }
 
-  getUsuario() {
-    if (this.storage.getItem("user") != undefined) {
-    //   this.usuario = JSON.parse(this.storage.getItem("user"));
-      return this.usuario;
-    } else return this.usuario;
-  }
+  // getUsuario() {
+  //   if (this.storage.getItem("user") != undefined) {
+  //   //   this.usuario = JSON.parse(this.storage.getItem("user"));
+  //     return this.usuario;
+  //   } else return this.usuario;
+  // }
 
 
-  removeData() {
-    this.usuario = new Usuario();
-  }
+  // removeData() {
+  //   this.usuario = new Usuario();
+  // }
 }

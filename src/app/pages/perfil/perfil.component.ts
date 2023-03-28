@@ -24,14 +24,45 @@ export class PerfilComponent implements OnInit {
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
     private translate: TranslateService,
+    private json: perfilUsuario
 
   ) { }
 
   ngOnInit(): void {
+    this.rellenarFormulario();
+    console.log(this.json);
+
   }
 
   getTouchedAndError(key: string) {
     return this.form.get(key)?.touched && this.form.get(key)?.errors?.required;
+  }
+
+  rellenarFormulario() {
+    this.form.get('usuario')?.setValue(this.json.jsonUsuarios.usuario);
+    this.form.get('contraseña')?.setValue(this.json.jsonUsuarios.contraseña);
+    this.form.get('telefono')?.setValue(this.json.jsonUsuarios.telefono);
+  }
+
+  modificarUsuario() {
+    if (this.form.valid) {
+      this.json.jsonUsuarios.usuario = this.form.get('usuario')?.value;
+      this.json.jsonUsuarios.contraseña = this.form.get('contraseña')?.value;
+      this.json.jsonUsuarios.email = this.form.get('email')?.value;
+      this.json.jsonUsuarios.telefono = this.form.get('telefono')?.value;
+      this.json.jsonUsuarios.domicilio = this.form.get('domicilio')?.value;
+      console.log(this.json);
+      this.matDialog.open(ErrorSuccessComponent, {
+        data: {
+          icon: '../../../../assets/icons/svg/icon-save.svg',
+          text: 'Formulario enviado con éxito',
+          buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL')
+        }
+      });
+    }
+
+    // this.json.jsonUsuarios.img = this.form.get('img')?.value;
+
   }
 
   modificarPerfil(): void {
@@ -43,7 +74,7 @@ export class PerfilComponent implements OnInit {
 
     const json = new perfilUsuario().jsonUsuarios;
     json.usuario = this.form.get('usuario')?.value;
-    json.constraseña = this.form.get('contraseña')?.value;
+    json.contraseña = this.form.get('contraseña')?.value;
     json.email = this.form.get('email')?.value;
     json.domicilio = this.form.get('domicilio')?.value;
     json.telefono = this.form.get('telefono')?.value;

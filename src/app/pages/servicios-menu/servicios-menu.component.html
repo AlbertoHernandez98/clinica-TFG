@@ -7,35 +7,35 @@
     <span id="buttons" class="services-wrap">
         <div role="list" class="services-wrap__list">
             <div role="listitem" class="services-wrap__list__item">
-                <a (click)="quiro()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.QUIROPODIA' | translate
-                    }}</a>
+                <label id="quiro" (click)="quiro()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.QUIROPODIA' | translate
+                    }}</label>
             </div>
             <div role="listitem" class="services-wrap__list__item">
-                <label (click)="bio()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.BIOMECANICA' | translate
+                <label id="bio" (click)="bio()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.BIOMECANICA' | translate
                     }}</label>
             </div>
             <div role="listitem" routerLink="/cirugia-ungeal" class="services-wrap__list__item">
-                <label (click)="ung()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.CIRUGIA_UNGEAL' |
+                <label id="ung" (click)="ung()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.CIRUGIA_UNGEAL' |
                     translate }}</label>
             </div>
-            <div role="listitem" class="services-wrap__list__item">
-                <label (click)="osea()" class="services-wrap__list__item__a">{{'SERVICES_MENU.CIRUGIA_OSEA' | translate
+            <div role="listitem" routerLink="/cirugia-osea" class="services-wrap__list__item">
+                <label id="osea" (click)="osea()" class="services-wrap__list__item__a">{{'SERVICES_MENU.CIRUGIA_OSEA' | translate
                     }}</label>
             </div>
-            <div role="listitem" class="services-wrap__list__item">
-                <label (click)="inf()" class="services-wrap__list__item__a">{{'SERVICES_MENU.PIE_DIABETICO' | translate
+            <div role="listitem" routerLink="/pie-diabetico" class="services-wrap__list__item">
+                <label id="pie" (click)="pie()" class="services-wrap__list__item__a">{{'SERVICES_MENU.PIE_DIABETICO' | translate
                     }}</label>
             </div>
-            <div role="listitem" class="services-wrap__list__item">
-                <label (click)="ger()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_INFANTIL' |
+            <div role="listitem" routerLink="/podologia-infantil" class="services-wrap__list__item">
+                <label id="inf" (click)="inf()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_INFANTIL' |
                     translate }}</label>
             </div>
-            <div role="listitem" class="services-wrap__list__item">
-                <label (click)="serv()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_GERIATRICA' |
+            <div role="listitem" routerLink="/podologia-geriatrica" class="services-wrap__list__item">
+                <label id="ger" (click)="ger()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_GERIATRICA' |
                     translate }}</label>
             </div>
-            <div role="listitem" class="services-wrap__list__item">
-                <label class="services-wrap__list__item__a">{{ 'SERVICES_MENU.SERVICIO_DOM' | translate }}</label>
+            <div role="listitem" routerLink="/servicio-domicilio" class="services-wrap__list__item">
+                <label id="dom" (click)="serv()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.SERVICIO_DOM' | translate }}</label>
             </div>
         </div>
     </span>

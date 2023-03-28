@@ -3,8 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AccessMenuComponent } from './pages/access-menu/access-menu.component';
 
 
-// HOLA PACO OJALA HABER HECHO ALGO PERO T LO JURO QUE ESTOY CON LAS BASES DE DATOS Y TODO EL ROLLO 
-// Y COGIDO PUES POCO SABES PERO YO ESTOY HACIENDO COSAS TE QUIEROPACO NO ME JUZGUES
 const routes: Routes = [
 
   {
@@ -14,8 +12,8 @@ const routes: Routes = [
   
   {
     path: 'access-menu',
-    loadChildren: () =>
-    import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
+    component: AccessMenuComponent
+
   }, 
   {
     path: 'servicios',
@@ -56,6 +54,11 @@ const routes: Routes = [
     path: 'clinica',
     loadChildren: () =>
       import('./pages/clinica/clinica.module').then((m) => m.ClinicaModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () =>
+      import('./pages/login/login.module').then((m) => m.LoginModule)
   },
 ]
 

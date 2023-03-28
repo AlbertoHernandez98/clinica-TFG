@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
-import { Usuario } from 'src/app/providers/usuario';
 import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
 
 
@@ -32,7 +31,6 @@ export class ContactoComponent implements OnInit {
   constructor(
     public router: Router,
     public formBuilder: FormBuilder,
-    public usuario: Usuario,
     private translate: TranslateService,
     private appService: AppStateService,
     private matDialog: MatDialog,

@@ -21,6 +21,11 @@ import { FascitisComponent } from './components/biomecanica/fascitis/fascitis.co
 import { EspolonComponent } from './components/biomecanica/espolon/espolon.component';
 import { InfiltracionComponent } from './components/biomecanica/infiltracion/infiltracion.component';
 import { CirugiaUngealComponent } from './components/cirugia-ungeal/cirugia-ungeal.component';
+import { PieDiabeticoComponent } from './components/pie-diabetico/pie-diabetico.component';
+import { CirugiaOseaComponent } from './components/cirugia-osea/cirugia-osea.component';
+import { PodologiaInfantilComponent } from './components/podologia-infantil/podologia-infantil.component';
+import { PodologiaGeriatricaComponent } from './components/podologia-geriatrica/podologia-geriatrica.component';
+import { ServicioDomicilioComponent } from './components/servicio-domicilio/servicio-domicilio.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -44,7 +49,12 @@ export function httpLoaderFactory(httpClient: HttpClient) {
     FascitisComponent,
     EspolonComponent,
     InfiltracionComponent,
-    CirugiaUngealComponent
+    CirugiaUngealComponent,
+    PieDiabeticoComponent,
+    CirugiaOseaComponent,
+    PodologiaInfantilComponent,
+    PodologiaGeriatricaComponent,
+    ServicioDomicilioComponent
   ],
   imports: [
     ReactiveFormsModule,

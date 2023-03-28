@@ -29,6 +29,9 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         deps: [HttpClient]
       }
     })
-  ]
+  ],
+  exports: [
+  AccessMenuComponent
+]
 })
 export class AccessMenuModule {}

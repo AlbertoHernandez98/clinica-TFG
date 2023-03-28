@@ -10,15 +10,15 @@ import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { AccessMenuModule } from './pages/access-menu/access-menu.module';
 import { ReservaCitaModule } from './pages/reserva-cita/reserva-cita.module';
-import { Usuario } from './providers/usuario';
 import { ServiciosModule } from './pages/reserva-cita/servicios/servicios.module';
 import { ServiciosMenuModule } from './pages/servicios-menu/servicios-menu.module';
 import { PersonalModule } from './pages/personal/personal.module';
 import { ContactoModule } from './pages/contacto/contacto.module';
 import { PerfilModule } from './pages/perfil/perfil.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ClinicaComponent } from './pages/clinica/clinica.component';
 import { ClinicaModule } from './pages/clinica/clinica.module';
+import { RouterModule } from '@angular/router';
+import { perfilUsuario } from './JSON-Model/perfilesUsuario';
 
 
 export function httpLoaderFactory(httpClient: HttpClient) {
@@ -52,7 +52,7 @@ export function httpLoaderFactory(httpClient: HttpClient) {
     }),
     BrowserAnimationsModule
   ],
-  providers: [Usuario],
+  providers: [perfilUsuario],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

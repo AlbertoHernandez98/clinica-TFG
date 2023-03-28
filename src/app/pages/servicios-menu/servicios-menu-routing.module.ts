@@ -6,7 +6,11 @@ import { InfiltracionComponent } from './components/biomecanica/infiltracion/inf
 import { MarchaComponent } from './components/biomecanica/marcha/marcha.component';
 import { PlantillasComponent } from './components/biomecanica/plantillas/plantillas.component';
 import { VendajeComponent } from './components/biomecanica/vendaje/vendaje.component';
+import { CirugiaOseaComponent } from './components/cirugia-osea/cirugia-osea.component';
 import { CirugiaUngealComponent } from './components/cirugia-ungeal/cirugia-ungeal.component';
+import { PieDiabeticoComponent } from './components/pie-diabetico/pie-diabetico.component';
+import { PodologiaGeriatricaComponent } from './components/podologia-geriatrica/podologia-geriatrica.component';
+import { PodologiaInfantilComponent } from './components/podologia-infantil/podologia-infantil.component';
 import { CorteComponent } from './components/quiropodia/corte/corte.component';
 import { DurezaComponent } from './components/quiropodia/dureza/dureza.component';
 import { HelomaComponent } from './components/quiropodia/heloma/heloma.component';
@@ -14,6 +18,7 @@ import { HongosComponent } from './components/quiropodia/hongos/hongos.component
 import { OrtesisComponent } from './components/quiropodia/ortesis/ortesis.component';
 import { UnyaComponent } from './components/quiropodia/unya/unya.component';
 import { VerrugaComponent } from './components/quiropodia/verruga/verruga.component';
+import { ServicioDomicilioComponent } from './components/servicio-domicilio/servicio-domicilio.component';
 import { ServiciosMenuComponent } from './servicios-menu.component';
 
 
@@ -35,6 +40,12 @@ const routes: Routes = [
   { path: 'vendaje', component: VendajeComponent },
 
   { path: 'cirugia-ungeal', component: CirugiaUngealComponent },
+  { path: 'pie-diabetico', component: PieDiabeticoComponent },
+  { path: 'cirugia-osea', component: CirugiaOseaComponent },
+  { path: 'podologia-infantil', component: PodologiaInfantilComponent },
+  { path: 'podologia-geriatrica', component: PodologiaGeriatricaComponent },
+  { path: 'servicio-domicilio', component: ServicioDomicilioComponent },
+
 
 ];
 

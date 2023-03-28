@@ -1,7 +1,7 @@
 export class perfilUsuario {
     jsonUsuarios = {
         usuario: '',
-        constraseña: '',
+        contraseña: '',
         email: '',
         telefono: '',
         domicilio: '',

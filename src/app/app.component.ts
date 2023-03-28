@@ -33,6 +33,7 @@ export class AppComponent implements OnInit {
     // this.lisentAppState();
     this.lisentToToastMsj();
     this.lisentToSpiner();
+    //EL PUTO ROUTING
   }
 
   ngOnInit(): void {
@@ -62,16 +63,16 @@ export class AppComponent implements OnInit {
     });
   }
 
-  lisentToRoute() {
-    return this.router.url === '/' || this.router.url.includes('access-menu');
-  }
+  // lisentToRoute() {
+  //   return this.router.url === '/' || this.router.url.includes('access-menu');
+  // }
 
-  showBreadCum() {
-    return (
-      this.router.url !== '/' &&
-      !this.router.url.includes('access-menu')
-    );
-  }
+  // showBreadCum() {
+  //   return (
+  //     this.router.url !== '/' &&
+  //     !this.router.url.includes('access-menu')
+  //   );
+  // }
 
   openSnackBar(parameters: Toast) {
     this.snackBar.open(parameters.msj, '', {
