@@ -12,9 +12,9 @@ const routes: Routes = [
   
   {
     path: 'access-menu',
-    component: AccessMenuComponent
-
-  }, 
+    loadChildren: () =>
+    import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
+  },
   {
     path: 'servicios',
     loadChildren: () =>
@@ -46,11 +46,6 @@ const routes: Routes = [
       import('./pages/contacto/contacto.module').then((m) => m.ContactoModule)
   },
   {
-    path: 'perfil',
-    loadChildren: () =>
-      import('./pages/perfil/perfil.module').then((m) => m.PerfilModule)
-  },
-  {
     path: 'clinica',
     loadChildren: () =>
       import('./pages/clinica/clinica.module').then((m) => m.ClinicaModule)
@@ -60,6 +55,16 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginModule)
   },
+  {
+    path: 'historial',
+    loadChildren: () =>
+      import('./pages/historial/historial.module').then((m) => m.HistorialModule)
+  },
+  {
+    path: 'perfil',
+    loadChildren: () =>
+      import('./pages/perfil-usuario/perfil-usuario.module').then((m) => m.PerfilUsuarioModule)
+  }
 ]
 
 @NgModule({

@@ -1,44 +1,63 @@
-<div class="card">
+<!-- <h2>Login</h2>
 
-  <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="card__form">
-    <div>
-      <app-input-text
-        label="{{ 'LOGIN.USERNAME_LABEL' | translate }}"
-        placeholder="{{ 'LOGIN.USERNAME_PLACEHOLDER' | translate }}"
-        formControlName="username"
-      ></app-input-text>
-      <em
-        *ngIf="
-          loginForm.controls.username?.errors?.required &&
-          loginForm.controls.username?.dirty
-        "
-        class="card__form__validation-error"
-        >{{ 'LOGIN.OBLIGATORY_FIELD' | translate }}</em
-      >
-    </div>
+<form (submit)="login()">
+  <label>
+    Username:
+    <input type="text" [(ngModel)]="username" name="username" required>
+  </label>
+  <br>
+  <label>
+    Password:
+    <input type="password" [(ngModel)]="password" name="password" required>
+  </label>
+  <br>
+  <button type="submit">Login</button>
+</form> -->
 
-    <div>
-      <app-input-password
-        label="{{ 'LOGIN.PASSWORD_LABEL' | translate }}"
-        placeholder="{{ 'LOGIN.PASSWORD_PLACEHOLDER' | translate }}"
-        formControlName="password"
-      ></app-input-password>
-      <em
-        *ngIf="
-          loginForm.controls.password?.errors?.required &&
-          loginForm.controls.password?.dirty
-        "
-        class="card__form__validation-error"
-        >{{ 'LOGIN.OBLIGATORY_FIELD' | translate }}</em
-      >
-    </div>
-
-    <hr />
-
-    <app-button-base
-      btnStyle="btn--large"
-      label="{{ 'LOGIN.BUTTON_LABEL' | translate }}"
-      [disabled]="loginForm.invalid"
-    ></app-button-base>
-  </form>
+<div class="wrapper">
+  <div class="wrapper__deco-line"></div>
+  <div class="wrapper__title">
+      LOGIN
+  </div>
+  <div class="wrapper__deco-line"></div>
 </div>
+<div class="content">
+  <div class="wrap">
+      <div class="form-wrap">
+          <form class="form" action="" [formGroup]="form" >
+              <div>
+                  <app-input-text 
+                  formControlName="dni" 
+                  label="{{ 'CONTACTO.DNI' | translate }}"
+                  [invalid]="getTouchedAndError('dni')" 
+                  [required]="true">
+                  </app-input-text>
+                  <p class="form-error" *ngIf="getTouchedAndError('dni')">
+                      {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                  </p>
+              </div>
+              <div>
+                  <app-input-password 
+                  label="{{ 'LOGIN.PASSWORD_LABEL' | translate }}"
+                  [required]="true"
+                  placeholder=""
+                  formControlName="password">
+                  </app-input-password>
+                  <p class="form-error" *ngIf="getTouchedAndError('password')">
+                      {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
+                  </p>
+                  <p class="form-error" *ngIf="loginError">
+                    {{ 'LOGIN.POPUP_ERROR_TEXT' | translate }}
+                </p>
+              </div>
+              <div class="button">
+                <app-button-base (click)="login()"
+                    label="{{'LOGIN.INICIAR_SESION' | translate }}"
+                ></app-button-base>
+            </div>
+          </form>
+      </div>
+  </div>
+</div>
+
+

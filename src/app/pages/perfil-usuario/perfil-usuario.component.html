@@ -1,0 +1,91 @@
+<div class="content">
+  <div class="wrap">
+    <div class="form-wrap">
+      <form class="form" action="" [formGroup]="form">
+        <div class="label">{{ "PERFIL.PERFIL" | translate }}</div>
+        <div style="display: none" class="form-column">
+          <input type="text" formControlName="usuario" />
+        </div>
+        <div class="form-column">
+            <p>
+                USUARIO
+            </p>
+          <input type="text" formControlName="newUsuario" />
+          <p class="form-error" *ngIf="getTouchedAndError('newUsuario')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+        </div>
+        <div class="form-column">
+            <p>
+                DNI
+            </p>
+          <input type="text" formControlName="dni" />
+
+          <p class="form-error" *ngIf="getTouchedAndError('dni')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+        </div>
+        <div class="form-column">
+            <p>
+                EMAIL
+            </p>
+          <input type="text" formControlName="email" />
+          <p class="form-error" *ngIf="getTouchedAndError('email')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+        </div>
+        <div class="form-column">
+            <p>
+                TELEFONO
+            </p>
+          <input type="text" formControlName="telefono" />
+          <p class="form-error" *ngIf="getTouchedAndError('telefono')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+        </div>
+        <div class="form-column">
+            <p>
+                DOMICILIO
+            </p>
+          <input type="text" formControlName="domicilio" />
+          <p class="form-error" *ngIf="getTouchedAndError('domicilio')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+        </div>
+        <!-- <div class="label-text__tag">
+            <span>Foto de perfil</span>
+        </div>
+        <div>
+            <div *ngIf="selectedFile">
+                <h3>Preview:</h3>
+                <img [src]="imageUrl" class="img">
+                </div>
+            <form (ngSubmit)="uploadPhoto()">
+                <input type="file" (change)="onFileSelected($event)">
+                <button type="submit">Upload</button>
+            </form>
+        </div> -->
+        <div class="button-form">
+          <app-button-base
+            label="{{ 'PERFIL.MODIFICAR' | translate }}"
+            (click)="pruebas()"
+          ></app-button-base>
+        </div>
+      </form>
+    </div>
+    <div class="contact">
+      <div class="button">
+        <app-button-base
+          label="{{ 'SHARED.POPUPS.CHANGE_PASSWORD.TITLE' | translate }}"
+          (click)="changePassword()"
+        ></app-button-base>
+      </div>
+      <div class="button">
+        <app-button-base
+          label="{{ 'PERFIL.HISTORIAL' | translate }}"
+          routerLink="/historial"
+        ></app-button-base>
+      </div>
+    </div>
+  </div>
+</div>

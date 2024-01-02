@@ -1,0 +1,100 @@
+
+<div class="head">
+  <h2 class="header">
+    {{ 'SHARED.POPUPS.ADMIN_USERS.TITLE' | translate }}
+  </h2>
+  <i (click)="close()" class="close">
+    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
+  </i>
+</div>
+
+<div class="container">
+  <div class="form-wrap">
+    <form class="form" action="" [formGroup]="form">
+      <div class="user-list">
+        <div style="display:none" class="form-column">
+          <p>
+              USUARIO
+          </p>
+          <input type="text" formControlName="usuario"/>
+        </div>
+        <div class="form-column">
+          <p>
+              USUARIO NUEVO
+          </p>
+          <input type="text" formControlName="newUsuario"/>
+        </div>
+        <div class="form-column">
+          <p>
+            CONTRASEÑA
+          </p>
+          <div class="password">
+            <input [type]="isHidden ? 'text' : 'password'" formControlName="password"/>
+            <button
+              type="button"
+              (click)="isHidden = !isHidden"
+              [ngClass]="{
+                'password-view': isHidden,
+                'password-noView': !isHidden
+              }"
+              class="btn-view-pass"
+              aria-label="Toggle Hide/Show password"
+            >
+              <i></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-column">
+          <p>
+              EMAIL
+          </p>
+          <input type="text" formControlName="email"/>
+        </div>
+        <div class="form-column">
+          <p>
+            ROL
+          </p>
+          <select formControlName="idRolNativo" class="rol">
+            <option *ngFor="let number of numbers"  [value]="number">{{ number }}</option>
+          </select>
+        </div>
+        <div class="form-column">
+          <p>
+              DNI
+          </p>
+          <input type="text" formControlName="dni"/>
+        </div>
+        <div class="form-column">
+          <p>
+              TELEFONO
+          </p>
+          <input type="text" formControlName="telefono"/>
+        </div>
+        <div class="form-column">
+          <p>
+              DOMICILIO
+          </p>
+          <input type="text" formControlName="domicilio"/>
+        </div>
+      </div>
+    </form>
+    <div class="buttons">
+      <div class="button" *ngIf="this.modifyUser">
+        <app-button-base
+        (click)="onDelete()"
+          label="{{ 'SHARED.POPUPS.ADMIN_USERS.ELIMINAR' | translate }}"
+        ></app-button-base>
+        <app-button-base
+        (click)="onSubmit()"
+          label="{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}"
+        ></app-button-base>
+      </div>
+      <div class="button" *ngIf="!this.modifyUser">
+        <app-button-base
+        [disabled]="!this.form.valid"
+        (click)="onCreate()"
+        label="{{ 'SHARED.POPUPS.ADMIN_USERS.CREAR' | translate }}"></app-button-base>
+      </div>
+    </div>
+  </div>
+</div>

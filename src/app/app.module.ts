@@ -1,3 +1,4 @@
+import { HistorialModule } from './pages/historial/historial.module';
 import { HttpClient } from '@angular/common/http';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -14,12 +15,10 @@ import { ServiciosModule } from './pages/reserva-cita/servicios/servicios.module
 import { ServiciosMenuModule } from './pages/servicios-menu/servicios-menu.module';
 import { PersonalModule } from './pages/personal/personal.module';
 import { ContactoModule } from './pages/contacto/contacto.module';
-import { PerfilModule } from './pages/perfil/perfil.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClinicaModule } from './pages/clinica/clinica.module';
-import { RouterModule } from '@angular/router';
-import { perfilUsuario } from './JSON-Model/perfilesUsuario';
-
+import { FormsModule } from '@angular/forms';
+import { PerfilUsuarioModule } from './pages/perfil-usuario/perfil-usuario.module';
 
 export function httpLoaderFactory(httpClient: HttpClient) {
   return new TranslateHttpLoader(httpClient);
@@ -29,6 +28,7 @@ export function httpLoaderFactory(httpClient: HttpClient) {
   declarations: [AppComponent],
   imports: [
     SharedModule,
+    FormsModule,
     BrowserModule,
     IonicModule,
     ReservaCitaModule,
@@ -39,7 +39,7 @@ export function httpLoaderFactory(httpClient: HttpClient) {
     ServiciosMenuModule,
     PersonalModule,
     ContactoModule,
-    PerfilModule,
+    PerfilUsuarioModule,
     ClinicaModule,
     TranslateModule.forRoot({
       extend: true,
@@ -47,12 +47,11 @@ export function httpLoaderFactory(httpClient: HttpClient) {
       loader: {
         provide: TranslateLoader,
         useFactory: httpLoaderFactory,
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
-  providers: [perfilUsuario],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

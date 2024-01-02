@@ -1,0 +1,57 @@
+@import "src/assets/theme/_variables.scss";
+
+* {
+    font-family: Karla;
+ }
+.head{
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 30px;
+}
+.heeader {
+    opacity: 0.6;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+ .list-header{
+    display: flex;
+    p{
+        flex:1;
+    }
+ }
+
+ .form-wrap{
+    display: grid;
+    gap: 10px;
+ }
+
+ .user-list{
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 5px;
+    display: grid;
+    border: 1px solid #ccc;
+    justify-items: center;
+ }
+
+
+.users{
+    display: flex;
+    gap: 30px;
+    
+    p{
+        flex: 1;
+    }
+}
+
+.buttons{
+    display: flex;
+    padding-top: 20px;
+    justify-content: center;
+}
+
+#lista:hover{
+    cursor: pointer;
+}

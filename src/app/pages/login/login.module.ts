@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginRoutingModule } from './login-routing.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { LoginComponent } from './login.component';
+import { Backend } from 'src/app/JSON-Model/backend';
 
 export function httpLoaderFactory(httpClient: HttpClient) {
     return new TranslateHttpLoader(httpClient);
@@ -20,6 +21,7 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         ReactiveFormsModule,
         LoginRoutingModule,
         SharedModule,
+        FormsModule,
         MatDialogModule,
         TranslateModule.forChild({
             extend: true,
@@ -30,7 +32,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
                 deps: [HttpClient]
             }
         })
-    ]
+    ], providers: [Backend]
+
 })
 export class LoginModule {}
 

@@ -12,8 +12,19 @@ export class AccessMenuComponent implements OnInit{
   productsIcon = '../../../assets/icons/svg/products.svg';
   applicationsIcon = '../../../assets/icons/svg/applications.svg';
   access: any;
+
+  isLogged: boolean = false;
   constructor(route: ActivatedRoute) {
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
+
+  logout(): void {
+    // Delete sessionToken cookie
+    document.cookie = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Redirect to login page
+    window.location.href = '/login';
+  }
 }

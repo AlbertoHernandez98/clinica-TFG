@@ -6,6 +6,7 @@
     overflow: hidden;
 }
 
+
 .wrap {
     position: relative;
     width: 940px;
@@ -46,6 +47,7 @@
     justify-content: center;
     margin-top: $gap-form;
     margin-bottom: $gap-form;
+    max-width: 25%;
 }
 
 .detalle {
@@ -77,6 +79,12 @@
     justify-content: center;
 }
 
+.button-form{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 .redes {
     display: flex;
     gap: $gap-form;
@@ -106,5 +114,33 @@
       letter-spacing: 2px;
       text-transform: uppercase;
 
+    }
+}
+
+.form-column{
+    display: grid;
+    flex: 1;
+    p{
+        padding-left: 5px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        position: static;
+        display: block;
+        opacity: 0.6;
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    input,select {
+        color: #000;
+        font-size: 14px;
+        border: 1px solid #75787b;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: #fff;
+        transition: filter 0.2s linear;
     }
 }

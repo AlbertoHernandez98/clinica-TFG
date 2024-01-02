@@ -10,6 +10,8 @@ import {
   MatSnackBarHorizontalPosition,
   MatSnackBarVerticalPosition
 } from '@angular/material/snack-bar';
+import { LangService } from './services/lang/lang';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -21,6 +23,7 @@ export class AppComponent implements OnInit {
   isLogged = false;
   showSpiner = false;
   listaBreadcum: any = [];
+  selectedLanguage = 'ES';
 
   title = 'configurador-pwa-app';
   idMenu = '';
@@ -28,7 +31,9 @@ export class AppComponent implements OnInit {
     private appState: AppStateService,
     private router: Router,
     private cd: ChangeDetectorRef,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private langService: LangService,
+    private translate: TranslateService
   ) {
     // this.lisentAppState();
     this.lisentToToastMsj();
@@ -38,18 +43,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
 
-  }
 
-  // lisentAppState() {
-  //   this.appState.getBreadcumInfo().subscribe((result) => {
-  //     this.appInfo = result;
-  //     this.listaBreadcum = [...this.appInfo.breadcum];
-  //     if (this.appInfo.idMenuActive) {
-  //       this.idMenu = this.appInfo.idMenuActive;
-  //     }
-  //     this.cd.detectChanges();
-  //   });
-  // }
+  }
 
   lisentToToastMsj() {
     this.appState.getSnackbarMsj().subscribe((res: Toast) => {
@@ -63,16 +58,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // lisentToRoute() {
-  //   return this.router.url === '/' || this.router.url.includes('access-menu');
-  // }
-
-  // showBreadCum() {
-  //   return (
-  //     this.router.url !== '/' &&
-  //     !this.router.url.includes('access-menu')
-  //   );
-  // }
 
   openSnackBar(parameters: Toast) {
     this.snackBar.open(parameters.msj, '', {

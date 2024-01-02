@@ -1,0 +1,114 @@
+@import "/src/assets/theme/_variables";
+
+.container {
+    position: relative;
+    width: 940px;
+    margin-right: auto;
+    margin-left: auto;
+    display: grid;
+    justify-items: center;
+    padding: 60px;
+    align-items: stretch;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(210, 210, 213, 0.5);
+    background-color: #fff;
+    gap: 40px;
+    textarea {
+        width: 600px;
+        height: 200px;
+        border: 1px solid black;
+    }
+
+    .label {
+        position: static;
+        display: block;
+        opacity: 0.6;
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: $gap-form;
+    }
+}
+
+@import "src/assets/theme/_variables.scss";
+
+* {
+    font-family: Karla;
+}
+.head {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 30px;
+}
+.list-header {
+    display: flex;
+    justify-content: space-around;
+
+    p {
+        flex: 1;
+    }
+}
+
+.list-body{
+    .list-row {
+        display: flex;
+        gap: 40px;
+    }
+}
+
+.form-wrap {
+    display: grid;
+    gap: 30px;
+    justify-items: center;
+    justify-content: center;
+}
+
+.divider {
+    border-bottom: 1px solid rgba(210, 210, 213, 0.3);
+    width: 100%;
+}
+
+.button {
+    display: flex;
+    gap: 40px;
+    padding-top: 20px;
+}
+.users {
+    display: flex;
+    gap: 30px;
+
+    p {
+        flex: 1;
+    }
+}
+
+.form-column {
+    display: grid;
+    flex: 1;
+    p {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        position: static;
+        display: block;
+        opacity: 0.6;
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    input,
+    select {
+        color: #000;
+        font-size: 14px;
+        border: 1px solid #75787b;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: #fff;
+        transition: filter 0.2s linear;
+    }
+}

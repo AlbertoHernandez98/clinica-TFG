@@ -51,7 +51,8 @@
     "PIE_DIABETICO": "Pié diabético",
     "PODOLOGIA_INFANTIL": "Podología infantil",
     "PODOLOGIA_GERIATRICA": "Podología geriátrica",
-    "SERVICIO_DOM": "Servicio a domicilio"
+    "SERVICIO_DOM": "Servicio a domicilio",
+    "MAS_SERVICIOS": "Más servicios..."
   },
   "BREADCUMTEXT": {
     "MENU": "Menú",
@@ -78,21 +79,11 @@
     "CIRUGIA_UNGEAL": "Cirugía Ungeal"
   },
   "MAIN_MENU": {
-    "ACCESO_PWA": "Carga y acceso a la PWA",
-    "IDENTIFICACION_USUARIO": "Identificación de usuario",
-    "MENU_LINEA": "Menú en línea",
-    "SOLICITUD_ASISTENCIA": "Solicitud de asistencia",
-    "SOLICITUD_REEMBOLSO": "Solicitud de reembolso",
-    "ORIGEN": "Origen",
-    "DESTINO": "Destino",
-    "SEGUIMIENTO": "Seguimiento",
-    "HISTORICO": "Histórico",
-    "TRADUCCION": "Traducción",
-    "ADD": "Añadir nueva linea",
-    "ERROR": "Errores",
-    "TRIGGERS": "Desencadenante",
-    "WARNING_MESSAGE": "Mensaje aviso",
-    "SERVICES": "Servicios"
+    "DESCRIPCION": "En la Clínica Podológica Lara Suárez Díaz se ubica en Riba-Roja del Túria, donde puedes encontrar todos los servicios podológicos a su disposición.  Ponte en contacto con nosotros y encontraremos una solución a tus pies. ¿A qué estas esperando?" ,
+    "SERVICES": "Servicios",
+    "NUESTRA_CLINICA": "Nuestra clínica podológica",
+    "NUESTROS_SERVICIOS": "Nuestros servicios",
+    "NUESTRO_PERSONAL": "Nuestro personal"
   },
   "404": {
     "TITLE": "Hay un problema",
@@ -107,7 +98,8 @@
     "PASSWORD_PLACEHOLDER": "Contraseña",
     "BUTTON_LABEL": "Entrar",
     "POPUP_ERROR_TEXT": "El nombre de usuario o contraseña son incorrectos.",
-    "POPUP_BUTTON_LABEL": "Cerrar"
+    "POPUP_BUTTON_LABEL": "Cerrar",
+    "INICIAR_SESION": "Iniciar sesión"
   },
   "ACCESS_MENU": {
     "RESERVA": "Reservar cita",
@@ -128,24 +120,73 @@
         "BUTTON_LABEL": "Continuar",
         "BUTTON_LABEL_ELIMINAR": "Eliminar",
         "BUTTON_LABEL_REEMPLAZAR": "Reemplazar"
+      },
+      "CHANGE_PASSWORD": {
+        "TITLE": "Cambiar contraseña",
+        "ACTUAL": "Contraseña actual",
+        "NUEVA": "Nueva contraseña",
+        "REPITE": "Repite la nueva contraseña",
+        "CERRAR": "Cerrar",
+        "ACEPTAR": "Aceptar",
+        "COINCIDIR": "Las contraseñas deben coincidir",
+        "ACTUAL_NUEVA": "La nueva contraseña no debe coincidir con la actual",
+        "SUCCESS": "La contraseña se ha cambiado correctamente",
+        "ERROR": "Ha habido un problema con el cambio de contraseña. Por favor, inténtalo de nuevo."
+      },
+      "ADMIN_USERS":{
+        "NOMBRE": "Nombre",
+        "ROL": "Rol de usuario",
+        "TITLE": "Administrar usuarios",
+        "ELIMINAR": "Eliminar",
+        "CREAR": "Crear nuevo usuario"
+      },
+      "ERROR_SUCCESS": {
+        "SUCCESS": ""
       }
+    },
+    "HEADER": {
+      "INICIO": "Inicio",
+      "SERVICIOS": "Servicios",
+      "CLINICA": "Clínica",
+      "QUIENES_SOMOS": "¿Quiénes somos?",
+      "CONTACTO": "Contacto",
+      "LOGIN": "Login",
+      "LOGOUT": "Logout",
+      "PERFIL": "Perfil",
+      "ADMIN": "Administrar"
+    },
+    "FOOTER": {
+      "NUESTRAS_REDES": "Nuestras redes sociales",
+      "HORARIO": "Horario de la clínica",
+      "DIAS_IMPARES": "Lunes, Miércoles y Viernes:",
+      "HORAS_TARDE": "16:00 a 20:00",
+      "DIAS_PARES": "Martes y Jueves:",
+      "HORAS_MAÑANA": "09:30 a 13:30",
+      "FIN_DE_SEMANA": "Sábado y Domingo:",
+      "CERRADO": "Cerrado"
     }
-  },
-  "HEADER": {
-    "CONTACTO": "Contacta",
-    "PERFIL": "Perfil"
   },
   "CONTACTO": {
     "NOMBRE": "Nombre",
     "EMAIL": "E-mail",
     "MSJ": "Tu mensaje",
-    "ENVIAR": "Enviar"
+    "ENVIAR": "Enviar",
+    "DNI": "DNI"
   },
   "PERFIL": {
     "TELEFONO": "Telefono",
     "DOMICILIO": "Domicilio",
     "FOTO_PERFIL": "Foto de perfil",
     "CITAS": "Ver historial de citas",
-    "HISTORIAL": "Ver historial clínico"
+    "HISTORIAL": "Ver historial clínico",
+    "MODIFICAR": "Modificar perfil",
+    "PERFIL": "Perfil de usuario",
+    "ADMINISTRAR_USUARIOS": "Administrar usuarios"
+  },
+  "HISTORIAL": {
+    "TITULO": "Historial clinico"
+  },
+  "ERRORS_MENSAJE": {
+    "REQUIRED": "Campo obligatorio"
   }
 }

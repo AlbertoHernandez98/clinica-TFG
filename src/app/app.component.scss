@@ -1,6 +1,8 @@
 .contenido{
     width: 100%;
     padding-top: 24px;
+    font-family: Karla;
+
     &__menu{
         display: flex;
         padding: 0 24px;
@@ -21,3 +23,4 @@
     font-family: Karla;
     src: url(../assets/fonts/Karla/Karla-VariableFont_wght.ttf);
   }
+

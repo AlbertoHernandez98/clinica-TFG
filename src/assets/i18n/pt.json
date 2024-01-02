@@ -1,0 +1,174 @@
+{
+    "BUTTONS": {
+        "ANTERIOR": "Anterior",
+        "SIGUIENTE": "Siguiente"
+    },
+    "RESERVA_CITA": {
+        "TITLE": "Reservar cita",
+        "NOMBRE": "Nombre",
+        "APELLIDOS": "Apellidos",
+        "TELEFONO": "Telefono",
+        "EMAIL": "E-mail",
+        "BUTTON_SIGUIENTE": "Siguiente",
+        "PASO": "Paso"
+    },
+    "LISTA_PRODUCTOS": {
+        "TITLE": "Listado de Productos",
+        "BNT_NUEVO": "+ Nuevo",
+        "FILTROS": {
+            "SEARCH_LABEL": "Buscar por:",
+            "SEARCH_PLACEHOLDER": "Producto",
+            "SELECT_LINEA": "Línea",
+            "SELECT_PAIS": "País"
+        }
+    },
+    "PERSONAL": {
+        "PERSONAL_A": "Lara Suárez"
+    },
+    "SERVICES_MENU": {
+       "SERVICES": "Nossos serviços",
+        "QUIROPODIA": "Chiropodia",
+        "QUIROPODIA_SERV": {
+            "CORTE": "Corte de unha",
+            "DUREZA": "Tratamento de dureza",
+            "HELOMA": "Helomas (olho de galinha)",
+            "UÑA": "Unha encravada",
+            "HONGOS": "Fungos",
+            "VERRUGAS": "Verrugas plantares",
+            "ORTESIS": "Órteses de silicone"
+        },
+        "BIOMECANICA": "Biomecânica",
+        "BIOMECANICA_SERV": {
+            "MARCHA": "Estudo da marcha",
+            "PLANTILLAS": "Modelos personalizados",
+            "VENDAJE": "Bandagem Terapêutica",
+            "FASCITIS": "Fascite plantar",
+            "ESPOLON": "Esporão de calcâneo",
+            "INFILTRACIONES": "Infiltrações"
+        },
+        "CIRUGIA_UNGEAL": "Cirurgia Ungeal",
+        "CIRUGIA_OSEA": "Cirurgia óssea",
+        "PIE_DIABETICO": "Pé diabético",
+        "PODOLOGIA_INFANTIL": "Podologia infantil",
+        "PODOLOGIA_GERIATRICA": "Podologia geriátrica",
+        "SERVICIO_DOM": "Atendimento domiciliar",
+        "MAS_SERVICIOS": "Mais serviços..."
+    },
+    "BREADCUMTEXT": {
+        "MENU": "Menú",
+        "CLINICA": "Clínica",
+        "RESERVA_CITA": "Reserva Cita",
+        "SERVICIOS": "Servicios",
+        "DISPONIBILIDAD": "Disponibilidad",
+        "PERSONAL": "Personal",
+        "PERSONAL-A": "Personal A",
+        "CONTACTO": "Contacto",
+        "CORTE": "Corte de uñas",
+        "DUREZA": "Tratamiento de durezas",
+        "HELOMA": "Helómas (Ojo de pollo)",
+        "UÑA": "Uña encarnada",
+        "HONGOS": "Hongos",
+        "VERRUGAS": "Verrugas plantares",
+        "ORTESIS": "Ortesis de silicona",
+        "MARCHA": "Estudio de la marcha",
+        "PLANTILLAS": "Plantillas personalizadas",
+        "VENDAJE": "Vendaje terapeutico",
+        "FASCITIS": "Fascitis plantar",
+        "ESPOLON": "Espolón calcáneo",
+        "INFILTRACIONES": "Infiltraciones",
+        "CIRUGIA_UNGEAL": "Cirugía Ungeal"
+    },
+    "MAIN_MENU": {
+        "DESCRIPCION": "A Clínica de Podologia Lara Suárez Díaz está localizada em Riba-Roja del Túria, onde poderá encontrar todos os serviços de Podologia ao seu dispor. Entre em contato conosco e encontraremos uma solução aos seus pés. O que está esperando?",
+        "SERVICES": "Serviços",
+        "NUESTRA_CLINICA": "Nossa clínica de podologia",
+        "NUESTROS_SERVICIOS": "Nossos serviços",
+        "NUESTRO_PERSONAL": "Nossa equipe"
+    },
+    "404": {
+        "TITLE": "Hay un problema",
+        "TEXT": "Página no encontrada",
+        "LINK": "Ir a la página de inicio de sesión"
+    },
+    "LOGIN": {
+        "USERNAME_LABEL": "Usuario",
+        "USERNAME_PLACEHOLDER": "Nombre / Usuario",
+        "OBLIGATORY_FIELD": "Campo obligatorio",
+        "PASSWORD_LABEL": "Contraseña",
+        "PASSWORD_PLACEHOLDER": "Contraseña",
+        "BUTTON_LABEL": "Entrar",
+        "POPUP_ERROR_TEXT": "El nombre de usuario o contraseña son incorrectos.",
+        "POPUP_BUTTON_LABEL": "Cerrar"
+    },
+    "ACCESS_MENU": {
+        "RESERVA": "Reservar cita",
+        "SERVICIOS": "Servicios",
+        "CLINICA": "Clinica podologica Lara Suárez Díaz",
+        "PERSONAL": "Personal",
+        "IDENTITIES_TEXT": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nibh sit etiam tortor proin varius fringilla. Lorem nisl quisque risus pellentesque.",
+        "PRODUCTS_TEXT": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nibh sit etiam tortor proin varius fringilla. Lorem nisl quisque risus pellentesque.",
+        "APPLICATIONS_TEXT": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nibh sit etiam tortor proin varius fringilla. Lorem nisl quisque risus pellentesque."
+    },
+    "SHARED": {
+        "POPUPS": {
+            "DRAGDROP": {
+                "TITLE": "Subida de archivos",
+                "TEXT_1": "Arrastra los archivos aquí",
+                "TEXT_2": "o",
+                "SELECT_FILE_LABEL": "Selecciona archivo",
+                "BUTTON_LABEL": "Continuar",
+                "BUTTON_LABEL_ELIMINAR": "Eliminar",
+                "BUTTON_LABEL_REEMPLAZAR": "Reemplazar"
+            },
+            "CHANGE_PASSWORD": {
+                "TITLE": "Alterar senha",
+                "ACTUAL": "Senha atual",
+                "NUEVA": "Nova senha",
+                "REPITE": "Repetir nova senha",
+                "CERRAR": "Fechar",
+                "ACEPTAR": "OK",
+                "COINCIDIR": "As senhas devem corresponder",
+                "ACTUAL_NUEVA": "A nova senha não deve corresponder à atual"
+              }
+        },
+        "HEADER": {
+            "INICIO": "Iniciar",
+            "SERVICIOS": "Serviços",
+            "CLINICA": "Clínica",
+            "QUIENES_SOMOS": "Quem somos nós?",
+            "CONTACTO": "Contato",
+            "LOGIN": "Login"
+        },
+        "FOOTER": {
+          "NUESTRAS_REDES": "Nossas redes sociais",
+          "HORARIO": "Horas clínicas",
+          "DIAS_IMPARES": "Segundas, Quartas e Sextas:",
+          "HORAS_TARDE": "16:00 às 20:00",
+          "DIAS_PARES": "Terça e Quinta:",
+          "HORAS_MAÑANA": "09:30 às 13:30",
+          "FIN_DE_SEMANA": "Sábado e Domingo:",
+          "CERRADO": "Fechado"
+        }
+    },
+    "HEADER": {
+        "CONTACTO": "Contato",
+        "PERFIL": "Perfil"
+    },
+    "CONTACTO": {
+        "NOMBRE": "Nome",
+        "EMAIL": "E-mail",
+        "MSJ": "Sua mensagem",
+        "ENVIAR": "Enviar"
+    },
+    "PERFIL": {
+        "TELEFONO": "Telefone",
+        "DOMICILIO": "Endereço",
+        "FOTO_PERFIL": "Foto de perfil",
+        "CITAS": "Visualizar histórico de agendamentos",
+        "HISTORIAL": "Ver história clínica",
+        "MODIFICAR": "Modificar perfil",
+        "PERFIL": "Perfil do usuário"
+
+
+    }
+}

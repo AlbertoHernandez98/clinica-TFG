@@ -32,13 +32,11 @@ export class ContactoComponent implements OnInit {
     public router: Router,
     public formBuilder: FormBuilder,
     private translate: TranslateService,
-    private appService: AppStateService,
     private matDialog: MatDialog,
   ) { }
 
   ngOnInit() {
     this.changesForm();
-    this.getTranslate();
   }
 
   getTouchedAndError(key: string) {
@@ -51,13 +49,6 @@ export class ContactoComponent implements OnInit {
     });
   }
 
-  getTranslate() {
-    this.appService
-      .traduccionesLoaded('BREADCUMTEXT.RESERVA_CITA')
-      .subscribe((res) => {
-        this.initRoutes();
-      });
-  }
 
   emailValida() {
     const email = this.form.controls.email.value;
@@ -81,24 +72,6 @@ export class ContactoComponent implements OnInit {
   }
 
 
-  initRoutes() {
-    const appInfo: AppInfo = {
-      breadcum: [
-        {
-          active: true,
-          name: this.translate.instant('BREADCUMTEXT.MENU'),
-          route: '/access-menu'
-        },
-        {
-          active: false,
-          name: this.translate.instant('BREADCUMTEXT.CONTACTO'),
-          route: '/contacto'
-        },
-      ],
-      isLogged: true,
-    };
-    this.appService.setBreadcumInfo(appInfo, 'appInfo');
-  }
 
   openDialog(icon: string, text: string, buttonLabel: string) {
     this.matDialog.open(ErrorSuccessComponent, {

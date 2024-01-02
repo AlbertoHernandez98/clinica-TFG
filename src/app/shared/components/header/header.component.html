@@ -8,44 +8,65 @@
 
         <div class="dropdown">
             <button class="dropbtn">
-                <a href="/access-menu">Inicio</a>
+                <a href="/access-menu">{{ 'SHARED.HEADER.INICIO' | translate }}</a>
             </button>
         </div>
 
         <div class="dropdown">
-            <button class="dropbtn">Servicios</button>
+            <button class="dropbtn">{{ 'SHARED.HEADER.SERVICIOS' | translate }}</button>
             <div class="dropdown-content">
-                <a href="/corte">Corte de uñas</a>
-                <a href="/unya">Uña encarnada</a>
-                <a href="/plantillas">Plantillas personalizadas</a>
-                <a href="/heloma">Helóma</a>
-                <a href="/serviciosMenu">Más servicios...</a>
+                <a href="/corte">{{ 'SERVICES_MENU.QUIROPODIA_SERV.CORTE' | translate }}</a>
+                <a href="/unya">{{ 'SERVICES_MENU.QUIROPODIA_SERV.UÑA' | translate }}</a>
+                <a href="/plantillas">{{ 'SERVICES_MENU.BIOMECANICA_SERV.PLANTILLAS' | translate }}</a>
+                <a href="/heloma">{{ 'SERVICES_MENU.QUIROPODIA_SERV.HELOMA' | translate }}</a>
+                <a href="/serviciosMenu">{{ 'SERVICES_MENU.MAS_SERVICIOS' | translate }}</a>
             </div>
         </div>
 
         <div class="dropdown">
             <button class="dropbtn">
-                <a href="/clinica">Clínica</a>
+                <a href="/clinica">{{ 'SHARED.HEADER.CLINICA' | translate }}</a>
             </button>
         </div>
 
         <div class="dropdown">
             <button class="dropbtn">
-                <a href="/personal">Quiénes somos</a>
+                <a href="/personal">{{ 'SHARED.HEADER.QUIENES_SOMOS' | translate }}</a>
             </button>
         </div>
 
         <div class="dropdown">
             <button class="dropbtn">
-                <a href="/contacto">Contacto</a>
+                <a href="/contacto">{{ 'SHARED.HEADER.CONTACTO' | translate }}</a>
             </button>
         </div>
     </div>
 
     <div class="login-option">
         <div class="dropdown">
-            <button class="dropbtn">
-                <a href="/perfil">Login</a>
+            <button id="idioma" class="dropbtn">{{ this.idioma }}</button>
+            <div class="dropdown-content">
+                <a (click)="useLanguage('es')">Español</a>
+                <a (click)="useLanguage('en')">Inglés</a>
+                <a (click)="useLanguage('pt')">Portugués</a>
+            </div>
+        </div>
+        
+        <div  class="dropdown">
+            <button *ngIf="!isLogged" class="dropbtn">
+                <a href="/login">{{ 'SHARED.HEADER.LOGIN' | translate }}</a>
+            </button>
+
+            <button (click)="redirectToAdmin()" *ngIf="isAdmin" class="dropbtn">
+                <a>{{ 'SHARED.HEADER.ADMIN' | translate }}</a>
+            </button>
+
+            <button *ngIf="isLogged" (click)="redirectToProfile()" class="dropbtn">
+                <a>{{ 'SHARED.HEADER.PERFIL' | translate }}</a>
+            </button>
+
+            <button *ngIf="isLogged" (click)="logout()" class="dropbtn">
+                <a href="/access-menu">{{ 'SHARED.HEADER.LOGOUT' | translate }}</a>
             </button>
         </div>
     </div>

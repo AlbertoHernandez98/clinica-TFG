@@ -1,77 +1,144 @@
 import { Component } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators
-} from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppStateService } from 'src/app/providers/app-state/app-state.service';
-import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
-import { MatDialog } from '@angular/material/dialog';
+
+import { HttpClient } from '@angular/common/http';
+import { Backend } from 'src/app/JSON-Model/backend';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
+import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 
 @Component({
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  spinner = false;
-  clinicaLogo = '../../../assets/icons/logo_clinica.png';
-  error = '../../../../assets/icons/svg/report_problem.svg';
-  success = '../../../../assets/icons/svg/green_check.svg';
-
   constructor(
-    private formBuilder: FormBuilder,
-    private appService: AppStateService,
+    private http: HttpClient,
     private router: Router,
-    private matDialog: MatDialog,
-    private translation: TranslateService
-  ) {
-    this.loginForm = this.formBuilder.group({
-      username: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required)
-    });
+    private urls: Backend,
+    public formBuilder: FormBuilder
+  ) {}
+
+
+  loginError: boolean = false;
+
+  usuarioEncontrado!: any;
+
+  form = this.formBuilder.group({
+    dni: new FormControl('', Validators.required),
+    password: new FormControl('', Validators.required),
+  });
+
+  ngOnInit() {
+    this.changesForm();
   }
 
-  openDialog(icon: string, text: string, buttonLabel: string) {
-    this.matDialog.open(ErrorSuccessComponent, {
-      data: {
-        icon,
-        text,
-        buttonLabel
+  login(): void {
+    this.loadUsername(this.form.controls.dni.value);    
+
+    if(this.usuarioEncontrado) {
+      const credentials = {
+        username: this.usuarioEncontrado.username,
+        password: this.form.controls.password.value,
+      };
+      const url =
+        this.urls.backend.url +
+        this.urls.backend.port +
+        this.urls.backend.rutas.login;
+
+      const headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      headers.append('Authorization', 'Bearer miToken');
+      headers.append('sec-fetch-mode', 'no-cors'); // Elimina las cabeceras experimentales
+      headers.append('sec-fetch-dest', 'empty');
+      headers.append('sec-fetch-site', 'same-origin');
+
+      const options = {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(credentials),
+      };
+
+      fetch(url, options)
+        .then((response: any) => {
+          if (response.ok) {
+            // El inicio de sesión fue exitoso, procesa la respuesta o redirige a otra página
+            const sessionToken = response.token;
+
+            // Set sessionToken cookie
+            document.cookie = `sessionToken=${sessionToken}`;
+
+            // Redirect to intranet page
+            window.location.href = '/access-menu';
+          } else {
+            // El inicio de sesión falló, maneja el error
+            this.loginFailed();
+            console.log('Ha fallado el login (response):', response);
+          }
+        })
+        .catch((error) => {
+          // Maneja errores de conexión u otros errores
+          console.error('Login failed:', error);
+        });
       }
+  }
+
+  private loginFailed() {
+    this.loginError = true;
+    return this.loginError;
+  }
+
+  private loadUserRol(username: any){
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const url = 'http://localhost:8080/persona';
+
+    fetch(url, options)
+      .then((response) => response.text())
+      .then((data) => {
+          const usuarioEncontrado = JSON.parse(data).find((user: { username: any; }) => user.username === username);
+          
+          document.cookie = `idRol=${usuarioEncontrado.idRolNativo}`;
+      }).catch((error) => {
+        console.error('Error:', error);
+      });
+  }
+
+  private loadUsername(dni: any){
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const url = 'http://localhost:8080/persona';
+
+    fetch(url, options)
+      .then((response) => response.text())
+      .then((data) => {
+          this.usuarioEncontrado = JSON.parse(data).find((user: { dni: any; }) => user.dni === dni);
+          document.cookie = `user=${this.usuarioEncontrado.username}`;
+
+          this.loadUserRol(this.usuarioEncontrado.username);
+
+      }).catch((error) => {
+        console.error('Error:', error);
+      });
+  }
+
+  changesForm() {
+    this.form.valueChanges.subscribe((res) => {
+      this.loginError = false;
     });
   }
 
-  submitLogin() {
-    if (
-      this.loginForm.controls.username.value === 'testusername' &&
-      this.loginForm.controls.password.value === 'testpassword'
-    ) {
-      this.spinner = true;
-      setTimeout(() => {
-        const obj: AppInfo = {
-          breadcum: [
-            {
-              active: false,
-              name: '',
-              route: ''
-            }
-          ],
-          isLogged: true
-        };
-        this.appService.setBreadcumInfo(obj, 'appInfo');
-        this.router.navigateByUrl('access-menu');
-      }, 1500);
-    } else {
-      this.openDialog(
-        this.error,
-        this.translation.instant('LOGIN.POPUP_ERROR_TEXT'),
-        this.translation.instant('LOGIN.POPUP_BUTTON_LABEL')
-      );
-    }
+  getTouchedAndError(key: string) {
+    return this.form.get(key)?.touched && this.form.get(key)?.errors?.required;
   }
 }

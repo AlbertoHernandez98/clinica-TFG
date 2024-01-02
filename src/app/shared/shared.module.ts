@@ -11,9 +11,6 @@ import { InputTextComponent } from './components/forms/input-text/input-text.com
 import { InputPasswordComponent } from './components/forms/input-password/input-password.component';
 import { ButtonBaseComponent } from './components/forms/button-base/button-base.component';
 import { HeaderComponent } from './components/header/header.component';
-import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
-import { MainMenuApplicationsComponent } from './components/main-menu-applications/main-menu-applications.component';
-import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { ErrorSuccessComponent } from './components/popups/error-success/error-success.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { FormCardComponent } from './components/forms/form-card/form-card.component';
@@ -21,6 +18,9 @@ import { FooterComponent } from './components/footer/footer.component';
 import { CardImgComponent } from './components/card-img/card-img.component';
 import { DragAndDropComponent } from './components/popups/drag-and-drop/drag-and-drop.component';
 import { InputTextV2Component } from './components/forms/input-text-v2/input-text-v2.component';
+import { ChangePasswordComponent } from './components/popups/change-password/change-password.component';
+import { AdminUsersComponent } from './components/popups/admin-users/admin-users.component';
+import { UserDetailComponent } from './components/popups/user-detail/user-detail.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -34,16 +34,16 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         InputPasswordComponent,
         ButtonBaseComponent,
         HeaderComponent,
-        BreadcrumbComponent,
-        MainMenuApplicationsComponent,
-        MainMenuComponent,
         ErrorSuccessComponent,
         SpinnerComponent,
         FormCardComponent,
         FooterComponent,
         CardImgComponent,
         DragAndDropComponent,
-        InputTextV2Component
+        InputTextV2Component,
+        ChangePasswordComponent,
+        AdminUsersComponent,
+        UserDetailComponent
     ],
     imports: [
         CommonModule,
@@ -67,9 +67,6 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         InputPasswordComponent,
         ButtonBaseComponent,
         HeaderComponent,
-        BreadcrumbComponent,
-        MainMenuApplicationsComponent,
-        MainMenuComponent,
         ErrorSuccessComponent,
         SpinnerComponent,
         FormCardComponent,
@@ -78,7 +75,10 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         FooterComponent,
         CardImgComponent,
         DragAndDropComponent,
-        InputTextV2Component
+        InputTextV2Component,
+        ChangePasswordComponent,
+        AdminUsersComponent,
+        UserDetailComponent
     ]
 })
 export class SharedModule { }

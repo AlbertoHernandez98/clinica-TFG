@@ -29,7 +29,8 @@
 
     &__columna2 {
         display: grid;
-        gap: $gap-form;
+        justify-items: center;
+        // gap: $gap-form;
 
         &__pack-dias {
             display: grid;

@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PerfilComponent } from './perfil.component';
+import { HistorialComponent } from './historial.component';
 
-const routes: Routes = [{ path: '', component: PerfilComponent }];
+const routes: Routes = [{ path: '', component: HistorialComponent }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class PerfilRoutingModule {}
+export class HistorialRoutingModule {}

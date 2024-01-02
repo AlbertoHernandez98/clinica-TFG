@@ -7,8 +7,10 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { PerfilComponent } from './perfil.component';
-import { PerfilRoutingModule } from './perfil-routing.module';
+import { PerfilUsuarioComponent } from './perfil-usuario.component';
+import { PerfilUsuarioRoutingModule } from './perfil-usuario-routing-module';
+import { Backend } from 'src/app/JSON-Model/backend';
+
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export function httpLoaderFactory(httpClient: HttpClient) {
@@ -16,12 +18,12 @@ export function httpLoaderFactory(httpClient: HttpClient) {
 }
 
 @NgModule({
-  declarations: [PerfilComponent],
+  declarations: [PerfilUsuarioComponent],
   imports: [
     CommonModule,
     SharedModule,
     ReactiveFormsModule,
-    PerfilRoutingModule,
+    PerfilUsuarioRoutingModule,
     TranslateModule.forChild({
       extend: true,
       defaultLanguage: 'es',
@@ -31,6 +33,6 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         deps: [HttpClient]
       }
     })
-  ]
+  ], providers: [Backend]
 })
-export class PerfilModule {}
+export class PerfilUsuarioModule {}
