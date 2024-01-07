@@ -100,8 +100,9 @@ export class HistorialComponent implements OnInit {
             (historial: { idCliente: number }) =>
               historial.idCliente === this.idPersona
           );
+       
 
-          this.listaLength = this.historialClinico === undefined;
+          this.listaLength = this.historialClinico.length === 0;
         } catch (error) {
           console.error('Error al analizar la respuesta JSON:', error);
         }
@@ -135,14 +136,22 @@ export class HistorialComponent implements OnInit {
     const url = `http://localhost:8080/historialclinico`;
 
 
+    const servicioEncontrado = this.servicios.find(
+      (servicio: { servicio: any }) => servicio.servicio === this.form.controls.idServicio.value
+    );
+   
+    
     if (this.form.valid) {
       const credentials = {
         comentarios: this.form.controls.comentarios.value,
         fecha: this.form.controls.fecha.value,
         idCliente: this.form.controls.idCliente.value,
         idMedico: this.form.controls.idMedico.value,
-        idServicio: this.form.controls.idServicio.value,
+        idServicio: servicioEncontrado.idServicio,
       };
+
+      console.log(credentials);
+      
 
       const optionsPOST = {
         method: 'POST',
@@ -166,6 +175,11 @@ export class HistorialComponent implements OnInit {
               },
             });
 
+
+            this.form.get('comentarios')?.patchValue('');
+            this.form.get('idServicio')?.patchValue(null);
+
+            this.servicios
             this.getHistorial();
           } catch (error) {
             console.error('Error al analizar la respuesta JSON:', error);
