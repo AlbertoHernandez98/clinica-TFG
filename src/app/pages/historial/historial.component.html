@@ -2,7 +2,15 @@
   <div class="label">{{ "HISTORIAL.TITULO" | translate }}</div>
   <div class="form-wrap" *ngIf="rol === 1 || rol === 2">
     <form class="form" action="" [formGroup]="form">
-      <div class="user-list">
+      <div class="list">
+        <div class="form-column">
+          <p>
+            Tipo de servicio:
+          </p>
+          <select formControlName="idServicio" class="servicio">
+            <option *ngFor="let item of servicios" [value]="item">{{ item.servicio }}</option>
+          </select>
+        </div>
         <div class="form-column">
           <textarea type="text" formControlName="comentarios"></textarea>
         </div>
@@ -16,9 +24,10 @@
   </div>
   <div class="list">
     <div class="list-header">
-      <div class="label"> {{ "HISTORIAL.TITULO" | translate }}</div>
-      <div class="label"> {{ "HISTORIAL.TITULO" | translate }}</div>
+      <div class="label"> {{ "HISTORIAL.FECHA" | translate }}</div>
+      <div class="label"> {{ "HISTORIAL.COMENTARIOS" | translate }}</div>
     </div>
+    <div class="list-row-noContent" *ngIf="listaLength">{{ "HISTORIAL.TABLA_VACIA" | translate }}</div>
     <div class="list-body">
       <div class="list-row" *ngFor="let item of historialClinico">
         <div class="list-fecha">{{item.fecha}}</div>

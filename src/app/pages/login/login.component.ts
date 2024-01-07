@@ -4,8 +4,6 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Backend } from 'src/app/JSON-Model/backend';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
-import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 
 @Component({
   templateUrl: './login.component.html',
@@ -21,6 +19,8 @@ export class LoginComponent {
 
 
   loginError: boolean = false;
+
+  isHidden!: boolean;
 
   usuarioEncontrado!: any;
 

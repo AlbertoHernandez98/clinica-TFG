@@ -43,19 +43,34 @@
     justify-content: space-between;
     padding-bottom: 30px;
 }
-.list-header {
-    display: flex;
-    justify-content: space-around;
 
-    p {
-        flex: 1;
-    }
-}
-
-.list-body{
-    .list-row {
+.list{
+    display: grid;
+    gap: 30px;
+    padding: 30px;
+    border: 1px solid;
+    border-radius: 5px;
+    border-color: rgba(210, 210, 220, 1.5);
+    .list-header {
         display: flex;
-        gap: 40px;
+        justify-content: space-around;
+
+        p {
+            flex: 1;
+        }
+    }
+
+    .list-body{
+        width: 500px;
+        .list-row {
+            display: flex;
+            gap: 40px;
+        }
+    }
+
+    .list-row-noContent{
+        display: flex;
+        justify-content: center;
     }
 }
 
@@ -111,4 +126,11 @@
         background-color: #fff;
         transition: filter 0.2s linear;
     }
+
+    .servicio{
+        max-width: 200px;
+        width: 100%;
+    }
 }
+
+

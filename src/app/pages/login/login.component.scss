@@ -1,4 +1,4 @@
-@import '/src/assets/theme/_variables';
+@import "/src/assets/theme/_variables";
 
 .wrapper {
     display: flex;
@@ -37,17 +37,17 @@
 }
 
 .wrap {
-  margin-right: auto;
-  margin-left: auto;
-  display: flex;
-  padding: 60px;
-  align-items: stretch;
-  border-style: solid;
-  border-width: 1px;
-  border-color: rgba(210, 210, 213, 0.5);
-  background-color: #fff;
-  justify-content: center;
-  width: 60%;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    padding: 60px;
+    align-items: stretch;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(210, 210, 213, 0.5);
+    background-color: #fff;
+    justify-content: center;
+    width: 60%;
 }
 
 .form-wrap {
@@ -108,3 +108,66 @@
     }
 }
 
+.form-column {
+    p {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        position: static;
+        display: block;
+        opacity: 0.6;
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    input,
+    select {
+        color: #000;
+        font-size: 14px;
+        border: 1px solid #75787b;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: #fff;
+        transition: filter 0.2s linear;
+        width: 100%;
+    }
+
+    .div-password {
+        display: flex; 
+        align-items: center;
+        .password-view i {
+            mask-image: url("../../../assets/icons/view.svg");
+        }
+
+        .password-noView i {
+            mask-image: url("../../../assets/icons/no-view.svg");
+        }
+
+        .btn-view-pass {
+            width: 30px;
+            height: 24px;
+            background-color: #fff;
+
+            i {
+                display: block;
+                width: 100%;
+                height: 100%;
+                background-color: $color-primary;
+                mask-size: contain;
+                mask-repeat: no-repeat;
+                mask-position: center right;
+            }
+        }
+
+        .password {
+            display: flex;
+            align-items: center;
+
+            input {
+                flex: 2;
+            }
+        }
+    }
+}

@@ -184,7 +184,12 @@
     "ADMINISTRAR_USUARIOS": "Administrar usuarios"
   },
   "HISTORIAL": {
-    "TITULO": "Historial clinico"
+    "TITULO": "Historial clinico",
+    "FECHA": "Fecha",
+    "COMENTARIOS": "Comentarios",
+    "TABLA_VACIA": "No existe ninguna entrada a mostrar.",
+    "SUCCESS": "Se ha añadido una nueva entrada de historial médico.",
+    "ERROR": "Ha habido un problema con el historial médico."
   },
   "ERRORS_MENSAJE": {
     "REQUIRED": "Campo obligatorio"

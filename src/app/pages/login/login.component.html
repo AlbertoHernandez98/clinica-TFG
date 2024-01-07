@@ -16,48 +16,61 @@
 
 <div class="wrapper">
   <div class="wrapper__deco-line"></div>
-  <div class="wrapper__title">
-      LOGIN
-  </div>
+  <div class="wrapper__title">LOGIN</div>
   <div class="wrapper__deco-line"></div>
 </div>
 <div class="content">
   <div class="wrap">
-      <div class="form-wrap">
-          <form class="form" action="" [formGroup]="form" >
-              <div>
-                  <app-input-text 
-                  formControlName="dni" 
-                  label="{{ 'CONTACTO.DNI' | translate }}"
-                  [invalid]="getTouchedAndError('dni')" 
-                  [required]="true">
-                  </app-input-text>
-                  <p class="form-error" *ngIf="getTouchedAndError('dni')">
-                      {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
-                  </p>
-              </div>
-              <div>
-                  <app-input-password 
-                  label="{{ 'LOGIN.PASSWORD_LABEL' | translate }}"
-                  [required]="true"
-                  placeholder=""
-                  formControlName="password">
-                  </app-input-password>
-                  <p class="form-error" *ngIf="getTouchedAndError('password')">
-                      {{ 'ERRORS_MENSAJE.REQUIRED' | translate }}
-                  </p>
-                  <p class="form-error" *ngIf="loginError">
-                    {{ 'LOGIN.POPUP_ERROR_TEXT' | translate }}
-                </p>
-              </div>
-              <div class="button">
-                <app-button-base (click)="login()"
-                    label="{{'LOGIN.INICIAR_SESION' | translate }}"
-                ></app-button-base>
+    <div class="form-wrap">
+      <form class="form" action="" [formGroup]="form">
+        <div>
+          <app-input-text
+            formControlName="dni"
+            label="{{ 'CONTACTO.DNI' | translate }}"
+            [invalid]="getTouchedAndError('dni')"
+            [required]="true"
+          >
+          </app-input-text>
+          <p class="form-error" *ngIf="getTouchedAndError('dni')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+        </div>
+        <div>
+          <div class="form-column">
+            <p>CONTRASEÑA</p>
+            <div class="div-password">
+              <input
+                [type]="isHidden ? 'text' : 'password'"
+                formControlName="password"
+              />
+              <button
+                type="button"
+                (click)="isHidden = !isHidden"
+                [ngClass]="{
+                  'password-view': isHidden,
+                  'password-noView': !isHidden
+                }"
+                class="btn-view-pass"
+                aria-label="Toggle Hide/Show password"
+              >
+                <i></i>
+              </button>
             </div>
-          </form>
-      </div>
+          </div>
+          <p class="form-error" *ngIf="getTouchedAndError('password')">
+            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+          </p>
+          <p class="form-error" *ngIf="loginError">
+            {{ "LOGIN.POPUP_ERROR_TEXT" | translate }}
+          </p>
+        </div>
+        <div class="button">
+          <app-button-base
+            (click)="login()"
+            label="{{ 'LOGIN.INICIAR_SESION' | translate }}"
+          ></app-button-base>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-
-

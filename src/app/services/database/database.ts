@@ -53,4 +53,23 @@ export class DatabaseService {
             console.error('Error:', error);
         });
       }
+
+      public loadServices() {
+        const options = {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+    
+        const url = 'http://localhost:8080/servicio';
+    
+        fetch(url, options)
+          .then((response) => response.text())
+          .then((data) => {
+              return data;
+          }).catch((error) => {
+            console.error('Error:', error);
+          });
+      }
 }
