@@ -1,25 +1,25 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormControl, FormBuilder } from '@angular/forms';
 import {
+  MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialog,
-  MatDialogRef,
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { ErrorSuccessComponent } from '../error-success/error-success.component';
+import { AdminUsersComponent } from '../admin-users/admin-users.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 
 @Component({
-  selector: 'app-admin-users',
-  templateUrl: './admin-users.component.html',
-  styleUrls: ['./admin-users.component.scss'],
+  selector: 'app-citas',
+  templateUrl: './citas.component.html',
+  styleUrls: ['./citas.component.scss'],
 })
-export class AdminUsersComponent implements OnInit {
+export class CitasComponent implements OnInit {
   buttonDisabled: boolean = true;
-  userList: any [] = [];
+  userList: any[] = [];
 
   form = this.formBuilder.group({
-    nombre: new FormControl('')
+    nombre: new FormControl(''),
   });
 
   constructor(
@@ -30,13 +30,13 @@ export class AdminUsersComponent implements OnInit {
     private translate: TranslateService
   ) {}
 
-
   success = './assets/icons/svg/icon-save.svg';
   error = './assets/icons/svg/icon-close.svg';
-
+  user: any;
 
   ngOnInit(): void {
     this.filtrarLista();
+    this.user = this.data.selectedUser;
   }
 
   private chargeList() {
@@ -54,41 +54,33 @@ export class AdminUsersComponent implements OnInit {
       .then((data) => {
         try {
           this.userList = JSON.parse(data);
-
         } catch (error) {
           console.error('Error al analizar la respuesta JSON:', error);
         }
-      })
+      });
   }
 
   public filtrarLista() {
     this.chargeList();
 
-    this.form.valueChanges.subscribe(user => {     
+    this.form.valueChanges.subscribe((user) => {
       var textoBuscado = user.nombre.toUpperCase();
-      const textoElemento = this.userList.filter((usuario) => usuario.username.toUpperCase().includes(textoBuscado));
+      const textoElemento = this.userList.filter((usuario) =>
+        usuario.username.toUpperCase().includes(textoBuscado)
+      );
       this.userList = textoElemento;
 
-      if(textoBuscado === ''){
+      if (textoBuscado === '') {
         this.chargeList();
       }
     });
   }
 
-  public async userDetail(user?: any) {   
-    const dialog = this.matDialog.open(UserDetailComponent, {
-      data: { selectedUser: user },
-      width: '500px'
-    });
-    dialog.afterClosed().subscribe(() => {
-      if(window.location.href.includes('historial')) {
-        this.dialogRef.close();
-      } 
-      this.chargeList();
-    });
-  }
-
-  close() {
-    this.dialogRef.close();
+  close(user?: any) {
+    if (user) {
+      this.dialogRef.close(user);
+    } else {
+      this.dialogRef.close();
+    }
   }
 }

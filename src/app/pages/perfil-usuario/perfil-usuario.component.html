@@ -7,18 +7,14 @@
           <input type="text" formControlName="usuario" />
         </div>
         <div class="form-column">
-            <p>
-                USUARIO
-            </p>
+          <p>USUARIO</p>
           <input type="text" formControlName="newUsuario" />
           <p class="form-error" *ngIf="getTouchedAndError('newUsuario')">
             {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
           </p>
         </div>
         <div class="form-column">
-            <p>
-                DNI
-            </p>
+          <p>DNI</p>
           <input type="text" formControlName="dni" />
 
           <p class="form-error" *ngIf="getTouchedAndError('dni')">
@@ -26,27 +22,21 @@
           </p>
         </div>
         <div class="form-column">
-            <p>
-                EMAIL
-            </p>
+          <p>EMAIL</p>
           <input type="text" formControlName="email" />
           <p class="form-error" *ngIf="getTouchedAndError('email')">
             {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
           </p>
         </div>
         <div class="form-column">
-            <p>
-                TELEFONO
-            </p>
+          <p>TELEFONO</p>
           <input type="text" formControlName="telefono" />
           <p class="form-error" *ngIf="getTouchedAndError('telefono')">
             {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
           </p>
         </div>
         <div class="form-column">
-            <p>
-                DOMICILIO
-            </p>
+          <p>DOMICILIO</p>
           <input type="text" formControlName="domicilio" />
           <p class="form-error" *ngIf="getTouchedAndError('domicilio')">
             {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
@@ -83,7 +73,7 @@
       <div class="button">
         <app-button-base
           label="{{ 'PERFIL.HISTORIAL' | translate }}"
-          routerLink="/historial"
+          (click)="redirectToHistorial()"
         ></app-button-base>
       </div>
     </div>

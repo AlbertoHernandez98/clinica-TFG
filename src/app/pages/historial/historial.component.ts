@@ -6,7 +6,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { log } from 'console';
 import { DatabaseService } from 'src/app/services/database/database';
 import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
 
@@ -18,6 +20,7 @@ import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-su
 export class HistorialComponent implements OnInit {
   historialClinico: any;
   servicios: any;
+  clienteSeleccionado: any;
 
   error = '../../../../assets/icons/svg/report_problem.svg';
   success = '../../../../assets/icons/svg/green_check.svg';
@@ -30,21 +33,58 @@ export class HistorialComponent implements OnInit {
     idServicio: new FormControl(Validators.required),
   });
 
+  filtros = this.formBuilder.group({
+    medico: new FormControl(),
+    servicio: new FormControl(),
+  });
+  listaFiltrada!: any[];
+  listaMedicos!: any[];
+
   idPersona!: number;
   rol!: number;
   listaLength!: boolean;
+  fechaFormateada: any;
 
   constructor(
     public formBuilder: FormBuilder,
     public database: DatabaseService,
     private translate: TranslateService,
-    public matDialog: MatDialog
+    public matDialog: MatDialog,
+    public route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.loadUser();
     this.getHistorial();
     this.loadServices();
+
+
+    this.route.params.subscribe((params) => {
+      this.clienteSeleccionado = params['dato'];
+    });
+  }
+
+  currentPage = 1;
+  pageSize = 5;
+  totalItems!: number;
+
+  loadItems(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.listaFiltrada = this.getPaginatedData(startIndex, this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadItems();
+  }
+
+  private getPaginatedData(startIndex: number, pageSize: number): string[] {
+    return this.listaFiltrada.slice(startIndex, startIndex + pageSize);
+  }
+
+  hasNextPage(): boolean {
+    const lastItemIndexOnPage = this.currentPage * this.pageSize;
+    return lastItemIndexOnPage < this.totalItems;
   }
 
   private loadUser() {
@@ -72,10 +112,21 @@ export class HistorialComponent implements OnInit {
 
         if (usuarioEncontrado) {
           this.idPersona = usuarioEncontrado.idPersona;
-          this.form.get('idCliente')?.setValue(usuarioEncontrado.idPersona);
+          this.form.get('idCliente')?.setValue(this.clienteSeleccionado);
           this.form.get('idMedico')?.setValue(usuarioEncontrado.idPersona);
           this.rol = usuarioEncontrado.idRolNativo;
         }
+
+        const clienteEncontrado = JSON.parse(data).find(
+          (cliente: { idPersona: any }) =>
+            cliente.idPersona == this.clienteSeleccionado
+        );
+
+        this.clienteSeleccionado = clienteEncontrado;
+
+        this.listaMedicos = JSON.parse(data).filter(
+          (elemento: { idRolNativo: any }) => elemento.idRolNativo === 2
+        );
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -98,11 +149,17 @@ export class HistorialComponent implements OnInit {
         try {
           this.historialClinico = JSON.parse(data).filter(
             (historial: { idCliente: number }) =>
-              historial.idCliente === this.idPersona
+              historial.idCliente === this.clienteSeleccionado.idPersona
           );
-       
+
+          this.dateConverter(this.historialClinico);
 
           this.listaLength = this.historialClinico.length === 0;
+          this.listaFiltrada = this.historialClinico;
+          this.totalItems = this.listaFiltrada.length;
+          // this.loadItems();
+
+
         } catch (error) {
           console.error('Error al analizar la respuesta JSON:', error);
         }
@@ -110,6 +167,21 @@ export class HistorialComponent implements OnInit {
       .catch((error) => {
         console.error('Error:', error);
       });
+  }
+
+  private dateConverter(historial: any) {
+    historial.forEach((item: { fecha: string | number | Date }) => {
+      item.fecha = new Date(item.fecha);
+      var dia: any = item.fecha.getDate();
+      var mes: any = item.fecha.getMonth() + 1; // Nota: los meses en JavaScript van de 0 a 11
+      var año = item.fecha.getFullYear();
+
+      // Asegurarse de que el día y el mes tengan dos dígitos
+      dia = dia < 10 ? '0' + dia : dia;
+      mes = mes < 10 ? '0' + mes : mes;
+
+      this.fechaFormateada = dia + '/' + mes + '/' + año;
+    });
   }
 
   public loadServices() {
@@ -135,12 +207,11 @@ export class HistorialComponent implements OnInit {
   public postHistorial() {
     const url = `http://localhost:8080/historialclinico`;
 
-
     const servicioEncontrado = this.servicios.find(
-      (servicio: { servicio: any }) => servicio.servicio === this.form.controls.idServicio.value
+      (servicio: { servicio: any }) =>
+        servicio.servicio === this.form.controls.idServicio.value
     );
-   
-    
+
     if (this.form.valid) {
       const credentials = {
         comentarios: this.form.controls.comentarios.value,
@@ -150,8 +221,6 @@ export class HistorialComponent implements OnInit {
         idServicio: servicioEncontrado.idServicio,
       };
 
-      console.log(credentials);
-      
 
       const optionsPOST = {
         method: 'POST',
@@ -175,11 +244,10 @@ export class HistorialComponent implements OnInit {
               },
             });
 
-
             this.form.get('comentarios')?.patchValue('');
             this.form.get('idServicio')?.patchValue(null);
 
-            this.servicios
+            this.servicios;
             this.getHistorial();
           } catch (error) {
             console.error('Error al analizar la respuesta JSON:', error);
@@ -202,5 +270,50 @@ export class HistorialComponent implements OnInit {
         },
       });
     }
+  }
+
+  public sortByDate() {
+    this.historialClinico.sort(
+      (
+        a: { fecha: { getTime: () => number } },
+        b: { fecha: { getTime: () => number } }
+      ) => a.fecha.getTime() - b.fecha.getTime()
+    );
+  }
+
+  public sortByServicio() {
+    const servicioEncontrado = this.servicios.find(
+      (servicio: { servicio: any }) =>
+        servicio.servicio === this.filtros.controls.servicio.value
+    );
+
+    this.listaFiltrada = this.historialClinico.filter(
+      (elemento: { idServicio: any }) =>
+        elemento.idServicio == servicioEncontrado.idServicio
+    );
+
+    if (this.filtros.controls.medico.value != undefined) {
+      this.listaFiltrada = this.listaFiltrada.filter(
+        (elemento: any) => elemento == this.filtros.controls.medico.value
+      );
+    }
+  }
+
+  public sortByMedico() {
+    this.listaFiltrada = this.historialClinico.filter(
+      (elemento: any) => elemento == this.filtros.controls.medico.value
+    );
+
+    if (this.filtros.controls.servicio.value != undefined) {
+      this.listaFiltrada = this.listaFiltrada.filter(
+        (elemento: any) => elemento == this.filtros.controls.servicio.value
+      );
+    }
+  }
+
+  public borrarFiltros() {
+    this.listaFiltrada = this.historialClinico;
+    this.filtros.get('servicio')?.setValue('');
+    this.filtros.get('medico')?.setValue('');
   }
 }

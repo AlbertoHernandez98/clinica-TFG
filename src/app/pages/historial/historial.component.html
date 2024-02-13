@@ -3,13 +3,21 @@
   <div class="form-wrap" *ngIf="rol === 1 || rol === 2">
     <form class="form" action="" [formGroup]="form">
       <div class="list">
-        <div class="form-column">
-          <p>
-            Tipo de servicio:
-          </p>
-          <select formControlName="idServicio" class="servicio">
-            <option *ngFor="let item of servicios" [value]="item.servicio">{{ item.servicio }}</option>
-          </select>
+        <div class="form-flex-row">
+          <div class="form-column">
+            <p>Tipo de servicio:</p>
+            <select formControlName="idServicio" class="servicio">
+              <option *ngFor="let item of servicios" [value]="item.servicio">
+                {{ item.servicio }}
+              </option>
+            </select>
+          </div>
+          <div class="form-column">
+            <p>Cliente:</p>
+            <p *ngIf="this.clienteSeleccionado !== undefined">
+              {{ this.clienteSeleccionado.username }}
+            </p>
+          </div>
         </div>
         <div class="form-column">
           <textarea type="text" formControlName="comentarios"></textarea>
@@ -18,22 +26,71 @@
     </form>
     <app-button-base
       (click)="postHistorial()"
-      label="{{'CONTACTO.ENVIAR' | translate }}"
+      label="{{ 'CONTACTO.ENVIAR' | translate }}"
     ></app-button-base>
     <div class="divider"></div>
   </div>
   <div class="list">
-    <div class="list-header">
-      <div class="label"> {{ "HISTORIAL.FECHA" | translate }}</div>
-      <div class="label"> {{ "HISTORIAL.COMENTARIOS" | translate }}</div>
-    </div>
-    <div class="list-row-noContent" *ngIf="listaLength">{{ "HISTORIAL.TABLA_VACIA" | translate }}</div>
-    <div class="list-body">
-      <div class="list-row" *ngFor="let item of historialClinico">
-        <div class="list-fecha">{{item.fecha}}</div>
-        <div class="list-comentario">{{item.comentarios}}</div>
+    <form class="filtros" action="" [formGroup]="filtros">
+      <div class="form-flex-row">
+        <div class="form-column">
+          <p>Tipo de servicio:</p>
+          <select
+            formControlName="servicio"
+            class="servicio"
+            (change)="sortByServicio()"
+          >
+            <option *ngFor="let item of servicios" [value]="item.servicio">
+              {{ item.servicio }}
+            </option>
+          </select>
+        </div>
+        <div class="form-column">
+          <p>Médico:</p>
+          <select
+            formControlName="medico"
+            class="medico"
+            (change)="sortByMedico()"
+          >
+            <option *ngFor="let item of listaMedicos" [value]="item.username">
+              {{ item.username }}
+            </option>
+          </select>
+        </div>
+        <div class="form-column">
+          <p class="borrar" (click)="borrarFiltros()">Borrar filtros</p>
+        </div>
       </div>
-    </div>
+      <div class="list-header">
+        <div class="label" (click)="sortByDate()">
+          {{ "HISTORIAL.FECHA" | translate }}
+        </div>
+        <div class="label">{{ "HISTORIAL.COMENTARIOS" | translate }}</div>
+      </div>
+      <div class="list-row-noContent" *ngIf="listaLength">
+        {{ "HISTORIAL.TABLA_VACIA" | translate }}
+      </div>
+      <div class="list-body">
+        <div class="list-row" *ngFor="let item of listaFiltrada">
+          <div class="list-fecha">{{ fechaFormateada }}</div>
+          <div class="list-comentario">{{ item.comentarios }}</div>
+        </div>
+        <!-- <div>
+          <button
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+          >
+            Previous
+          </button>
+          <span>{{ currentPage }}</span>
+          <button
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="!hasNextPage()"
+          >
+            Next
+          </button>
+        </div> -->
+      </div>
+    </form>
   </div>
-
 </div>

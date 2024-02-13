@@ -1,0 +1,29 @@
+
+<div class="head">
+    <h2 class="header">
+      {{ 'SHARED.POPUPS.ADMIN_USERS.TITLE' | translate }}
+    </h2>
+    <i (click)="close()" class="close">
+      <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
+    </i>
+  </div>
+  
+  <div class="container">
+    <form action="" [formGroup]="form">
+      <div class="form-wrap">
+        <div class="list-header">
+            <app-input-text
+            id="filtro"
+            formControlName="nombre"
+            label="{{ 'SHARED.POPUPS.ADMIN_USERS.NOMBRE' | translate }}"
+            ></app-input-text>
+        </div>
+        <div class="user-list">
+          <div class="users" *ngFor="let user of userList" (click)="close(user)">
+            <p id="lista">{{user.username.toUpperCase()}}</p>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  

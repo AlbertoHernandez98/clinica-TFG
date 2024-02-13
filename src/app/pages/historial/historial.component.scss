@@ -51,9 +51,13 @@
     border: 1px solid;
     border-radius: 5px;
     border-color: rgba(210, 210, 220, 1.5);
+
+
     .list-header {
         display: flex;
-        justify-content: space-around;
+        justify-content:flex-start;
+        margin-top: 30px;
+        gap: 80px;
 
         p {
             flex: 1;
@@ -127,10 +131,31 @@
         transition: filter 0.2s linear;
     }
 
-    .servicio{
-        max-width: 200px;
-        width: 100%;
-    }
+    
 }
 
+.servicio{
+    max-width: 200px;
+    width: 100%;
+}
+
+.form-flex-row{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+select {
+    color: #000;
+    font-size: 14px;
+    border: 1px solid #75787b;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #fff;
+    transition: filter 0.2s linear;
+}
+
+.borrar{
+    cursor: pointer;
+}
 

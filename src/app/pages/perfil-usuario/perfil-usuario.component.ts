@@ -14,6 +14,7 @@ import { ModalController } from '@ionic/angular';
 import { ChangePasswordComponent } from 'src/app/shared/components/popups/change-password/change-password.component';
 import { LangService } from 'src/app/services/lang/lang';
 import { AdminUsersComponent } from 'src/app/shared/components/popups/admin-users/admin-users.component';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-perfil-usuario',
   templateUrl: './perfil-usuario.component.html',
@@ -37,6 +38,7 @@ export class PerfilUsuarioComponent implements OnInit {
     public matDialog: MatDialog,
     private translate: TranslateService,
     private urls: Backend,
+    public router: Router
   ) {}
 
   ngOnInit(): void {
@@ -210,5 +212,11 @@ export class PerfilUsuarioComponent implements OnInit {
         edit: true
       }
     });
+  }
+
+  redirectToHistorial(){
+    this.router.navigate(['/historial', { dato: this.usuarioEncontrado.idPersona }]).then(() => {
+      window.location.reload();
+    });;
   }
 }

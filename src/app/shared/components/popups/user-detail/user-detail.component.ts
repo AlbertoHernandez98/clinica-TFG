@@ -7,6 +7,7 @@ import {
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
+import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-detail',
@@ -30,7 +31,8 @@ export class UserDetailComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
-    private translate: TranslateService
+    private translate: TranslateService,
+    public router: Router
   ) {}
 
 
@@ -209,5 +211,19 @@ export class UserDetailComponent implements OnInit {
 
   public close() {
     this.dialogRef.close();
+  }
+
+  public openHistorial(user: any) {
+    this.router.navigate(['/historial', { dato: user.idPersona }]).then(() => {
+      window.location.reload();
+    });;
+    this.dialogRef.close();
+  }
+
+  public openCita(user: any){
+    const dialog = this.matDialog.open(UserDetailComponent, {
+      data: { selectedUser: user },
+      width: '500px'
+    });
   }
 }

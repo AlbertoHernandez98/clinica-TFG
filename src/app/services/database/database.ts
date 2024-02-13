@@ -18,7 +18,7 @@ export class DatabaseService {
           .then((response) => response.text())
           .then((data) => {
               const res = JSON.parse(data).find((user: { username: any; }) => user.username === username);
-              return res;
+              return res.idRolNativo;
           }).catch((error) => {
             console.error('Error:', error);
           });
