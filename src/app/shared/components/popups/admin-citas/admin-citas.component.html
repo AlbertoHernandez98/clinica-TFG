@@ -1,0 +1,55 @@
+<div class="head">
+  <h2 class="header">
+    {{ "SHARED.POPUPS.CITAS.TITLE" | translate }}
+  </h2>
+  <i (click)="close()" class="close">
+    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
+  </i>
+</div>
+
+<div class="container">
+  <form class="form" action="" [formGroup]="form">
+    <div class="user-list">
+      <div class="form-column">
+        <p>FECHA INCIO</p>
+        <input type="datetime-local" formControlName="fechaInicio" />
+      </div>
+      <div class="form-column">
+        <p>DURACION</p>
+        <select formControlName="duracion" class="servicio">
+          <option *ngFor="let item of duraciones" [value]="item">
+            {{ item }}
+          </option>
+        </select>
+      </div>
+      <div class="form-column">
+        <p>TIPO DE SERVICIO</p>
+        <select formControlName="idServicio" class="servicio">
+          <option *ngFor="let item of servicios" [value]="item.idServicio">
+            {{ item.servicio }}
+          </option>
+        </select>
+      </div>
+      <div class="form-column">
+        <p>MEDICO</p>
+        <select formControlName="idMedico" class="servicio">
+          <option *ngFor="let item of listaMedicos" [value]="item.idPersona">
+            {{ item.username }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="buttons">
+    <div class="button">
+      <app-button-base
+        (click)="onDelete()"
+        label="{{ 'SHARED.POPUPS.ADMIN_USERS.ELIMINAR' | translate }}"
+      ></app-button-base>
+      <app-button-base
+        (click)="onSubmit()"
+        label="{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}"
+      ></app-button-base>
+    </div>
+  </div>
+</div>

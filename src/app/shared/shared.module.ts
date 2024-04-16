@@ -22,6 +22,7 @@ import { ChangePasswordComponent } from './components/popups/change-password/cha
 import { AdminUsersComponent } from './components/popups/admin-users/admin-users.component';
 import { UserDetailComponent } from './components/popups/user-detail/user-detail.component';
 import { CitasComponent } from './components/popups/citas/citas.component';
+import { AdminCitasComponent } from './components/popups/admin-citas/admin-citas.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -45,7 +46,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         ChangePasswordComponent,
         AdminUsersComponent,
         UserDetailComponent,
-        CitasComponent
+        CitasComponent,
+        AdminCitasComponent
     ],
     imports: [
         CommonModule,
@@ -80,7 +82,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         InputTextV2Component,
         ChangePasswordComponent,
         AdminUsersComponent,
-        UserDetailComponent
+        UserDetailComponent,
+        AdminCitasComponent
     ]
 })
 export class SharedModule { }

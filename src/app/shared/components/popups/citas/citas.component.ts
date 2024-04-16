@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, FormBuilder } from '@angular/forms';
+import { FormControl, FormBuilder, Validators } from '@angular/forms';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -8,6 +8,8 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { AdminUsersComponent } from '../admin-users/admin-users.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { ErrorSuccessComponent } from '../error-success/error-success.component';
+import { AdminCitasComponent } from '../admin-citas/admin-citas.component';
 
 @Component({
   selector: 'app-citas',
@@ -15,11 +17,24 @@ import { UserDetailComponent } from '../user-detail/user-detail.component';
   styleUrls: ['./citas.component.scss'],
 })
 export class CitasComponent implements OnInit {
-  buttonDisabled: boolean = true;
-  userList: any[] = [];
+  citasList: any[] = [];
+  servicios: any;
+  listaMedicos: any[] = [];
+
+  listaLength!: boolean;
+  fechaFormateada: any;
+
+
+
+  duraciones: number[] = [15,30,45,60,75,90];
+
 
   form = this.formBuilder.group({
-    nombre: new FormControl(''),
+    idServicio: new FormControl(null),
+    idMedico: new FormControl(null),
+    fechaInicio: new FormControl(null),
+    fechaFin: new FormControl(null),
+    duracion: new FormControl(null),
   });
 
   constructor(
@@ -35,9 +50,10 @@ export class CitasComponent implements OnInit {
   user: any;
 
   ngOnInit(): void {
-    this.filtrarLista();
-    this.user = this.data.selectedUser;
+    this.chargeList();
   }
+
+ 
 
   private chargeList() {
     const options = {
@@ -47,34 +63,62 @@ export class CitasComponent implements OnInit {
       },
     };
 
-    const url = 'http://localhost:8080/persona';
+    const url = 'http://localhost:8080/citas';
 
     fetch(url, options)
       .then((response) => response.text())
       .then((data) => {
         try {
-          this.userList = JSON.parse(data);
+          this.citasList = JSON.parse(data).filter(
+            (cita: { idCliente: number }) =>
+              cita.idCliente === this.data.selectedUser.idPersona
+          );
+
+          console.log(data);
+          
+
+
+          this.dateConverter(this.citasList);
+
+          
+          this.listaLength = this.citasList.length === 0;
+
+
         } catch (error) {
           console.error('Error al analizar la respuesta JSON:', error);
         }
-      });
+      })
   }
 
-  public filtrarLista() {
-    this.chargeList();
+  private dateConverter(historial: any) {
+    historial.forEach((item: { fecha: string | number | Date }) => {
+      item.fecha = new Date(item.fecha);
+      var dia: any = item.fecha.getDate();
+      var mes: any = item.fecha.getMonth() + 1; // Nota: los meses en JavaScript van de 0 a 11
+      var año = item.fecha.getFullYear();
 
-    this.form.valueChanges.subscribe((user) => {
-      var textoBuscado = user.nombre.toUpperCase();
-      const textoElemento = this.userList.filter((usuario) =>
-        usuario.username.toUpperCase().includes(textoBuscado)
-      );
-      this.userList = textoElemento;
+      // Asegurarse de que el día y el mes tengan dos dígitos
+      dia = dia < 10 ? '0' + dia : dia;
+      mes = mes < 10 ? '0' + mes : mes;
 
-      if (textoBuscado === '') {
-        this.chargeList();
-      }
+      this.fechaFormateada = dia + '/' + mes + '/' + año;
     });
   }
+
+
+  public async administrarCita(user?: any) {   
+
+    const dialog = this.matDialog.open(AdminCitasComponent, {
+      data: { selectedUser: this.data.selectedUser
+      },
+      width: '500px'
+    });
+
+    dialog.afterClosed().subscribe(() => {
+      this.chargeList();
+    });
+  }
+
 
   close(user?: any) {
     if (user) {

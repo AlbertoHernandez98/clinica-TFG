@@ -9,17 +9,15 @@
 
 <div class="container">
   <div class="form-wrap">
-    <div class="form-flex-row">
-      <div class="form-column">
+    <div class="buttons">
+      <div class="button">
         <app-button-base
           (click)="openHistorial(user)"
           label="{{ 'HISTORIAL.TITULO' | translate }}"
         ></app-button-base>
-      </div>
-      <div class="form-column">
         <app-button-base
           (click)="openCita(user)"
-          label="{{ 'PERFIL.CITA' | translate }}"
+          label="{{ 'SHARED.POPUPS.CITAS.TITLE' | translate }}"
         ></app-button-base>
       </div>
     </div>

@@ -40,6 +40,7 @@
 .button{
     display: flex;
     gap: 40px;
+    padding-top: 20px;
 }
 .users{
     display: flex;
@@ -84,42 +85,7 @@
     }
 }
 
-.password-view i {
-    mask-image: url('../../../../../assets/icons/view.svg');
-  }
-  
-  .password-noView i {
-    mask-image: url('../../../../../assets/icons/no-view.svg');
-  }
-  
-
-  .btn-view-pass {
-    width: 30px;
-    height: 24px;
-    background-color: #fff;
-
-    i {
-      display: block;
-      width: 100%;
-      height: 100%;
-      background-color: $color-primary;
-      mask-size: contain;
-      mask-repeat: no-repeat;
-      mask-position: center right;
-    }
-  }
-
-  .password{
-    display: flex;
-    align-items: center;
-
-    input{ flex: 2}
-  }
-
-  .form-flex-row{
-    display: flex;
-    gap: 20px;
-    align-items: center;
+.servicio{
+    max-width: 200px;
+    width: 100%;
 }
-
-  

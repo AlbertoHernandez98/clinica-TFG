@@ -142,6 +142,12 @@
       },
       "ERROR_SUCCESS": {
         "SUCCESS": ""
+      },
+      "CITAS": {
+        "TITLE": "Administrar cita",
+        "LISTA": "Lista de citas",
+        "CREAR": "Crear nueva cita"
+
       }
     },
     "HEADER": {

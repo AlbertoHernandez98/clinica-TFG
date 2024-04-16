@@ -8,6 +8,7 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { Route, Router } from '@angular/router';
+import { CitasComponent } from '../citas/citas.component';
 
 @Component({
   selector: 'app-user-detail',
@@ -221,7 +222,7 @@ export class UserDetailComponent implements OnInit {
   }
 
   public openCita(user: any){
-    const dialog = this.matDialog.open(UserDetailComponent, {
+    const dialog = this.matDialog.open(CitasComponent, {
       data: { selectedUser: user },
       width: '500px'
     });

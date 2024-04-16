@@ -1,29 +1,29 @@
-
 <div class="head">
-    <h2 class="header">
-      {{ 'SHARED.POPUPS.ADMIN_USERS.TITLE' | translate }}
-    </h2>
-    <i (click)="close()" class="close">
-      <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
-    </i>
-  </div>
-  
-  <div class="container">
-    <form action="" [formGroup]="form">
-      <div class="form-wrap">
-        <div class="list-header">
-            <app-input-text
-            id="filtro"
-            formControlName="nombre"
-            label="{{ 'SHARED.POPUPS.ADMIN_USERS.NOMBRE' | translate }}"
-            ></app-input-text>
+  <h2 class="header">
+    {{ 'SHARED.POPUPS.CITAS.LISTA' | translate }}
+  </h2>
+  <i (click)="close()" class="close">
+    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
+  </i>
+</div>
+
+<div class="container">
+  <form action="" [formGroup]="form">
+    <div class="form-wrap">
+      <div class="user-list">
+        <div class="list-row-noContent" *ngIf="listaLength">
+          {{ "HISTORIAL.TABLA_VACIA" | translate }}
         </div>
-        <div class="user-list">
-          <div class="users" *ngFor="let user of userList" (click)="close(user)">
-            <p id="lista">{{user.username.toUpperCase()}}</p>
-          </div>
+        <div class="users" *ngFor="let user of citasList" (click)="administrarCita(user)">
+          <p id="lista">{{user.idServicio}} {{fechaFormateada}}</p>
         </div>
       </div>
-    </form>
+    </div>
+  </form>
+  <div class="buttons">
+    <app-button-base
+    label="{{ 'SHARED.POPUPS.CITAS.CREAR' | translate }}"
+    (click)="administrarCita()"
+    ></app-button-base>
   </div>
-  
+</div>

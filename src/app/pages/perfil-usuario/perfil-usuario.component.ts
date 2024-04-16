@@ -57,10 +57,8 @@ export class PerfilUsuarioComponent implements OnInit {
   private loadForm() {
     const inputString = document.cookie;
 
-    // Buscamos el índice del '=' en la cadena
     const indexOfEqualSign = inputString.indexOf('user=');
 
-    // Extraemos el substring que sigue después del '=' y el espacio
     const userToDepure = inputString.substring(indexOfEqualSign + 5);
     var newUsuario = userToDepure.split(';')[0];
 
