@@ -16,7 +16,7 @@ import { UserDetailComponent } from '../user-detail/user-detail.component';
 })
 export class AdminUsersComponent implements OnInit {
   buttonDisabled: boolean = true;
-  userList: any [] = [];
+  userList: any[] = [];
 
   form = this.formBuilder.group({
     nombre: new FormControl('')
@@ -28,7 +28,7 @@ export class AdminUsersComponent implements OnInit {
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
     private translate: TranslateService
-  ) {}
+  ) { }
 
 
   success = './assets/icons/svg/icon-save.svg';
@@ -64,26 +64,26 @@ export class AdminUsersComponent implements OnInit {
   public filtrarLista() {
     this.chargeList();
 
-    this.form.valueChanges.subscribe(user => {     
+    this.form.valueChanges.subscribe(user => {      
       var textoBuscado = user.nombre.toUpperCase();
       const textoElemento = this.userList.filter((usuario) => usuario.username.toUpperCase().includes(textoBuscado));
       this.userList = textoElemento;
 
-      if(textoBuscado === ''){
+      if (textoBuscado === '') {
         this.chargeList();
       }
     });
   }
 
-  public async userDetail(user?: any) {   
+  public async userDetail(user?: any) {
     const dialog = this.matDialog.open(UserDetailComponent, {
       data: { selectedUser: user },
-      width: '500px'
+      width: '600px'
     });
     dialog.afterClosed().subscribe(() => {
-      if(window.location.href.includes('historial')) {
+      if (window.location.href.includes('historial')) {
         this.dialogRef.close();
-      } 
+      }
       this.chargeList();
     });
   }

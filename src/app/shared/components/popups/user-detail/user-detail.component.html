@@ -9,7 +9,7 @@
 
 <div class="container">
   <div class="form-wrap">
-    <div class="buttons">
+    <div class="buttons" *ngIf="this.modifyUser">
       <div class="button">
         <app-button-base
           (click)="openHistorial(user)"
@@ -28,7 +28,7 @@
           <input type="text" formControlName="usuario" />
         </div>
         <div class="form-column">
-          <p>USUARIO NUEVO</p>
+          <p>USUARIO</p>
           <input type="text" formControlName="newUsuario" />
         </div>
         <div class="form-column">
@@ -65,8 +65,21 @@
           </select>
         </div>
         <div class="form-column">
-          <p>DNI</p>
-          <input type="text" formControlName="dni" />
+            <app-input-text
+              formControlName="dni"
+              label="{{ 'CONTACTO.DNI' | translate }}"
+              [invalid]="getTouchedAndError('dni')"
+              [required]="true"
+            >
+            </app-input-text>
+            <p class="form-error" *ngIf="getTouchedAndError('dni')">
+              {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
+            </p>
+            <p class="form-error" *ngIf="validarForm('dni')">
+              DNI INVALIDO
+            </p>
+          <!-- <p>DNI</p>
+          <input type="text" formControlName="dni" /> -->
         </div>
         <div class="form-column">
           <p>TELEFONO</p>

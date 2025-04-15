@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Backend } from 'src/app/JSON-Model/backend';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { log } from 'console';
 
 @Component({
   templateUrl: './login.component.html',
@@ -15,7 +16,7 @@ export class LoginComponent {
     private router: Router,
     private urls: Backend,
     public formBuilder: FormBuilder
-  ) {}
+  ) { }
 
 
   loginError: boolean = false;
@@ -29,14 +30,18 @@ export class LoginComponent {
     password: new FormControl('', Validators.required),
   });
 
+  loginBool = false;
+
   ngOnInit() {
     this.changesForm();
   }
 
   login(): void {
-    this.loadUsername(this.form.controls.dni.value);    
+    this.loadUsername(this.form.controls.dni.value);
 
-    if(this.usuarioEncontrado) {
+    if (this.usuarioEncontrado) {
+
+
       const credentials = {
         username: this.usuarioEncontrado.username,
         password: this.form.controls.password.value,
@@ -59,28 +64,28 @@ export class LoginComponent {
         body: JSON.stringify(credentials),
       };
 
-      fetch(url, options)
-        .then((response: any) => {
-          if (response.ok) {
-            // El inicio de sesión fue exitoso, procesa la respuesta o redirige a otra página
-            const sessionToken = response.token;
+      // fetch(url, options)
+      //   .then((response: any) => {
+      //     if (response.ok) {
+      //       // El inicio de sesión fue exitoso, procesa la respuesta o redirige a otra página
+      //       const sessionToken = response.token;
 
-            // Set sessionToken cookie
-            document.cookie = `sessionToken=${sessionToken}`;
+      //       // Set sessionToken cookie
+      //       document.cookie = `sessionToken=${sessionToken}`;
 
-            // Redirect to intranet page
-            window.location.href = '/access-menu';
-          } else {
-            // El inicio de sesión falló, maneja el error
-            this.loginFailed();
-            console.log('Ha fallado el login (response):', response);
-          }
-        })
-        .catch((error) => {
-          // Maneja errores de conexión u otros errores
-          console.error('Login failed:', error);
-        });
-      }
+      //       // Redirect to intranet page
+      //       window.location.href = '/access-menu';
+      //     } else {
+      //       // El inicio de sesión falló, maneja el error
+      //       this.loginFailed();
+      //       console.log('Ha fallado el login (response):', response);
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     // Maneja errores de conexión u otros errores
+      //     console.error('Login failed:', error);
+      //   });
+    }
   }
 
   private loginFailed() {
@@ -88,7 +93,7 @@ export class LoginComponent {
     return this.loginError;
   }
 
-  private loadUserRol(username: any){
+  private loadUserRol(userLogged: any) {
     const options = {
       method: 'GET',
       headers: {
@@ -101,15 +106,25 @@ export class LoginComponent {
     fetch(url, options)
       .then((response) => response.text())
       .then((data) => {
-          const usuarioEncontrado = JSON.parse(data).find((user: { username: any; }) => user.username === username);
-          
+        const usuarioEncontrado = JSON.parse(data).find((user: { dni: any; }) => user.dni === userLogged.dni);
+
+        console.log('Usuario encontrado:', usuarioEncontrado);
+        if (usuarioEncontrado.password === this.form.controls.password.value) {
+
+          this.loginBool = true;
           document.cookie = `idRol=${usuarioEncontrado.idRolNativo}`;
+          document.cookie = `sessionToken=${Math.random()}`;
+
+          window.location.href = '/access-menu';
+        }
+
+
       }).catch((error) => {
         console.error('Error:', error);
       });
   }
 
-  private loadUsername(dni: any){
+  private loadUsername(dni: string) {
     const options = {
       method: 'GET',
       headers: {
@@ -122,10 +137,18 @@ export class LoginComponent {
     fetch(url, options)
       .then((response) => response.text())
       .then((data) => {
-          this.usuarioEncontrado = JSON.parse(data).find((user: { dni: any; }) => user.dni === dni);
-          document.cookie = `user=${this.usuarioEncontrado.username}`;
+        console.log('Data:', JSON.parse(data));
+        console.log('DNI:', dni);
+        console.log(typeof dni);
+        
 
-          this.loadUserRol(this.usuarioEncontrado.username);
+        this.usuarioEncontrado = JSON.parse(data).find((user: { dni: string; }) => user.dni === dni);
+        document.cookie = `user=${this.usuarioEncontrado.username}`;
+
+        console.log('Usuario encontrado:', this.usuarioEncontrado);
+        console.log('Contraseña:', this.usuarioEncontrado.password);
+
+        this.loadUserRol(this.usuarioEncontrado);
 
       }).catch((error) => {
         console.error('Error:', error);
