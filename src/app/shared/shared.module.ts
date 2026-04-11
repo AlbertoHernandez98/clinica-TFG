@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
 import { InputTextComponent } from './components/forms/input-text/input-text.component';
 import { InputPasswordComponent } from './components/forms/input-password/input-password.component';
 import { ButtonBaseComponent } from './components/forms/button-base/button-base.component';
@@ -56,6 +58,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         ReactiveFormsModule,
         MatDialogModule,
         MatProgressSpinnerModule,
+        MatAutocompleteModule,
+        MatInputModule,
         TranslateModule.forChild({
             extend: true,
             defaultLanguage: 'es',

@@ -2,7 +2,7 @@ export class Backend {
     backend =
     {
         "url": "http://localhost",
-        "port": ":8080",
+        "port": ":3000",
         "rutas": {
             "login": "/auth/login",
             "logut": "/auth/logout",

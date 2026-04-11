@@ -21,7 +21,7 @@
         ></app-button-base>
       </div>
     </div>
-    <form class="form" action="" [formGroup]="form">
+    <form class="form" [formGroup]="form">
       <div class="user-list">
         <!-- Nombre -->
         <div class="form-column">
@@ -53,13 +53,12 @@
 
         <!-- DNI/NIE/Pasaporte -->
         <div class="form-column">
-          <label for="dni">DNI/NIE/Pasaporte <span class="required">*</span></label>
+          <label for="dni">Documento (DNI/NIE/Pasaporte) <span class="required">*</span></label>
           <input 
             id="dni"
             type="text" 
             formControlName="dni"
             [class.error]="getTouchedAndError('dni')"
-            placeholder="12345678A"
           />
           <p class="form-error" *ngIf="getTouchedAndError('dni')">
             {{ getErrorMessage('dni') }}
@@ -102,7 +101,6 @@
             type="email" 
             formControlName="email"
             [class.error]="getTouchedAndError('email')"
-            placeholder="usuario@dominio.com"
           />
           <p class="form-error" *ngIf="getTouchedAndError('email')">
             {{ getErrorMessage('email') }}
@@ -114,12 +112,10 @@
           <label for="telefono">Teléfono <span class="required">*</span></label>
           <input 
             id="telefono"
-            type="text" 
+            type="tel" 
             formControlName="telefono"
             [class.error]="getTouchedAndError('telefono')"
             inputmode="numeric"
-            maxlength="9"
-            (input)="onlyNumbers($event)"
           />
           <p class="form-error" *ngIf="getTouchedAndError('telefono')">
             {{ getErrorMessage('telefono') }}
@@ -135,8 +131,6 @@
               type="text" 
               [formControl]="domicilioControl"
               [class.error]="getTouchedAndError('domicilio')"
-              (focus)="showPredictions = true"
-              (blur)="closePredictions()"
               autocomplete="off"
             />
             <div class="loading-spinner" *ngIf="isLoadingPredictions">
@@ -148,7 +142,8 @@
                 (mousedown)="onSelectPrediction(prediction)"
                 class="prediction-item"
               >
-                <div class="prediction-text">{{ prediction.display_name }}</div>
+                <div class="prediction-main">{{ prediction.main_text }}</div>
+                <div class="prediction-secondary">{{ prediction.secondary_text }}</div>
               </li>
             </ul>
             <div class="no-results" *ngIf="showPredictions && filteredPredictions.length === 0 && !isLoadingPredictions">

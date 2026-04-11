@@ -12,12 +12,12 @@ export class DatabaseService {
           },
         };
     
-        const url = 'http://localhost:8080/persona';
+        const url = 'http://localhost:3000/persona';
     
         fetch(url, options)
           .then((response) => response.text())
           .then((data) => {
-              const res = JSON.parse(data).find((user: { username: any; }) => user.username === username);
+              const res = JSON.parse(data).find((user: { dni: any; }) => user.dni === username);
               return res.idRolNativo;
           }).catch((error) => {
             console.error('Error:', error);
@@ -38,13 +38,13 @@ export class DatabaseService {
           },
         };
     
-        const url = 'http://localhost:8080/persona';
+        const url = 'http://localhost:3000/persona';
     
         fetch(url, options)
           .then((response) => response.text())
           .then((data) => {
             const res = JSON.parse(data).find(
-              (user: { username: any }) => user.username === userLogged
+              (user: { dni: any }) => user.dni === userLogged
             );
         
             return res;
@@ -62,7 +62,7 @@ export class DatabaseService {
           },
         };
     
-        const url = 'http://localhost:8080/servicio';
+        const url = 'http://localhost:3000/servicio';
     
         fetch(url, options)
           .then((response) => response.text())

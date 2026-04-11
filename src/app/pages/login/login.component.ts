@@ -64,27 +64,27 @@ export class LoginComponent {
         body: JSON.stringify(credentials),
       };
 
-      // fetch(url, options)
-      //   .then((response: any) => {
-      //     if (response.ok) {
-      //       // El inicio de sesión fue exitoso, procesa la respuesta o redirige a otra página
-      //       const sessionToken = response.token;
+      fetch(url, options)
+        .then((response: any) => {
+          if (response.ok) {
+            // El inicio de sesión fue exitoso, procesa la respuesta o redirige a otra página
+            const sessionToken = response.token;
 
-      //       // Set sessionToken cookie
-      //       document.cookie = `sessionToken=${sessionToken}`;
+            // Set sessionToken cookie
+            document.cookie = `sessionToken=${sessionToken}`;
 
-      //       // Redirect to intranet page
-      //       window.location.href = '/access-menu';
-      //     } else {
-      //       // El inicio de sesión falló, maneja el error
-      //       this.loginFailed();
-      //       console.log('Ha fallado el login (response):', response);
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     // Maneja errores de conexión u otros errores
-      //     console.error('Login failed:', error);
-      //   });
+            // Redirect to intranet page
+            window.location.href = '/access-menu';
+          } else {
+            // El inicio de sesión falló, maneja el error
+            this.loginFailed();
+            console.log('Ha fallado el login (response):', response);
+          }
+        })
+        .catch((error) => {
+          // Maneja errores de conexión u otros errores
+          console.error('Login failed:', error);
+        });
     }
   }
 
@@ -94,34 +94,19 @@ export class LoginComponent {
   }
 
   private loadUserRol(userLogged: any) {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    const url = 'http://localhost:8080/persona';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
-        const usuarioEncontrado = JSON.parse(data).find((user: { dni: any; }) => user.dni === userLogged.dni);
-
-        console.log('Usuario encontrado:', usuarioEncontrado);
-        if (usuarioEncontrado.password === this.form.controls.password.value) {
-
-          this.loginBool = true;
-          document.cookie = `idRol=${usuarioEncontrado.idRolNativo}`;
-          document.cookie = `sessionToken=${Math.random()}`;
-
-          window.location.href = '/access-menu';
-        }
-
-
-      }).catch((error) => {
-        console.error('Error:', error);
-      });
+    console.log('Usuario a verificar:', userLogged);
+    console.log('Contraseña ingresada:', this.form.controls.password.value);
+    console.log('Contraseña en BD:', userLogged.password);
+    
+    if (userLogged.password === this.form.controls.password.value) {
+      this.loginBool = true;
+      document.cookie = `idRol=${userLogged.idRolNativo}`;
+      document.cookie = `sessionToken=${Math.random()}`;
+      window.location.href = '/access-menu';
+    } else {
+      this.loginFailed();
+      console.error('Contraseñas no coinciden');
+    }
   }
 
   private loadUsername(dni: string) {
@@ -132,7 +117,7 @@ export class LoginComponent {
       },
     };
 
-    const url = 'http://localhost:8080/persona';
+    const url = 'http://localhost:3000/persona';
 
     fetch(url, options)
       .then((response) => response.text())
@@ -143,7 +128,8 @@ export class LoginComponent {
         
 
         this.usuarioEncontrado = JSON.parse(data).find((user: { dni: string; }) => user.dni === dni);
-        document.cookie = `user=${this.usuarioEncontrado.username}`;
+        document.cookie = `user=${this.usuarioEncontrado.dni}`;
+        document.cookie = `nombre=${this.usuarioEncontrado.nombre}`;
 
         console.log('Usuario encontrado:', this.usuarioEncontrado);
         console.log('Contraseña:', this.usuarioEncontrado.password);
