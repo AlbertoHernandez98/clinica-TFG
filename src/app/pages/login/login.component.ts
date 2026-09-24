@@ -38,54 +38,6 @@ export class LoginComponent {
 
   login(): void {
     this.loadUsername(this.form.controls.dni.value);
-
-    if (this.usuarioEncontrado) {
-
-
-      const credentials = {
-        username: this.usuarioEncontrado.username,
-        password: this.form.controls.password.value,
-      };
-      const url =
-        this.urls.backend.url +
-        this.urls.backend.port +
-        this.urls.backend.rutas.login;
-
-      const headers = new Headers();
-      headers.append('Content-Type', 'application/json');
-      headers.append('Authorization', 'Bearer miToken');
-      headers.append('sec-fetch-mode', 'no-cors'); // Elimina las cabeceras experimentales
-      headers.append('sec-fetch-dest', 'empty');
-      headers.append('sec-fetch-site', 'same-origin');
-
-      const options = {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(credentials),
-      };
-
-      fetch(url, options)
-        .then((response: any) => {
-          if (response.ok) {
-            // El inicio de sesión fue exitoso, procesa la respuesta o redirige a otra página
-            const sessionToken = response.token;
-
-            // Set sessionToken cookie
-            document.cookie = `sessionToken=${sessionToken}`;
-
-            // Redirect to intranet page
-            window.location.href = '/access-menu';
-          } else {
-            // El inicio de sesión falló, maneja el error
-            this.loginFailed();
-            console.log('Ha fallado el login (response):', response);
-          }
-        })
-        .catch((error) => {
-          // Maneja errores de conexión u otros errores
-          console.error('Login failed:', error);
-        });
-    }
   }
 
   private loginFailed() {
@@ -122,22 +74,32 @@ export class LoginComponent {
     fetch(url, options)
       .then((response) => response.text())
       .then((data) => {
-        console.log('Data:', JSON.parse(data));
+        const parsedData = JSON.parse(data);
+        console.log('Data:', parsedData);
         console.log('DNI:', dni);
         console.log(typeof dni);
         
+        // Maneja tanto arrays como objetos únicos
+        const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
+        this.usuarioEncontrado = dataArray.find((user: { dni: string; }) => user.dni === dni);
+        
+        if (this.usuarioEncontrado) {
+          document.cookie = `user=${this.usuarioEncontrado.dni}`;
+          document.cookie = `nombre=${this.usuarioEncontrado.nombre}`;
 
-        this.usuarioEncontrado = JSON.parse(data).find((user: { dni: string; }) => user.dni === dni);
-        document.cookie = `user=${this.usuarioEncontrado.dni}`;
-        document.cookie = `nombre=${this.usuarioEncontrado.nombre}`;
+          console.log('Usuario encontrado:', this.usuarioEncontrado);
+          console.log('Contraseña:', this.usuarioEncontrado.password);
 
-        console.log('Usuario encontrado:', this.usuarioEncontrado);
-        console.log('Contraseña:', this.usuarioEncontrado.password);
-
-        this.loadUserRol(this.usuarioEncontrado);
+          // Verificar contraseña y proceder con login
+          this.loadUserRol(this.usuarioEncontrado);
+        } else {
+          this.loginFailed();
+          console.error('Usuario no encontrado con DNI:', dni);
+        }
 
       }).catch((error) => {
         console.error('Error:', error);
+        this.loginFailed();
       });
   }
 
