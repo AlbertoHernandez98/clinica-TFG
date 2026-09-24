@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AccessMenuComponent } from './pages/access-menu/access-menu.component';
 
 
 const routes: Routes = [
 
   {
     path: '',
-    component: AccessMenuComponent
+    loadChildren: () =>
+    import('./pages/access-menu/access-menu.module').then((m) => m.AccessMenuModule)
   },
   
   {
