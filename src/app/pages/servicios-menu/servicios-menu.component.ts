@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-servicios-menu',
@@ -18,13 +19,25 @@ export class ServiciosMenuComponent implements OnInit {
   infBool = false;
   gerBool = false;
   domBool = false;
+  mostrandoServicio = false;
 
   constructor(
     private translate: TranslateService,
     private appService: AppStateService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    // Detectar si hay una ruta hija activa
+    this.route.firstChild?.data.subscribe(() => {
+      this.mostrandoServicio = !!this.route.firstChild;
+    });
+
+    // También subscribirse a cambios en los parámetros
+    this.route.params.subscribe(() => {
+      this.mostrandoServicio = !!this.route.firstChild;
+    });
+    
     this.getTranslate();
   }
 

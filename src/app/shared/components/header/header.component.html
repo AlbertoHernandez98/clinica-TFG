@@ -13,12 +13,14 @@
         </div>
 
         <div class="dropdown">
-            <button class="dropbtn">{{ 'SHARED.HEADER.SERVICIOS' | translate }}</button>
+            <button class="dropbtn">
+                <a href="/serviciosMenu">{{ 'SHARED.HEADER.SERVICIOS' | translate }}</a>
+            </button>
             <div class="dropdown-content">
-                <a href="/corte">{{ 'SERVICES_MENU.QUIROPODIA_SERV.CORTE' | translate }}</a>
-                <a href="/unya">{{ 'SERVICES_MENU.QUIROPODIA_SERV.UÑA' | translate }}</a>
-                <a href="/plantillas">{{ 'SERVICES_MENU.BIOMECANICA_SERV.PLANTILLAS' | translate }}</a>
-                <a href="/heloma">{{ 'SERVICES_MENU.QUIROPODIA_SERV.HELOMA' | translate }}</a>
+                <a href="/serviciosMenu/corte">{{ 'SERVICES_MENU.QUIROPODIA_SERV.CORTE' | translate }}</a>
+                <a href="/serviciosMenu/unya">{{ 'SERVICES_MENU.QUIROPODIA_SERV.UÑA' | translate }}</a>
+                <a href="/serviciosMenu/plantillas">{{ 'SERVICES_MENU.BIOMECANICA_SERV.PLANTILLAS' | translate }}</a>
+                <a href="/serviciosMenu/heloma">{{ 'SERVICES_MENU.QUIROPODIA_SERV.HELOMA' | translate }}</a>
                 <a href="/serviciosMenu">{{ 'SERVICES_MENU.MAS_SERVICIOS' | translate }}</a>
             </div>
         </div>

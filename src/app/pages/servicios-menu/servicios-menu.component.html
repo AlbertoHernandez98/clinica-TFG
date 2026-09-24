@@ -1,45 +1,48 @@
-<div class="wrapper">
-    <div class="deco-line"></div>
-    <div class="label-services">{{ 'SERVICES_MENU.SERVICES' | translate }}</div>
-    <div class="deco-line"></div>
-</div>
-<form name="form1">
-    <span id="buttons" class="services-wrap">
-        <div role="list" class="services-wrap__list">
-            <div role="listitem" class="services-wrap__list__item">
-                <label id="quiro" (click)="quiro()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.QUIROPODIA' | translate
-                    }}</label>
-            </div>
-            <div role="listitem" class="services-wrap__list__item">
-                <label id="bio" (click)="bio()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.BIOMECANICA' | translate
-                    }}</label>
-            </div>
-            <div role="listitem" routerLink="/cirugia-ungeal" class="services-wrap__list__item">
-                <label id="ung" (click)="ung()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.CIRUGIA_UNGEAL' |
-                    translate }}</label>
-            </div>
-            <div role="listitem" routerLink="/cirugia-osea" class="services-wrap__list__item">
-                <label id="osea" (click)="osea()" class="services-wrap__list__item__a">{{'SERVICES_MENU.CIRUGIA_OSEA' | translate
-                    }}</label>
-            </div>
-            <div role="listitem" routerLink="/pie-diabetico" class="services-wrap__list__item">
-                <label id="pie" (click)="pie()" class="services-wrap__list__item__a">{{'SERVICES_MENU.PIE_DIABETICO' | translate
-                    }}</label>
-            </div>
-            <div role="listitem" routerLink="/podologia-infantil" class="services-wrap__list__item">
-                <label id="inf" (click)="inf()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_INFANTIL' |
-                    translate }}</label>
-            </div>
-            <div role="listitem" routerLink="/podologia-geriatrica" class="services-wrap__list__item">
-                <label id="ger" (click)="ger()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_GERIATRICA' |
-                    translate }}</label>
-            </div>
-            <div role="listitem" routerLink="/servicio-domicilio" class="services-wrap__list__item">
-                <label id="dom" (click)="serv()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.SERVICIO_DOM' | translate }}</label>
-            </div>
+<div class="content">
+    <div *ngIf="!mostrandoServicio">
+        <!-- CONTENIDO PRINCIPAL DE SERVICIOS MENU -->
+        <div class="wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">{{ 'SERVICES_MENU.SERVICES' | translate }}</div>
+            <div class="deco-line"></div>
         </div>
-    </span>
-</form>
+        <form name="form1">
+            <span id="buttons" class="services-wrap">
+                <div role="list" class="services-wrap__list">
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label id="quiro" (click)="quiro()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.QUIROPODIA' | translate
+                            }}</label>
+                    </div>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label id="bio" (click)="bio()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.BIOMECANICA' | translate
+                            }}</label>
+                    </div>
+                    <div role="listitem" routerLink="/serviciosMenu/cirugia-ungeal" class="services-wrap__list__item">
+                        <label id="ung" (click)="ung()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.CIRUGIA_UNGEAL' |
+                            translate }}</label>
+                    </div>
+                    <div role="listitem" routerLink="/serviciosMenu/cirugia-osea" class="services-wrap__list__item">
+                        <label id="osea" (click)="osea()" class="services-wrap__list__item__a">{{'SERVICES_MENU.CIRUGIA_OSEA' | translate
+                            }}</label>
+                    </div>
+                    <div role="listitem" routerLink="/serviciosMenu/pie-diabetico" class="services-wrap__list__item">
+                        <label id="pie" (click)="pie()" class="services-wrap__list__item__a">{{'SERVICES_MENU.PIE_DIABETICO' | translate
+                            }}</label>
+                    </div>
+                    <div role="listitem" routerLink="/serviciosMenu/podologia-infantil" class="services-wrap__list__item">
+                        <label id="inf" (click)="inf()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_INFANTIL' |
+                            translate }}</label>
+                    </div>
+                    <div role="listitem" routerLink="/serviciosMenu/podologia-geriatrica" class="services-wrap__list__item">
+                        <label id="ger" (click)="ger()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_GERIATRICA' |
+                            translate }}</label>
+                    </div>
+                    <div role="listitem" routerLink="/serviciosMenu/servicio-domicilio" class="services-wrap__list__item">
+                        <label id="dom" (click)="serv()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.SERVICIO_DOM' | translate }}</label>
+                    </div>
+                </div>
+            </span>
+        </form>
 
 <div class="content">
     <div *ngIf="quiroBool" class="content__content-quiro">
@@ -49,60 +52,60 @@
             <div class="deco-line"></div>
         </div>
         <div class="content__servicio" >
-            <div routerLink="/corte" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/corte" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_corte.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/corte">{{'SERVICES_MENU.QUIROPODIA_SERV.CORTE' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/corte">{{'SERVICES_MENU.QUIROPODIA_SERV.CORTE' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/dureza" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/dureza" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_dureza.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="">{{'SERVICES_MENU.QUIROPODIA_SERV.DUREZA' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/dureza">{{'SERVICES_MENU.QUIROPODIA_SERV.DUREZA' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/heloma" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/heloma" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_heloma.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/heloma">{{'SERVICES_MENU.QUIROPODIA_SERV.HELOMA' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/heloma">{{'SERVICES_MENU.QUIROPODIA_SERV.HELOMA' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/unya" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/unya" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_uña-enc.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/unya">{{'SERVICES_MENU.QUIROPODIA_SERV.UÑA' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/unya">{{'SERVICES_MENU.QUIROPODIA_SERV.UÑA' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/hongos" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/hongos" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_hongo.jpeg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/hongos">{{'SERVICES_MENU.QUIROPODIA_SERV.HONGOS' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/hongos">{{'SERVICES_MENU.QUIROPODIA_SERV.HONGOS' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/verruga" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/verruga" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_verruga.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/verruga">{{'SERVICES_MENU.QUIROPODIA_SERV.VERRUGAS' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/verruga">{{'SERVICES_MENU.QUIROPODIA_SERV.VERRUGAS' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/ortesis" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/ortesis" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/quiro_ortesis.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/ortesis">{{'SERVICES_MENU.QUIROPODIA_SERV.ORTESIS' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/ortesis">{{'SERVICES_MENU.QUIROPODIA_SERV.ORTESIS' | translate }}</a>
                 </div>
             </div>
         </div>
@@ -118,62 +121,108 @@
             <div class="deco-line"></div>
         </div>
         <div class="content__servicio" >
-            <div routerLink="/espolon" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/espolon" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/bio_espolon.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/espolon">{{'SERVICES_MENU.BIOMECANICA_SERV.ESPOLON' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/espolon">{{'SERVICES_MENU.BIOMECANICA_SERV.ESPOLON' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/fascitis" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/fascitis" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/bio_fascitis.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="content__servicio">{{'SERVICES_MENU.BIOMECANICA_SERV.FASCITIS' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/fascitis">{{'SERVICES_MENU.BIOMECANICA_SERV.FASCITIS' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/infiltracion" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/infiltracion" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/bio_infiltraciones.png" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/infiltracion">{{'SERVICES_MENU.BIOMECANICA_SERV.INFILTRACIONES' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/infiltracion">{{'SERVICES_MENU.BIOMECANICA_SERV.INFILTRACIONES' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/marcha" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/marcha" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/bio_marcha.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/marcha">{{'SERVICES_MENU.BIOMECANICA_SERV.MARCHA' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/marcha">{{'SERVICES_MENU.BIOMECANICA_SERV.MARCHA' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/plantillas" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/plantillas" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/bio_plantillas.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/plantillas">{{'SERVICES_MENU.BIOMECANICA_SERV.PLANTILLAS' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/plantillas">{{'SERVICES_MENU.BIOMECANICA_SERV.PLANTILLAS' | translate }}</a>
                 </div>
             </div>
-            <div routerLink="/vendaje" class="content__servicio__item">
+            <div routerLink="/serviciosMenu/vendaje" class="content__servicio__item">
                 <div class="content__servicio__item__producto">
                     <img class="content__servicio__item__producto" src="../../../assets/img/bio_vendaje.jpg" alt="">
                 </div>
                 <div class="content__servicio__item__text">
-                    <a class="content__servicio__item__text__a" href="/vendaje">{{'SERVICES_MENU.BIOMECANICA_SERV.VENDAJE' | translate }}</a>
+                    <a class="content__servicio__item__text__a" href="/serviciosMenu/vendaje">{{'SERVICES_MENU.BIOMECANICA_SERV.VENDAJE' | translate }}</a>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="content__servicio" *ngIf="ungBool">
+        <div class="content__wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">CIRUGIA UNGEAL</div>
+            <div class="deco-line"></div>
+        </div>
+        <app-cirugia-ungeal></app-cirugia-ungeal>
     </div>
-    <div class="content__servicio" *ngIf="oseaBool">4</div>
-    <div class="content__servicio" *ngIf="pieBool">5</div>
-    <div class="content__servicio" *ngIf="infBool">6</div>
-    <div class="content__servicio" *ngIf="gerBool">7</div>
-    <div class="content__servicio" *ngIf="domBool">8</div>
+    <div class="content__servicio" *ngIf="oseaBool">
+        <div class="content__wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">CIRUGIA OSEA</div>
+            <div class="deco-line"></div>
+        </div>
+        <app-cirugia-osea></app-cirugia-osea>
+    </div>
+    <div class="content__servicio" *ngIf="pieBool">
+        <div class="content__wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">PIE DIABETICO</div>
+            <div class="deco-line"></div>
+        </div>
+        <app-pie-diabetico></app-pie-diabetico>
+    </div>
+    <div class="content__servicio" *ngIf="infBool">
+        <div class="content__wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">PODOLOGIA INFANTIL</div>
+            <div class="deco-line"></div>
+        </div>
+        <app-podologia-infantil></app-podologia-infantil>
+    </div>
+    <div class="content__servicio" *ngIf="gerBool">
+        <div class="content__wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">PODOLOGIA GERIATRICA</div>
+            <div class="deco-line"></div>
+        </div>
+        <app-podologia-geriatrica></app-podologia-geriatrica>
+    </div>
+    <div class="content__servicio" *ngIf="domBool">
+        <div class="content__wrapper">
+            <div class="deco-line"></div>
+            <div class="label-services">SERVICIO A DOMICILIO</div>
+            <div class="deco-line"></div>
+        </div>
+        <app-servicio-domicilio></app-servicio-domicilio>
+    </div>
+    </div>
+    <!-- FIN CONTENIDO PRINCIPAL -->
+
+    <!-- ROUTER OUTLET PARA SERVICIOS ESPECIFICOS -->
+    <router-outlet></router-outlet>
 </div>
