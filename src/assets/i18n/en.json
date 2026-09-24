@@ -109,6 +109,12 @@
         "PRODUCTS_TEXT": "Wide variety of specialized services, from routine treatments to advanced surgical interventions. Each service designed with utmost care.",
         "APPLICATIONS_TEXT": "Team of highly qualified podiatrists with extensive experience. Committed to providing you the best care and innovative solutions."
     },
+    "CLINICA": {
+        "DESCRIPTION": "Lara Suárez Díaz Podiatry Clinic is a specialized center for comprehensive foot care with over 15 years of experience. We have highly qualified professionals using the most modern techniques and equipment. Our goal is to provide personalized, effective and lasting solutions for all our patients. We are committed to offering a welcoming and professional environment where each patient receives the care and attention they deserve."
+    },
+    "PERSONAL": {
+        "DESCRIPTION": "Lara Suárez Díaz is a specialized podiatrist with over 15 years of experience in comprehensive foot care. She is dedicated to providing personalized and effective solutions for each patient, using the most advanced and modern techniques. Her commitment is to provide professional, friendly and welcoming care, ensuring the well-being and comfort of all her patients."
+    },
     "SHARED": {
         "POPUPS": {
             "DRAGDROP": {

@@ -110,6 +110,12 @@
     "PRODUCTS_TEXT": "Amplia variedad de servicios especializados, desde tratamientos de rutina hasta intervenciones quirúrgicas. Cada servicio diseñado con máximo cuidado.",
     "APPLICATIONS_TEXT": "Equipo de podólogos altamente cualificados con amplia experiencia. Comprometidos con brindarle la mejor atención y soluciones innovadoras."
   },
+  "CLINICA": {
+    "DESCRIPTION": "La Clínica Podológica Lara Suárez Díaz es un centro especializado en el cuidado integral de los pies con más de 15 años de experiencia. Contamos con profesionales altamente cualificados utilizando las técnicas y equipos más modernos. Nuestro objetivo es proporcionar soluciones personalizadas, efectivas y duraderas para todos nuestros pacientes. Nos compromete ofrecer un ambiente acogedor y profesional donde cada paciente recibe la atención y el cuidado que merece."
+  },
+  "PERSONAL": {
+    "DESCRIPTION": "Lara Suárez Díaz es podóloga especializada con más de 15 años de experiencia en el cuidado integral de los pies. Se dedica a proporcionar soluciones personalizadas y efectivas para cada paciente, utilizando las técnicas más avanzadas y modernas. Su compromiso es brindar un trato profesional, amable y acogedor, garantizando el bienestar e comodidad de todos sus pacientes."
+  },
   "SHARED": {
     "POPUPS": {
       "DRAGDROP": {

@@ -74,5 +74,9 @@
             letter-spacing: 1px;
             color: $color-primary;
         }
+        &__texto {
+            text-align: center;
+            line-height: 1.6;
+        }
     }
 }
