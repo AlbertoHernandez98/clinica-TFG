@@ -5,11 +5,12 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { log } from 'console';
 import { DatabaseService } from 'src/app/services/database/database';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
 
 @Component({
@@ -48,9 +49,11 @@ export class HistorialComponent implements OnInit {
   constructor(
     public formBuilder: FormBuilder,
     public database: DatabaseService,
+    private http: HttpClient,
     private translate: TranslateService,
     public matDialog: MatDialog,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    private configService: ConfigService
   ) {}
 
   ngOnInit() {
@@ -89,24 +92,13 @@ export class HistorialComponent implements OnInit {
 
   private loadUser() {
     const str = document.cookie;
-
     const match: any = str.match(/user=([^;]*)/);
+    const userLogged = match ? match[1].trim() : '';
+    const url = this.configService.getClinicalApiUrl('/persona');
 
-    const userLogged = match[1].trim();
-
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    const url = 'http://localhost:8080/persona';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
-        const usuarioEncontrado = JSON.parse(data).find(
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
+        const usuarioEncontrado = data.find(
           (user: { username: any }) => user.username === userLogged
         );
 
@@ -117,56 +109,46 @@ export class HistorialComponent implements OnInit {
           this.rol = usuarioEncontrado.idRolNativo;
         }
 
-        const clienteEncontrado = JSON.parse(data).find(
+        const clienteEncontrado = data.find(
           (cliente: { idPersona: any }) =>
             cliente.idPersona == this.clienteSeleccionado
         );
 
         this.clienteSeleccionado = clienteEncontrado;
 
-        this.listaMedicos = JSON.parse(data).filter(
+        this.listaMedicos = data.filter(
           (elemento: { idRolNativo: any }) => elemento.idRolNativo === 2
         );
-      })
-      .catch((error) => {
+      },
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   private getHistorial() {
-    const url = `http://localhost:8080/historialclinico`;
+    const url = this.configService.getClinicalApiUrl('/historialclinico');
 
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
         try {
-          this.historialClinico = JSON.parse(data).filter(
+          this.historialClinico = data.filter(
             (historial: { idCliente: number }) =>
               historial.idCliente === this.clienteSeleccionado.idPersona
           );
 
           this.dateConverter(this.historialClinico);
-
           this.listaLength = this.historialClinico.length === 0;
           this.listaFiltrada = this.historialClinico;
           this.totalItems = this.listaFiltrada.length;
-          // this.loadItems();
-
-
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      })
-      .catch((error) => {
+      },
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   private dateConverter(historial: any) {
@@ -185,27 +167,20 @@ export class HistorialComponent implements OnInit {
   }
 
   public loadServices() {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    const url = this.configService.getClinicalApiUrl('/servicio');
+
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
+        this.servicios = data;
       },
-    };
-
-    const url = 'http://localhost:8080/servicio';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
-        this.servicios = JSON.parse(data);
-      })
-      .catch((error) => {
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   public postHistorial() {
-    const url = `http://localhost:8080/historialclinico`;
+    const url = this.configService.getClinicalApiUrl('/historialclinico');
 
     const servicioEncontrado = this.servicios.find(
       (servicio: { servicio: any }) =>
@@ -221,21 +196,9 @@ export class HistorialComponent implements OnInit {
         idServicio: servicioEncontrado.idServicio,
       };
 
-
-      const optionsPOST = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      };
-
-      fetch(url, optionsPOST)
-        .then((response) => response.text())
-        .then((data) => {
+      this.http.post<any>(url, credentials).subscribe(
+        (data) => {
           try {
-            // Hacer algo con jsonData
-
             const dialog = this.matDialog.open(ErrorSuccessComponent, {
               data: {
                 icon: this.success,
@@ -246,14 +209,12 @@ export class HistorialComponent implements OnInit {
 
             this.form.get('comentarios')?.patchValue('');
             this.form.get('idServicio')?.patchValue(null);
-
-            this.servicios;
             this.getHistorial();
           } catch (error) {
-            console.error('Error al analizar la respuesta JSON:', error);
+            console.error('Error al procesar respuesta:', error);
           }
-        })
-        .catch((error) => {
+        },
+        (error) => {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
               text: this.translate.instant('HISTORIAL.ERROR'),
@@ -261,7 +222,8 @@ export class HistorialComponent implements OnInit {
             },
           });
           console.error('Error:', error);
-        });
+        }
+      );
     } else {
       const dialog = this.matDialog.open(ErrorSuccessComponent, {
         data: {

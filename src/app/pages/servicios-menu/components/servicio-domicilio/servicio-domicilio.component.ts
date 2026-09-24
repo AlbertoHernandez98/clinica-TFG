@@ -1,21 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { AppStateService } from 'src/app/providers/app-state/app-state.service';
+import { BaseServiceComponent } from 'src/app/shared/classes/base-service.component';
 
 @Component({
   selector: 'app-servicio-domicilio',
   templateUrl: './servicio-domicilio.component.html',
   styleUrls: ['./servicio-domicilio.component.scss']
 })
-export class ServicioDomicilioComponent implements OnInit {
+export class ServicioDomicilioComponent extends BaseServiceComponent {
 
   constructor(
-    private router: Router
-  ) { }
-
-  ngOnInit() {
+    translate: TranslateService,
+    appService: AppStateService,
+    router: Router
+  ) {
+    super(translate, appService, router);
   }
 
-  volver() {
-    this.router.navigateByUrl('/serviciosMenu')
+  protected initRoutes(): void {
+    this.setBreadcrumbs([
+      {
+        active: true,
+        name: this.translate.instant('BREADCUMTEXT.MENU'),
+        route: '/access-menu'
+      },
+      {
+        active: true,
+        name: this.translate.instant('BREADCUMTEXT.SERVICIOS'),
+        route: '/serviciosMenu'
+      },
+      {
+        active: false,
+        name: this.translate.instant('BREADCUMTEXT.SERVICIO_DOMICILIO'),
+        route: '/servicio-domicilio'
+      }
+    ]);
   }
 }

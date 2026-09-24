@@ -1,66 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AppStateService } from 'src/app/providers/app-state/app-state.service';
-import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
+import { BaseServiceComponent } from 'src/app/shared/classes/base-service.component';
 
 @Component({
   selector: 'app-plantillas',
   templateUrl: './plantillas.component.html',
   styleUrls: ['./plantillas.component.scss']
 })
-export class PlantillasComponent implements OnInit {
+export class PlantillasComponent extends BaseServiceComponent {
 
   constructor(
-    private translate: TranslateService,
-    private appService: AppStateService,
-    private router: Router
-
-  ) { }
-
-  ngOnInit() {
-    this.getTranslate();
+    translate: TranslateService,
+    appService: AppStateService,
+    router: Router
+  ) {
+    super(translate, appService, router);
   }
 
-
-
-  getTranslate() {
-    this.appService
-      .traduccionesLoaded('BREADCUMTEXT.SERVICIOS')
-      .subscribe((res) => {
-        this.initRoutes();
-      });
+  protected initRoutes(): void {
+    this.setBreadcrumbs([
+      {
+        active: true,
+        name: this.translate.instant('BREADCUMTEXT.MENU'),
+        route: '/access-menu'
+      },
+      {
+        active: true,
+        name: this.translate.instant('BREADCUMTEXT.SERVICIOS'),
+        route: '/serviciosMenu'
+      },
+      {
+        active: false,
+        name: this.translate.instant('BREADCUMTEXT.PLANTILLAS'),
+        route: '/plantillas'
+      }
+    ]);
   }
-
-  initRoutes() {
-    const appInfo: AppInfo = {
-      breadcum: [
-        {
-          active: true,
-          name: this.translate.instant('BREADCUMTEXT.MENU'),
-          route: '/access-menu'
-        },
-        {
-          active: true,
-          name: this.translate.instant('BREADCUMTEXT.SERVICIOS'),
-          route: '/serviciosMenu'
-        },
-        {
-          active: false,
-          name: this.translate.instant('BREADCUMTEXT.PLANTILLAS'),
-          route: '/plantillas'
-        },
-      ],
-      isLogged: true,
-      idMenuActive: '2'
-    };
-    this.appService.setBreadcumInfo(appInfo, 'appInfo');
-  }
-
-  
-  volver() {
-    this.router.navigateByUrl('/serviciosMenu')
-  }
-
-
 }

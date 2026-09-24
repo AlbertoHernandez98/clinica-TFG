@@ -1,11 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormBuilder, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from '../../../../services/config/config.service';
 import { AdminUsersComponent } from '../admin-users/admin-users.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
@@ -36,7 +38,9 @@ export class AdminCitasComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
-    private translate: TranslateService
+    private http: HttpClient,
+    private translate: TranslateService,
+    private configService: ConfigService
   ) {}
 
   success = './assets/icons/svg/icon-save.svg';
@@ -95,64 +99,41 @@ export class AdminCitasComponent implements OnInit {
   }
 
   public loadServices() {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    const url = this.configService.getClinicalApiUrl('/servicio');
+
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
+        this.servicios = data;
       },
-    };
-
-    const url = 'http://localhost:8080/servicio';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
-        this.servicios = JSON.parse(data);
-      })
-      .catch((error) => {
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   private loadMedicos() {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
+    const url = this.configService.getClinicalApiUrl('/persona');
 
-    const url = 'http://localhost:8080/persona';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
         this.loadMedicoHasServicio();
-        this.listaMedicos = JSON.parse(data).filter(
+        this.listaMedicos = data.filter(
           (elemento: { idRolNativo: any }) => elemento.idRolNativo === 2
         );
-
-      })
-      .catch((error) => {
+      },
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   private loadMedicoHasServicio() {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
+    const url = this.configService.getClinicalApiUrl('/medico_has_servicio');
 
-    const url = 'http://localhost:8080/medico_has_servicio';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
         this.form.get('idServicio')?.valueChanges.subscribe((value) => {
-          const listaMedicoHasServ = JSON.parse(data);
+          const listaMedicoHasServ = data;
           listaMedicoHasServ.filter((medico: { idServicio: string }) => {
             const ids = medico.idServicio.split(',');
             ids.filter((lista: string | any[]) => {
@@ -162,28 +143,20 @@ export class AdminCitasComponent implements OnInit {
             });
           });
           console.log(this.listaFiltrada);
-
         });
-      })
-      .catch((error) => {
+      },
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   public onDelete() {
-    const options = {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    const url = `http://localhost:8080/citas/${this.user.idPersona}`;
+    const url = this.configService.getClinicalApiUrl(`/citas/${this.user.idPersona}`);
     console.log(url);
 
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.delete<any>(url).subscribe(
+      (data) => {
         try {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
@@ -195,10 +168,14 @@ export class AdminCitasComponent implements OnInit {
             },
           });
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      });
-    this.close();
+        this.close();
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
   }
 
   public onChange() {
@@ -210,19 +187,10 @@ export class AdminCitasComponent implements OnInit {
       duracion: this.form.controls.duracion.value,
     };
 
-    const url = 'http://localhost:8080/citas/changeCita';
+    const url = this.configService.getClinicalApiUrl('/citas/changeCita');
 
-    const options = {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.put<any>(url, credentials).subscribe(
+      (data) => {
         try {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
@@ -234,10 +202,11 @@ export class AdminCitasComponent implements OnInit {
             },
           });
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      })
-      .catch((error) => {
+        this.close();
+      },
+      (error) => {
         const dialog = this.matDialog.open(ErrorSuccessComponent, {
           data: {
             text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
@@ -245,8 +214,8 @@ export class AdminCitasComponent implements OnInit {
           },
         });
         console.error('Error:', error);
-      });
-    this.close();
+      }
+    );
   }
 
   public onSubmit() {
@@ -260,21 +229,11 @@ export class AdminCitasComponent implements OnInit {
 
     console.log(credentials);
 
-    const url = 'http://localhost:8080/citas';
+    const url = this.configService.getClinicalApiUrl('/citas');
 
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.post<any>(url, credentials).subscribe(
+      (data) => {
         try {
-          // Hacer algo con jsonData
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
               icon: this.success,
@@ -287,8 +246,8 @@ export class AdminCitasComponent implements OnInit {
         } catch (error) {
           console.error('Error al analizar la respuesta JSON:', error);
         }
-      })
-      .catch((error) => {
+      },
+      (error) => {
         const dialog = this.matDialog.open(ErrorSuccessComponent, {
           data: {
             text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
@@ -296,7 +255,8 @@ export class AdminCitasComponent implements OnInit {
           },
         });
         console.error('Error:', error);
-      });
+      }
+    );
     this.close();
   }
 

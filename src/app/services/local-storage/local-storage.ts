@@ -5,21 +5,39 @@ import { Injectable } from '@angular/core';
 })
 export class LocalStorageService {
     public getItem(item: string) {
-        const localStorageItem = localStorage?.getItem(item);
-        if (localStorageItem !== 'undefined') {
-          return JSON.parse(localStorage?.getItem(item) as string);
+        try {
+          const localStorageItem = localStorage?.getItem(item);
+          if (localStorageItem && localStorageItem !== 'undefined') {
+            return JSON.parse(localStorageItem);
+          }
+          return null;
+        } catch (error) {
+          console.error('Error reading from localStorage:', error);
+          return null;
         }
       }
     
       public setItem(item: string, value: any) {
-        return localStorage.setItem(item, JSON.stringify(value));
+        try {
+          return localStorage.setItem(item, JSON.stringify(value));
+        } catch (error) {
+          console.error('Error writing to localStorage:', error);
+        }
       }
     
       public removeItem(item: string) {
-        return localStorage.removeItem(item);
+        try {
+          return localStorage.removeItem(item);
+        } catch (error) {
+          console.error('Error removing from localStorage:', error);
+        }
       }
     
       public clear() {
-        return localStorage.clear();
+        try {
+          return localStorage.clear();
+        } catch (error) {
+          console.error('Error clearing localStorage:', error);
+        }
       }
 }

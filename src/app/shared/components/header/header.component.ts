@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class HeaderComponent implements OnInit {
   @Input() login = false;
 
-  idioma: string = 'ES';
+  idioma: string = 'es';
   isLogged = false;
   isAdmin = false;
 
@@ -25,8 +25,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.logFunctions();
-    this.idioma = this.languageService.getCurrentLanguage();
-    this.translate.use(this.idioma);
+    this.idioma = this.languageService.getCurrentLanguage().toLowerCase();
   }
 
   logFunctions() {
@@ -91,11 +90,9 @@ export class HeaderComponent implements OnInit {
   }
 
   public useLanguage(language: string) {
-    // this.idioma = language;
-    // this.translate.use(language);
-    this.idioma = language;
-    this.languageService.setLanguage(language);
-    this.translate.use(language);
-
+    const lang = language.toLowerCase();
+    this.idioma = lang;
+    this.languageService.setLanguage(lang);
+    this.translate.use(lang);
   }
 }

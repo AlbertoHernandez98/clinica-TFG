@@ -1,11 +1,13 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from '../../../../services/config/config.service';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 
@@ -27,7 +29,9 @@ export class AdminUsersComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
-    private translate: TranslateService
+    private http: HttpClient,
+    private translate: TranslateService,
+    private configService: ConfigService
   ) { }
 
 
@@ -40,25 +44,20 @@ export class AdminUsersComponent implements OnInit {
   }
 
   private chargeList() {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
+    const url = this.configService.getClinicalApiUrl('/persona');
 
-    const url = 'http://localhost:8080/persona';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
         try {
-          this.userList = JSON.parse(data);
-
+          this.userList = data;
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      })
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
   }
 
   public filtrarLista() {

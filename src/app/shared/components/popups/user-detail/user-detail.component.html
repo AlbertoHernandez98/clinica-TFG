@@ -148,7 +148,7 @@
                 (mousedown)="onSelectPrediction(prediction)"
                 class="prediction-item"
               >
-                <div class="prediction-text">{{ prediction.display_name }}</div>
+                <div class="prediction-main">{{ prediction.display_name }}</div>
               </li>
             </ul>
             <div class="no-results" *ngIf="showPredictions && filteredPredictions.length === 0 && !isLoadingPredictions">

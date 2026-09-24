@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 /**
  * Interfaz para predicciones de Nominatim
@@ -23,7 +23,6 @@ export interface AddressPrediction {
 })
 export class NominatimPlacesService {
 
-  private predictions$ = new BehaviorSubject<AddressPrediction[]>([]);
   private readonly NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search';
   private readonly SPAIN_BBOX = '44.36,-9.30,36.00,-2.50'; // Bounding box de España
 
@@ -31,62 +30,65 @@ export class NominatimPlacesService {
 
   /**
    * Obtiene predicciones de direcciones basadas en la entrada del usuario
-   * @param input - Texto de entrada del usuario
+   * Usa Nominatim de OpenStreetMap (sin API key necesaria)
+   * @param input - Texto de entrada del usuario (mínimo 2 caracteres)
    * @returns Observable con array de predicciones
    */
   public getPredictions(input: string): Observable<AddressPrediction[]> {
-    if (!input || input.length < 3) {
-      this.predictions$.next([]);
-      return this.predictions$;
+    if (!input || input.trim().length < 2) {
+      return of([]);
     }
 
     const params = {
-      q: input,
+      q: input.trim(),
       format: 'json',
       addressdetails: '1',
-      limit: '8',
+      limit: '10',
       viewbox: this.SPAIN_BBOX,
-      bounded: '1',
+      bounded: '0',  // Permitir búsqueda fuera de España si es necesario
       'accept-language': 'es'
     };
 
-    // Construir query string manualmente
+    // Construir query string manualmente (compatibilidad)
     const queryString = Object.entries(params)
-      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
       .join('&');
 
     const url = `${this.NOMINATIM_BASE_URL}?${queryString}`;
 
-    this.http.get<any[]>(url)
-      .pipe(
-        map((response: any[]) => {
-          // Filtrar solo direcciones (no centros de interés)
-          return response
-            .filter(item => {
-              // Incluir tipos de dirección relevantes
-              const relevantTypes = ['residential', 'street', 'house', 'building', 'commercial', 'industrial'];
-              return relevantTypes.includes(item.type) || item.display_name.includes(',');
-            })
-            .map(item => ({
-              place_id: item.place_id,
-              display_name: item.display_name,
-              lat: item.lat,
-              lon: item.lon,
-              type: item.type
-            }));
-        })
-      )
-      .subscribe(
-        (predictions: AddressPrediction[]) => {
-          this.predictions$.next(predictions);
-        },
-        (error) => {
-          console.error('Error obteniendo predicciones:', error);
-          this.predictions$.next([]);
-        }
-      );
+    console.log('Buscando direcciones en Nominatim:', url);
 
-    return this.predictions$;
+    return this.http.get<any[]>(url, { withCredentials: false }).pipe(
+      map((response: any[]) => {
+        if (!Array.isArray(response)) {
+          console.warn('Respuesta de Nominatim no es un array:', response);
+          return [];
+        }
+        
+        // Mapear respuesta a nuestro formato
+        return response
+          .filter(item => item && item.display_name && item.display_name.trim().length > 0)
+          .slice(0, 10)
+          .map(item => ({
+            place_id: item.place_id || 0,
+            display_name: item.display_name || item.name || input,
+            lat: (item.lat || '0').toString(),
+            lon: (item.lon || '0').toString(),
+            type: item.type || 'unknown'
+          }));
+      }),
+      catchError((error) => {
+        console.error('Error obteniendo predicciones de Nominatim:', error);
+        // Permitir que el usuario use la entrada como dirección manual
+        return of([{
+          place_id: 0,
+          display_name: input.trim(),
+          lat: '0',
+          lon: '0',
+          type: 'manual'
+        }]);
+      })
+    );
   }
 
   /**
@@ -100,13 +102,13 @@ export class NominatimPlacesService {
    * Limpia las predicciones
    */
   public clearPredictions(): void {
-    this.predictions$.next([]);
+    // En esta versión no es necesario
   }
 
   /**
    * Observable para suscribirse a las predicciones
    */
   public predictions(): Observable<AddressPrediction[]> {
-    return this.predictions$.asObservable();
+    return of([]);
   }
 }

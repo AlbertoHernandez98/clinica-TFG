@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { LoadingController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
 
@@ -28,7 +30,9 @@ export class ServiciosComponent implements OnInit {
     public loadingCtrl: LoadingController,
     private appService: AppStateService,
     public translate: TranslateService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private configService: ConfigService
   ) {
 
 
@@ -84,15 +88,17 @@ export class ServiciosComponent implements OnInit {
 
 
   getListOfServices() {
-    fetch("../../../../../assets/reportes.json")
-      .then(response => {
-        return response.json();
-      })
-      .then(jsondata => {
-        this.servicios = jsondata;
+    const url = 'assets/reportes.json';
+    
+    this.http.get<any>(url).subscribe(
+      (data) => {
+        this.servicios = data;
         console.log(this.servicios);
-      })
-
+      },
+      (error) => {
+        console.error('Error loading services:', error);
+      }
+    );
   }
 
 

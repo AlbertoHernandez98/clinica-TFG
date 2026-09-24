@@ -55,12 +55,18 @@
                 opacity: 1;
                 cursor: pointer;
                 color: rgba(162, 95, 75, 0.6);
+                transition: all 0.3s ease;
             }
             &__a:hover {
                 margin-left: 5px;
                 border-color: rgba(162, 95, 75, 0.4);
                 opacity: 1;
                 color: #a25f4b;
+            }
+            &__a.is-active {
+                color: #A25F4B;
+                border-color: #A25F4B;
+                opacity: 1;
             }
         }
     }

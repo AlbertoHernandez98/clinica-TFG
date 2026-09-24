@@ -8,6 +8,7 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
+import { ConfigService } from 'src/app/services/config/config.service';
 import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
 import { Backend } from 'src/app/JSON-Model/backend';
 import { ModalController } from '@ionic/angular';
@@ -38,6 +39,8 @@ export class PerfilUsuarioComponent implements OnInit {
     public matDialog: MatDialog,
     private translate: TranslateService,
     private urls: Backend,
+    private http: HttpClient,
+    private configService: ConfigService,
     public router: Router
   ) {}
 
@@ -63,29 +66,23 @@ export class PerfilUsuarioComponent implements OnInit {
     var newUsuario = userToDepure.split(';')[0];
 
 
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    const url = this.configService.getClinicalApiUrl('/persona');
+
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
+        this.usuarioEncontrado = data.find((user: { username: any; }) => user.username === newUsuario);
+
+        this.form.controls.usuario.patchValue(newUsuario);
+        this.form.controls.newUsuario.patchValue(this.usuarioEncontrado.username);
+        this.form.controls.email.patchValue(this.usuarioEncontrado.email);
+        this.form.controls.telefono.patchValue(this.usuarioEncontrado.telefono);
+        this.form.controls.domicilio.patchValue(this.usuarioEncontrado.domicilio);
+        this.form.controls.dni.patchValue(this.usuarioEncontrado.dni);
       },
-    };
-
-    const url = 'http://localhost:8080/persona';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
-          this.usuarioEncontrado = JSON.parse(data).find((user: { username: any; }) => user.username === newUsuario);
-
-          this.form.controls.usuario.patchValue(newUsuario)
-          this.form.controls.newUsuario.patchValue(this.usuarioEncontrado.username)
-          this.form.controls.email.patchValue(this.usuarioEncontrado.email)
-          this.form.controls.telefono.patchValue(this.usuarioEncontrado.telefono)
-          this.form.controls.domicilio.patchValue(this.usuarioEncontrado.domicilio)
-          this.form.controls.dni.patchValue(this.usuarioEncontrado.dni)
-      }).catch((error) => {
+      (error) => {
         console.error('Error:', error);
-      });
+      }
+    );
 
   }
 
@@ -110,30 +107,16 @@ export class PerfilUsuarioComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('photo', this.selectedFile);
-    const url = this.urls.backend.url + this.urls.backend.port + '/upload';
+    const url = this.configService.getClinicalApiUrl('/upload');
 
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    headers.append('Authorization', 'Bearer miToken');
-    headers.append('sec-fetch-mode', 'no-cors'); // Elimina las cabeceras experimentales
-    headers.append('sec-fetch-dest', 'empty');
-    headers.append('sec-fetch-site', 'same-origin');
-
-    const options = {
-      method: 'POST',
-      // headers: headers,
-      body: formData,
-    };
-
-    fetch(url, options)
-      .then((response) => response.json())
-      .then((data) => {
+    this.http.post<any>(url, formData).subscribe(
+      (data) => {
         console.log('Respuesta del servidor:', data);
-        // Realiza acciones adicionales si es necesario
-      })
-      .catch((error) => {
+      },
+      (error) => {
         console.error('Error al subir la foto:', error);
-      });
+      }
+    );
   }
 
   getTouchedAndError(key: string) {
@@ -165,21 +148,11 @@ export class PerfilUsuarioComponent implements OnInit {
       email: this.form.controls.email.value
     };
 
-    const url = 'http://localhost:8080/persona/changeUser';
+    const url = this.configService.getClinicalApiUrl('/persona/changeUser');
 
-    const options = {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.put<any>(url, credentials).subscribe(
+      (data) => {
         try {
-          // Hacer algo con jsonData
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
               icon: this.success,
@@ -188,10 +161,10 @@ export class PerfilUsuarioComponent implements OnInit {
             },
           });
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error:', error);
         }
-      })
-      .catch((error) => {
+      },
+      (error) => {
         const dialog = this.matDialog.open(ErrorSuccessComponent, {
           data: {
             text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
@@ -199,7 +172,8 @@ export class PerfilUsuarioComponent implements OnInit {
           },
         });
         console.error('Error:', error);
-      });
+      }
+    );
   }
 
   admin(){

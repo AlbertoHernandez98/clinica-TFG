@@ -27,7 +27,10 @@ export class LangService {
       savedLanguage &&
       this.idiomasDisponibles.find((lang) => lang.codigo === savedLanguage)
     ) {
-      this.currentLanguageSubject.next(savedLanguage);
+      this.currentLanguageSubject.next(savedLanguage.toLowerCase());
+    } else {
+      // Si no hay idioma guardado, usar el default
+      this.currentLanguageSubject.next(this.defaultLanguage);
     }
   }
 
@@ -39,6 +42,7 @@ export class LangService {
   }
 
   public getCurrentLanguage(): string {
-    return this.currentLanguageSubject.getValue();
+    const lang = this.currentLanguageSubject.getValue();
+    return lang.toLowerCase();
   }
 }

@@ -3,6 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppStateService } from 'src/app/providers/app-state/app-state.service';
 import { AppInfo } from 'src/app/providers/app-state/models/app-state.interface';
 import { ActivatedRoute } from '@angular/router';
+import { ServiceCategory } from 'src/app/shared/models/service.interface';
 
 @Component({
   selector: 'app-servicios-menu',
@@ -11,14 +12,11 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ServiciosMenuComponent implements OnInit {
 
-  quiroBool = true;
-  bioBool = false;
-  ungBool = false;
-  oseaBool = false;
-  pieBool = false;
-  infBool = false;
-  gerBool = false;
-  domBool = false;
+  // Usar enum en lugar de múltiples booleans
+  activeCategory: ServiceCategory = ServiceCategory.QUIROPODIA;
+  readonly ServiceCategory = ServiceCategory; // Para acceso en template
+
+  // Estado de visibilidad de servicio específico
   mostrandoServicio = false;
 
   constructor(
@@ -33,7 +31,7 @@ export class ServiciosMenuComponent implements OnInit {
       this.mostrandoServicio = !!this.route.firstChild;
     });
 
-    // También subscribirse a cambios en los parámetros
+    // Subscribirse a cambios en los parámetros
     this.route.params.subscribe(() => {
       this.mostrandoServicio = !!this.route.firstChild;
     });
@@ -41,16 +39,20 @@ export class ServiciosMenuComponent implements OnInit {
     this.getTranslate();
   }
 
-
-
+  /**
+   * Obtiene las traducciones y luego inicializa las rutas
+   */
   getTranslate() {
     this.appService
       .traduccionesLoaded('BREADCUMTEXT.SERVICIOS')
-      .subscribe((res) => {
+      .subscribe(() => {
         this.initRoutes();
       });
   }
 
+  /**
+   * Inicializa la información de rutas y breadcrumbs
+   */
   initRoutes() {
     const appInfo: AppInfo = {
       breadcum: [
@@ -71,370 +73,23 @@ export class ServiciosMenuComponent implements OnInit {
     this.appService.setBreadcumInfo(appInfo, 'appInfo');
   }
 
-  quiro() {
-    this.quiroBool = true;
-    this.bioBool = false;
-    this.ungBool = false;
-    this.oseaBool = false;
-    this.pieBool = false;
-    this.infBool = false;
-    this.gerBool = false;
-    this.domBool = false;
-
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-
-    if (bio !== null) {
-      bio.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (osea !== null) {
-      osea.style.color = '#a25f4b99';
-    }
-    if (pie !== null) {
-      pie.style.color = '#a25f4b99';
-    }
-    if (inf !== null) {
-      inf.style.color = '#a25f4b99';
-    }
-    if (ger !== null) {
-      ger.style.color = '#a25f4b99';
-    }
-    if (dom !== null) {
-      dom.style.color = '#a25f4b99';
-    }
-
-
-    if (quiro !== null) {
-      quiro.style.color = '#A25F4B';
-    }
+  /**
+   * Cambia la categoría activa
+   * Reemplaza los 8 métodos anteriores (quiro, bio, ung, etc.)
+   * @param category - La categoría a activar
+   */
+  selectCategory(category: ServiceCategory): void {
+    this.activeCategory = category;
   }
 
-  bio() {
-    this.quiroBool = false;
-    this.bioBool = true;
-    this.ungBool = false;
-    this.oseaBool = false;
-    this.pieBool = false;
-    this.infBool = false;
-    this.gerBool = false;
-    this.domBool = false;
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-    
-    if (quiro !== null) {
-      quiro.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (osea !== null) {
-      osea.style.color = '#a25f4b99';
-    }
-    if (pie !== null) {
-      pie.style.color = '#a25f4b99';
-    }
-    if (inf !== null) {
-      inf.style.color = '#a25f4b99';
-    }
-    if (ger !== null) {
-      ger.style.color = '#a25f4b99';
-    }
-    if (dom !== null) {
-      dom.style.color = '#a25f4b99';
-    }
-
-
-
-
-    if (bio !== null) {
-      bio.style.color = '#A25F4B';
-    }
+  /**
+   * Helper para verificar si una categoría está activa
+   * Útil para templates y lógica
+   */
+  isCategoryActive(category: ServiceCategory): boolean {
+    return this.activeCategory === category;
   }
-
-  ung() {
-    this.quiroBool = false;
-    this.bioBool = false;
-    this.ungBool = true;
-    this.oseaBool = false;
-    this.pieBool = false;
-    this.infBool = false;
-    this.gerBool = false;
-    this.domBool = false;
-  }
-
-  osea() {
-    this.quiroBool = false;
-    this.bioBool = false;
-    this.ungBool = false;
-    this.oseaBool = true;
-    this.pieBool = false;
-    this.infBool = false;
-    this.gerBool = false;
-    this.domBool = false;
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-    
-    if (quiro !== null) {
-      quiro.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (bio !== null) {
-      bio.style.color = '#a25f4b99';
-    }
-    if (pie !== null) {
-      pie.style.color = '#a25f4b99';
-    }
-    if (inf !== null) {
-      inf.style.color = '#a25f4b99';
-    }
-    if (ger !== null) {
-      ger.style.color = '#a25f4b99';
-    }
-    if (dom !== null) {
-      dom.style.color = '#a25f4b99';
-    }
-
-
-
-
-    if (osea !== null) {
-      osea.style.color = '#A25F4B';
-    }
-  }
-
-  pie() {
-    this.quiroBool = false;
-    this.bioBool = false;
-    this.ungBool = false;
-    this.oseaBool = false;
-    this.pieBool = true;
-    this.infBool = false;
-    this.gerBool = false;
-    this.domBool = false;
-
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-    
-    if (quiro !== null) {
-      quiro.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (bio !== null) {
-      bio.style.color = '#a25f4b99';
-    }
-    if (osea !== null) {
-      osea.style.color = '#a25f4b99';
-    }
-    if (inf !== null) {
-      inf.style.color = '#a25f4b99';
-    }
-    if (ger !== null) {
-      ger.style.color = '#a25f4b99';
-    }
-    if (dom !== null) {
-      dom.style.color = '#a25f4b99';
-    }
-
-
-
-
-    if (pie !== null) {
-      pie.style.color = '#A25F4B';
-    }
-  }
-
-  inf() {
-    this.quiroBool = false;
-    this.bioBool = false;
-    this.ungBool = false;
-    this.oseaBool = false;
-    this.pieBool = false;
-    this.infBool = true;
-    this.gerBool = false;
-    this.domBool = false;
-
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-    
-    if (quiro !== null) {
-      quiro.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (bio !== null) {
-      bio.style.color = '#a25f4b99';
-    }
-    if (pie !== null) {
-      pie.style.color = '#a25f4b99';
-    }
-    if (osea !== null) {
-      osea.style.color = '#a25f4b99';
-    }
-    if (ger !== null) {
-      ger.style.color = '#a25f4b99';
-    }
-    if (dom !== null) {
-      dom.style.color = '#a25f4b99';
-    }
-
-
-
-
-    if (inf !== null) {
-      inf.style.color = '#A25F4B';
-    }
-  }
-
-  ger() {
-    this.quiroBool = false;
-    this.bioBool = false;
-    this.ungBool = false;
-    this.oseaBool = false;
-    this.pieBool = false;
-    this.infBool = false;
-    this.gerBool = true;
-    this.domBool = false;
-
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-    
-    if (quiro !== null) {
-      quiro.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (bio !== null) {
-      bio.style.color = '#a25f4b99';
-    }
-    if (pie !== null) {
-      pie.style.color = '#a25f4b99';
-    }
-    if (inf !== null) {
-      inf.style.color = '#a25f4b99';
-    }
-    if (osea !== null) {
-      osea.style.color = '#a25f4b99';
-    }
-    if (dom !== null) {
-      dom.style.color = '#a25f4b99';
-    }
-
-
-
-
-    if (ger !== null) {
-      ger.style.color = '#A25F4B';
-    }
-  }
-
-  serv() {
-    this.quiroBool = false;
-    this.bioBool = false;
-    this.ungBool = false;
-    this.oseaBool = false;
-    this.pieBool = false;
-    this.infBool = false;
-    this.gerBool = false;
-    this.domBool = true;
-
-
-    var quiro = document.getElementById('quiro');
-    var bio = document.getElementById('bio');
-    var ung = document.getElementById('ung');
-    var osea = document.getElementById('osea');
-    var pie = document.getElementById('pie');
-    var inf = document.getElementById('inf');
-    var ger = document.getElementById('ger');
-    var dom = document.getElementById('dom');
-
-    
-    if (quiro !== null) {
-      quiro.style.color = '#a25f4b99';
-    }
-    if (ung !== null) {
-      ung.style.color = '#a25f4b99';
-    }
-    if (bio !== null) {
-      bio.style.color = '#a25f4b99';
-    }
-    if (pie !== null) {
-      pie.style.color = '#a25f4b99';
-    }
-    if (inf !== null) {
-      inf.style.color = '#a25f4b99';
-    }
-    if (ger !== null) {
-      ger.style.color = '#a25f4b99';
-    }
-    if (osea !== null) {
-      osea.style.color = '#a25f4b99';
-    }
-
-
-
-
-    if (dom !== null) {
-      dom.style.color = '#A25F4B';
-    }
-  }
-
 }
+
 
 

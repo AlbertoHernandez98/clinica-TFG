@@ -46,7 +46,7 @@
 
     <div class="login-option">
         <div class="dropdown">
-            <button id="idioma" class="dropbtn">{{ this.idioma }}</button>
+            <button id="idioma" class="dropbtn">{{ idioma | uppercase }}</button>
             <div class="dropdown-content">
                 <a (click)="useLanguage('es')">Español</a>
                 <a (click)="useLanguage('en')">Inglés</a>

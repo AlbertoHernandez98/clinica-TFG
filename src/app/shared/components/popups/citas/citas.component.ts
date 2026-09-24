@@ -1,11 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormBuilder, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from '../../../../services/config/config.service';
 import { AdminUsersComponent } from '../admin-users/admin-users.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
@@ -42,7 +44,9 @@ export class CitasComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
-    private translate: TranslateService
+    private http: HttpClient,
+    private translate: TranslateService,
+    private configService: ConfigService
   ) {}
 
   success = './assets/icons/svg/icon-save.svg';
@@ -56,38 +60,28 @@ export class CitasComponent implements OnInit {
  
 
   private chargeList() {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
+    const url = this.configService.getClinicalApiUrl('/citas');
 
-    const url = 'http://localhost:8080/citas';
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.get<any[]>(url).subscribe(
+      (data: any[]) => {
         try {
-          this.citasList = JSON.parse(data).filter(
+          this.citasList = data.filter(
             (cita: { idCliente: number }) =>
               cita.idCliente === this.data.selectedUser.idPersona
           );
 
-          console.log(data);
-          
-
-
           this.dateConverter(this.citasList);
-
-          
           this.listaLength = this.citasList.length === 0;
 
-
+          console.log(data);
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      })
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
   }
 
   private dateConverter(historial: any) {

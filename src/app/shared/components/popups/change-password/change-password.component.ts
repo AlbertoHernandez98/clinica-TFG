@@ -1,11 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from '../../../../services/config/config.service';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 
 @Component({
@@ -22,7 +24,9 @@ export class ChangePasswordComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
-    private translate: TranslateService
+    private http: HttpClient,
+    private translate: TranslateService,
+    private configService: ConfigService
   ) {}
 
   form = this.formBuilder.group({
@@ -99,43 +103,39 @@ export class ChangePasswordComponent implements OnInit {
         },
       });
     } else {
+      const url = this.configService.getClinicalApiUrl('/persona/changePassword');
 
-    const url = 'http://localhost:8080/persona/changePassword';
+      const credentials = {
+        username: userSubstring,
+        password: this.form.controls.password.value,
+        newPassword: this.form.controls.newPassword.value,
+      };
 
-    const options = {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
-        try {
-          // Hacer algo con jsonData
+      this.http.put<any>(url, credentials).subscribe(
+        (data) => {
+          try {
+            const dialog = this.matDialog.open(ErrorSuccessComponent, {
+              data: {
+                icon: this.success,
+                text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
+                buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+              },
+            });
+          } catch (error) {
+            console.error('Error al procesar respuesta:', error);
+          }
+          this.dialogRef.close();
+        },
+        (error) => {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
-              icon: this.success,
-              text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
+              text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
               buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
             },
           });
-        } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error:', error);
         }
-      })
-      .catch((error) => {
-        const dialog = this.matDialog.open(ErrorSuccessComponent, {
-          data: {
-            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-          },
-        });
-        console.error('Error:', error);
-      });
-      this.dialogRef.close();
+      );
     }
   }
 

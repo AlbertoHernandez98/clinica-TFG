@@ -10,42 +10,35 @@
             <span id="buttons" class="services-wrap">
                 <div role="list" class="services-wrap__list">
                     <div role="listitem" class="services-wrap__list__item">
-                        <label id="quiro" (click)="quiro()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.QUIROPODIA' | translate
-                            }}</label>
+                        <label (click)="selectCategory(ServiceCategory.QUIROPODIA)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.QUIROPODIA)">{{ 'SERVICES_MENU.QUIROPODIA' | translate }}</label>
                     </div>
                     <div role="listitem" class="services-wrap__list__item">
-                        <label id="bio" (click)="bio()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.BIOMECANICA' | translate
-                            }}</label>
+                        <label (click)="selectCategory(ServiceCategory.BIOMECANICA)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.BIOMECANICA)">{{ 'SERVICES_MENU.BIOMECANICA' | translate }}</label>
                     </div>
-                    <div role="listitem" routerLink="/serviciosMenu/cirugia-ungeal" class="services-wrap__list__item">
-                        <label id="ung" (click)="ung()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.CIRUGIA_UNGEAL' |
-                            translate }}</label>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label (click)="selectCategory(ServiceCategory.CIRUGIA_UNGEAL)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.CIRUGIA_UNGEAL)">{{ 'SERVICES_MENU.CIRUGIA_UNGEAL' | translate }}</label>
                     </div>
-                    <div role="listitem" routerLink="/serviciosMenu/cirugia-osea" class="services-wrap__list__item">
-                        <label id="osea" (click)="osea()" class="services-wrap__list__item__a">{{'SERVICES_MENU.CIRUGIA_OSEA' | translate
-                            }}</label>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label (click)="selectCategory(ServiceCategory.CIRUGIA_OSEA)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.CIRUGIA_OSEA)">{{'SERVICES_MENU.CIRUGIA_OSEA' | translate }}</label>
                     </div>
-                    <div role="listitem" routerLink="/serviciosMenu/pie-diabetico" class="services-wrap__list__item">
-                        <label id="pie" (click)="pie()" class="services-wrap__list__item__a">{{'SERVICES_MENU.PIE_DIABETICO' | translate
-                            }}</label>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label (click)="selectCategory(ServiceCategory.PIE_DIABETICO)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.PIE_DIABETICO)">{{'SERVICES_MENU.PIE_DIABETICO' | translate }}</label>
                     </div>
-                    <div role="listitem" routerLink="/serviciosMenu/podologia-infantil" class="services-wrap__list__item">
-                        <label id="inf" (click)="inf()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_INFANTIL' |
-                            translate }}</label>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label (click)="selectCategory(ServiceCategory.PODOLOGIA_INFANTIL)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.PODOLOGIA_INFANTIL)">{{ 'SERVICES_MENU.PODOLOGIA_INFANTIL' | translate }}</label>
                     </div>
-                    <div role="listitem" routerLink="/serviciosMenu/podologia-geriatrica" class="services-wrap__list__item">
-                        <label id="ger" (click)="ger()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.PODOLOGIA_GERIATRICA' |
-                            translate }}</label>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label (click)="selectCategory(ServiceCategory.PODOLOGIA_GERIATRICA)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.PODOLOGIA_GERIATRICA)">{{ 'SERVICES_MENU.PODOLOGIA_GERIATRICA' | translate }}</label>
                     </div>
-                    <div role="listitem" routerLink="/serviciosMenu/servicio-domicilio" class="services-wrap__list__item">
-                        <label id="dom" (click)="serv()" class="services-wrap__list__item__a">{{ 'SERVICES_MENU.SERVICIO_DOM' | translate }}</label>
+                    <div role="listitem" class="services-wrap__list__item">
+                        <label (click)="selectCategory(ServiceCategory.SERVICIO_DOMICILIO)" class="services-wrap__list__item__a" [class.is-active]="isCategoryActive(ServiceCategory.SERVICIO_DOMICILIO)">{{ 'SERVICES_MENU.SERVICIO_DOM' | translate }}</label>
                     </div>
                 </div>
             </span>
         </form>
 
 <div class="content">
-    <div *ngIf="quiroBool" class="content__content-quiro">
+    <div *ngIf="isCategoryActive(ServiceCategory.QUIROPODIA)" class="content__content-quiro">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">QUIROPODIA</div>
@@ -114,7 +107,7 @@
 
 
 
-    <div *ngIf="bioBool" class="content__content-bio">
+    <div *ngIf="isCategoryActive(ServiceCategory.BIOMECANICA)" class="content__content-bio">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">BIOMECANICA</div>
@@ -172,7 +165,7 @@
         </div>
     </div>
 
-    <div class="content__servicio" *ngIf="ungBool">
+    <div class="content__servicio" *ngIf="isCategoryActive(ServiceCategory.CIRUGIA_UNGEAL)">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">CIRUGIA UNGEAL</div>
@@ -180,7 +173,7 @@
         </div>
         <app-cirugia-ungeal></app-cirugia-ungeal>
     </div>
-    <div class="content__servicio" *ngIf="oseaBool">
+    <div class="content__servicio" *ngIf="isCategoryActive(ServiceCategory.CIRUGIA_OSEA)">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">CIRUGIA OSEA</div>
@@ -188,7 +181,7 @@
         </div>
         <app-cirugia-osea></app-cirugia-osea>
     </div>
-    <div class="content__servicio" *ngIf="pieBool">
+    <div class="content__servicio" *ngIf="isCategoryActive(ServiceCategory.PIE_DIABETICO)">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">PIE DIABETICO</div>
@@ -196,7 +189,7 @@
         </div>
         <app-pie-diabetico></app-pie-diabetico>
     </div>
-    <div class="content__servicio" *ngIf="infBool">
+    <div class="content__servicio" *ngIf="isCategoryActive(ServiceCategory.PODOLOGIA_INFANTIL)">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">PODOLOGIA INFANTIL</div>
@@ -204,7 +197,7 @@
         </div>
         <app-podologia-infantil></app-podologia-infantil>
     </div>
-    <div class="content__servicio" *ngIf="gerBool">
+    <div class="content__servicio" *ngIf="isCategoryActive(ServiceCategory.PODOLOGIA_GERIATRICA)">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">PODOLOGIA GERIATRICA</div>
@@ -212,7 +205,7 @@
         </div>
         <app-podologia-geriatrica></app-podologia-geriatrica>
     </div>
-    <div class="content__servicio" *ngIf="domBool">
+    <div class="content__servicio" *ngIf="isCategoryActive(ServiceCategory.SERVICIO_DOMICILIO)">
         <div class="content__wrapper">
             <div class="deco-line"></div>
             <div class="label-services">SERVICIO A DOMICILIO</div>

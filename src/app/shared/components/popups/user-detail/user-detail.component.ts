@@ -1,15 +1,16 @@
 import { Component, Inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfigService } from '../../../../services/config/config.service';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { Route, Router } from '@angular/router';
 import { CitasComponent } from '../citas/citas.component';
-import { log } from 'console';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import {
@@ -64,8 +65,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
+    private http: HttpClient,
     private translate: TranslateService,
     public router: Router,
+    private configService: ConfigService,
     private nominatimService: NominatimPlacesService
   ) { }
 
@@ -103,21 +106,40 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   private setupAddressAutocomplete(): void {
     this.domicilioControl.valueChanges
       .pipe(
-        debounceTime(400),
+        debounceTime(300),
         takeUntil(this.destroy$)
       )
       .subscribe((value: any) => {
         if (typeof value === 'string') {
-          if (value.length > 2) {
+          console.log('Búsqueda de dirección:', value);
+          if (value.length > 1) {
             this.isLoadingPredictions = true;
             this.showPredictions = true;
             this.nominatimService.getPredictions(value)
               .pipe(takeUntil(this.destroy$))
-              .subscribe((predictions: AddressPrediction[]) => {
-                this.predictions = predictions;
-                this.filteredPredictions = predictions;
-                this.showPredictions = predictions.length > 0;
-                this.isLoadingPredictions = false;
+              .subscribe({
+                next: (predictions: AddressPrediction[]) => {
+                  console.log('✅ Predicciones obtenidas:', predictions.length, predictions);
+                  this.predictions = predictions;
+                  this.filteredPredictions = predictions;
+                  this.showPredictions = predictions.length > 0;
+                  this.isLoadingPredictions = false;
+                },
+                error: (error) => {
+                  console.error('❌ Error en getPredictions:', error);
+                  this.isLoadingPredictions = false;
+                  this.showPredictions = false;
+                  // Permitir entrada manual
+                  this.predictions = [{
+                    place_id: 0,
+                    display_name: value,
+                    lat: '0',
+                    lon: '0',
+                    type: 'manual'
+                  }];
+                  this.filteredPredictions = this.predictions;
+                  this.showPredictions = true;
+                }
               });
           } else {
             this.filteredPredictions = [];
@@ -267,7 +289,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           return 'La contraseña es requerida';
         }
         if (control.errors['invalidPassword']) {
-          return 'Mínimo 6 caracteres: 1 mayúscula, 1 minúscula, 1 número';
+          return 'Mínimo 4 caracteres';
         }
         break;
       
@@ -319,19 +341,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       email: this.form.controls.email.value
     };
 
-    const url = 'http://localhost:3000/persona/changeUser';
+    const url = this.configService.getClinicalApiUrl('/persona/changeUser');
 
-    const options = {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.put<any>(url, credentials).subscribe(
+      (data) => {
         try {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
@@ -341,10 +354,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             },
           });
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error:', error);
         }
-      })
-      .catch((error) => {
+      },
+      (error) => {
         const dialog = this.matDialog.open(ErrorSuccessComponent, {
           data: {
             text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
@@ -352,24 +365,17 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           },
         });
         console.error('Error:', error);
-      });
+      }
+    );
     this.close();
   }
 
   public onDelete() {
-    const options = {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    const url = `http://localhost:3000/persona/${this.user.idPersona}`;
+    const url = this.configService.getApiUrl(`/persona/${this.user.idPersona}`);
     console.log(url);
 
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.delete<any>(url).subscribe(
+      (data) => {
         try {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
@@ -379,10 +385,14 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             },
           });
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      });
-    this.close();
+        this.close();
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
   }
 
   public onCreate() {
@@ -402,19 +412,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       email: this.form.controls.email.value
     };
 
-    const url = 'http://localhost:3000/persona';
+    const url = this.configService.getApiUrl('/persona');
 
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    };
-
-    fetch(url, options)
-      .then((response) => response.text())
-      .then((data) => {
+    this.http.post<any>(url, credentials).subscribe(
+      (data) => {
         try {
           const dialog = this.matDialog.open(ErrorSuccessComponent, {
             data: {
@@ -424,10 +425,11 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             },
           });
         } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
+          console.error('Error al procesar respuesta:', error);
         }
-      })
-      .catch((error) => {
+        this.close();
+      },
+      (error) => {
         const dialog = this.matDialog.open(ErrorSuccessComponent, {
           data: {
             text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
@@ -435,8 +437,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           },
         });
         console.error('Error:', error);
-      });
-    this.close();
+      }
+    );
   }
 
   public close() {

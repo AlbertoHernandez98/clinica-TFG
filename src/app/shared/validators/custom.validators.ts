@@ -58,7 +58,8 @@ export function phoneValidator(): ValidatorFn {
 }
 
 /**
- * Validador para contraseña (mínimo 6 caracteres, al menos 1 mayúscula, 1 minúscula, 1 número)
+ * Validador para contraseña (mínimo 4 caracteres)
+ * Flexible: permite cualquier combinación de caracteres
  */
 export function passwordValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -67,13 +68,8 @@ export function passwordValidator(): ValidatorFn {
     }
     
     const value = control.value;
-    const hasUpperCase = /[A-Z]/.test(value);
-    const hasLowerCase = /[a-z]/.test(value);
-    const hasNumber = /\d/.test(value);
-    const isLengthValid = value.length >= 6;
+    const isLengthValid = value.length >= 4;
     
-    const passwordValid = hasUpperCase && hasLowerCase && hasNumber && isLengthValid;
-    
-    return passwordValid ? null : { invalidPassword: true };
+    return isLengthValid ? null : { invalidPassword: true };
   };
 }
