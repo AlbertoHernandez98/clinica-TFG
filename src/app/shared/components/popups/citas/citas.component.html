@@ -38,6 +38,9 @@
             <span class="appointments__item-label">{{ 'SHARED.POPUPS.CITAS.SERVICIO' | translate }} {{ user.idServicio }}</span>
             <span class="appointments__date">{{ user.fechaInicio ? (user.fechaInicio | date:'dd/MM/yyyy HH:mm') : ('PERFIL.NO_DISPONIBLE' | translate) }}</span>
           </span>
+          <button type="button" class="appointments__manage" *ngIf="canManage(user)" (click)="editAppointment(user)">
+            {{ 'SHARED.POPUPS.CITAS.MODIFICAR_ELIMINAR' | translate }}
+          </button>
         </div>
       </ng-container>
     </div>

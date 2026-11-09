@@ -1,10 +1,12 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConfigService } from '../../../../services/config/config.service';
 import { merge, of, Subject, timer } from 'rxjs';
 import { catchError, distinctUntilChanged, map, startWith, switchMap, takeUntil } from 'rxjs/operators';
+import { clinicToday } from '../../../classes/clinic-date';
+import { ConfirmActionService } from '../confirm-action/confirm-action.service';
 
 interface Appointment {
   idCita: number;
@@ -13,6 +15,14 @@ interface Appointment {
   idMedico: number;
   fechaInicio: string | null;
   duracion: number | null;
+}
+
+const DURACIONES = [30, 60, 90];
+function duracionValida(control: AbstractControl): { duracionInvalida: true } | null {
+  const value = control.value;
+  if (value === null || value === '') return null;
+  return (typeof value === 'number' || (typeof value === 'string' && /^\d+$/.test(value))) &&
+    DURACIONES.includes(Number(value)) ? null : { duracionInvalida: true };
 }
 
 @Component({
@@ -24,22 +34,25 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
   servicios: { idServicio: number; servicio: string }[] = [];
   listaMedicos: { idPersona: number; nombre: string; apellidos: string; idRolNativo: number }[] = [];
   pacientes: { idPersona: number; nombre: string; apellidos: string; idRolNativo: number }[] = [];
-  duraciones = [15, 30, 45, 60, 75, 90];
+  readonly duraciones = DURACIONES;
   saving = false;
   loadError = false;
   errorKey = '';
-  availability: 'idle' | 'checking' | 'available' | 'unavailable' | 'outside' | 'error' = 'idle';
+  availability: 'idle' | 'checking' | 'available' | 'unavailable' | 'patient' | 'outside' | 'error' = 'idle';
   slotsState: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
   slots: string[] = [];
   dateControl = new FormControl('');
+  timeControl = new FormControl('');
   patientControl = new FormControl(null, Validators.required);
   private destroyed$ = new Subject<void>();
   private refreshSlots$ = new Subject<void>();
   form = this.formBuilder.group({
     idServicio: [null, Validators.required],
     idMedico: [null, Validators.required],
-    fechaInicio: ['', Validators.required],
-    duracion: [null, Validators.required],
+    fechaInicio: ['', [Validators.required, (control: AbstractControl) =>
+      !this.data.appointment && control.value && control.value.slice(0, 10) < clinicToday()
+        ? { fechaPasada: true } : null]],
+    duracion: [null, [Validators.required, duracionValida]],
   });
 
   constructor(
@@ -52,39 +65,47 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
     },
     private formBuilder: FormBuilder,
     private http: HttpClient,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private confirmAction: ConfirmActionService
   ) {}
 
   ngOnInit(): void {
     if (this.data.selectedUser) this.patientControl.setValue(this.data.selectedUser.idPersona);
-    this.patientControl.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => this.form.updateValueAndValidity());
-    this.dateControl.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(date => {
-      const current = this.form.controls.fechaInicio.value || '';
-      this.form.controls.fechaInicio.setValue(date && current ? `${date}T${current.slice(11, 16)}` : '');
+    this.patientControl.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+      if (this.errorKey === 'ADMIN_CITA.PACIENTE_OCUPADO') this.errorKey = '';
+    });
+    merge(this.dateControl.valueChanges, this.timeControl.valueChanges).pipe(takeUntil(this.destroyed$)).subscribe(() => {
+      const date = this.dateControl.value;
+      const time = this.timeControl.value;
+      this.form.controls.fechaInicio.setValue(date && time ? `${date}T${time}` : '');
     });
     this.form.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(value => {
       if (value.fechaInicio) this.dateControl.setValue(value.fechaInicio.slice(0, 10), { emitEvent: false });
-      if (this.errorKey === 'ADMIN_CITA.NO_DISPONIBLE' || this.errorKey === 'ADMIN_CITA.REQUERIDOS') this.errorKey = '';
+      if (value.fechaInicio) this.timeControl.setValue(value.fechaInicio.slice(11, 16), { emitEvent: false });
+      if (['ADMIN_CITA.NO_DISPONIBLE', 'ADMIN_CITA.PACIENTE_OCUPADO', 'ADMIN_CITA.REQUERIDOS'].includes(this.errorKey)) this.errorKey = '';
     });
     const slotKey = () => {
       const value = this.form.value;
-      return { fecha: this.dateControl.value || '', idMedico: value.idMedico, duracion: value.duracion };
+      return { fecha: this.dateControl.value || '', idMedico: value.idMedico, duracion: value.duracion, idCliente: this.patientControl.value };
     };
     merge(
-      this.form.valueChanges.pipe(startWith(null), map(slotKey), distinctUntilChanged((a, b) =>
-        a.fecha === b.fecha && a.idMedico === b.idMedico && a.duracion === b.duracion)),
+      merge(this.form.valueChanges, this.patientControl.valueChanges).pipe(startWith(null), map(slotKey), distinctUntilChanged((a, b) =>
+        a.fecha === b.fecha && a.idMedico === b.idMedico && a.duracion === b.duracion && a.idCliente === b.idCliente)),
       this.refreshSlots$.pipe(map(slotKey))
     ).pipe(
       switchMap(key => {
         this.slots = [];
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(key.fecha) || key.idMedico === null || key.idMedico === '' || !key.duracion) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(key.fecha) || (!this.data.appointment && key.fecha < clinicToday()) ||
+            key.idMedico === null || key.idMedico === '' || this.form.controls.duracion.invalid) {
           this.slotsState = 'idle';
           return of(null);
         }
         this.slotsState = 'loading';
         return timer(300).pipe(
           switchMap(() => this.http.post<{ huecos: string[] }>(this.configService.getApiUrl('/citas/huecos'), {
-            ...key, ...(this.data.appointment ? { idCita: this.data.appointment.idCita } : {})
+            fecha: key.fecha, idMedico: key.idMedico, duracion: key.duracion,
+            ...(key.idCliente !== null && key.idCliente !== '' ? { idCliente: key.idCliente } : {}),
+            ...(this.data.appointment ? { idCita: this.data.appointment.idCita } : {})
           })),
           catchError(error => {
             console.error('Error al cargar los huecos:', error);
@@ -97,13 +118,13 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
     ).subscribe(result => {
       if (result) { this.slots = result.huecos; this.slotsState = 'ready'; }
     });
-    this.form.valueChanges.pipe(
-      switchMap(value => {
+    merge(this.form.valueChanges, this.patientControl.valueChanges).pipe(
+      switchMap(() => {
         if (this.form.invalid || this.patientControl.invalid) { this.availability = 'idle'; return of(null); }
         this.availability = 'checking';
         return timer(300).pipe(
           switchMap(() => this.http.post<{ disponible: boolean; motivo?: string }>(this.configService.getApiUrl('/citas/disponibilidad'), {
-            ...value, idCliente: this.patientControl.value,
+            ...this.form.value, idCliente: this.patientControl.value,
             ...(this.data.appointment ? { idCita: this.data.appointment.idCita } : {})
           })),
           catchError(error => {
@@ -115,7 +136,8 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.destroyed$)
     ).subscribe(result => {
-      if (result) this.availability = result.disponible ? 'available' : result.motivo === 'fuera_horario' ? 'outside' : 'unavailable';
+      if (result) this.availability = result.disponible ? 'available' :
+        result.motivo === 'fuera_horario' ? 'outside' : result.motivo === 'paciente_ocupado' ? 'patient' : 'unavailable';
     });
     if (this.data.appointment) {
       const cita = this.data.appointment;
@@ -148,8 +170,11 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
 
   refreshSlots(): void { this.refreshSlots$.next(); }
 
+  get today(): string { return clinicToday(); }
+
   onSubmit(): void {
-    if (this.saving || this.loadError || this.availability === 'checking' || this.availability === 'unavailable' || this.availability === 'outside' || this.availability === 'error') return;
+    this.form.controls.fechaInicio.updateValueAndValidity({ emitEvent: false });
+    if (this.saving || this.loadError || this.availability === 'checking' || this.availability === 'unavailable' || this.availability === 'patient' || this.availability === 'outside' || this.availability === 'error') return;
     if (this.form.invalid || this.patientControl.invalid) { this.form.markAllAsTouched(); this.patientControl.markAsTouched(); this.errorKey = 'ADMIN_CITA.REQUERIDOS'; return; }
     const body = { ...this.form.value, idCliente: this.patientControl.value };
     const id = this.data.appointment?.idCita;
@@ -162,8 +187,9 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
       error: (error: HttpErrorResponse) => {
         console.error('Error al guardar la cita:', error);
         this.saving = false;
-        this.errorKey = error.status === 409 ? 'ADMIN_CITA.NO_DISPONIBLE' : 'ADMIN_CITA.ERROR';
-        if (error.status === 409) { this.availability = 'unavailable'; this.refreshSlots(); }
+        const patientConflict = error.status === 409 && error.error?.code === 'PATIENT_CONFLICT';
+        this.errorKey = patientConflict ? 'ADMIN_CITA.PACIENTE_OCUPADO' : error.status === 409 ? 'ADMIN_CITA.NO_DISPONIBLE' : 'ADMIN_CITA.ERROR';
+        if (error.status === 409) { this.availability = patientConflict ? 'patient' : 'unavailable'; this.refreshSlots(); }
       }
     });
   }
@@ -171,9 +197,17 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
   onDelete(): void {
     if (!this.data.appointment || this.saving) return;
     this.saving = true;
-    this.http.delete(this.configService.getApiUrl(`/citas/${this.data.appointment.idCita}`)).subscribe({
-      next: () => { this.saving = false; this.dialogRef.close(true); },
-      error: error => { console.error('Error al eliminar la cita:', error); this.saving = false; this.errorKey = 'ADMIN_CITA.ERROR'; }
+    const appointment = this.data.appointment;
+    this.confirmAction.confirm({
+      title: 'CONFIRM_ACTION.DELETE_APPOINTMENT_TITLE',
+      message: 'CONFIRM_ACTION.DELETE_APPOINTMENT',
+      params: { id: String(appointment.idCita) }
+    }).pipe(takeUntil(this.destroyed$)).subscribe(confirmed => {
+      if (!confirmed) { this.saving = false; return; }
+      this.http.delete(this.configService.getApiUrl(`/citas/${appointment.idCita}`)).subscribe({
+        next: () => { this.saving = false; this.dialogRef.close(true); },
+        error: error => { console.error('Error al eliminar la cita:', error); this.saving = false; this.errorKey = 'ADMIN_CITA.ERROR'; }
+      });
     });
   }
 

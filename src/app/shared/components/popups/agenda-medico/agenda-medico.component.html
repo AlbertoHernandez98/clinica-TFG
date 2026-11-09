@@ -24,6 +24,9 @@
     <button type="button" (click)="changeWeek(-1)">‹ {{ 'AGENDA.ANTERIOR' | translate }}</button>
     <button type="button" (click)="today()">{{ 'AGENDA.HOY' | translate }}</button>
     <button type="button" (click)="changeWeek(1)">{{ 'AGENDA.SIGUIENTE' | translate }} ›</button>
+    <label class="agenda__date">{{ 'AGENDA.IR_A_FECHA' | translate }}
+      <app-clinic-date-picker [ngModel]="selectedWeekDate" (ngModelChange)="jumpToWeek($event)" [label]="'AGENDA.IR_A_FECHA' | translate"></app-clinic-date-picker>
+    </label>
     <strong class="agenda__period" aria-live="polite">{{ weekLabel }}</strong>
   </nav>
 
@@ -76,11 +79,11 @@
                 <span *ngIf="event.appointment.duracion !== null">{{ 'AGENDA.DURACION' | translate:{ minutes: event.appointment.duracion } }}</span>
                 <span *ngIf="event.appointment.duracion === null">{{ 'AGENDA.DURACION_DESCONOCIDA' | translate }}</span>
               </button>
-              <button type="button" class="agenda__free" *ngIf="isOpen(day, i) && !day.holiday && day.slots.includes(hour) && !day.hours[i].length"
+              <button type="button" class="agenda__free" *ngIf="canCreateOn(day.date) && isOpen(day, i) && !day.holiday && day.slots.includes(hour) && !day.hours[i].length"
                 (click)="createAppointment(day, hour)" [attr.aria-label]="('AGENDA.CREAR_HORA' | translate) + ' ' + day.label + ' ' + hour">
                 {{ 'AGENDA.LIBRE' | translate }}
               </button>
-              <span class="agenda__unavailable" *ngIf="isOpen(day, i) && !day.holiday && !day.slots.includes(hour) && !day.hours[i].length">
+              <span class="agenda__unavailable" *ngIf="isOpen(day, i) && !day.holiday && (!canCreateOn(day.date) || !day.slots.includes(hour)) && !day.hours[i].length">
                 {{ 'AGENDA.NO_DISPONIBLE' | translate }}
               </span>
             </td>

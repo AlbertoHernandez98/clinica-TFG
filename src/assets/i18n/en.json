@@ -1,4 +1,18 @@
 {
+    "CONFIRM_ACTION": {
+        "CANCEL": "Cancel",
+        "CONFIRM": "Yes, confirm",
+        "DELETE_USER_TITLE": "Delete user",
+        "DELETE_USER": "Are you sure you want to delete {{user}}? This action cannot be undone.",
+        "DELETE_APPOINTMENT_TITLE": "Delete appointment",
+        "DELETE_APPOINTMENT": "Are you sure you want to delete appointment #{{id}}? This action cannot be undone.",
+        "DELETE_HOLIDAY_TITLE": "Delete holiday",
+        "DELETE_HOLIDAY": "Are you sure you want to delete the holiday period from {{start}} to {{end}}?",
+        "CHANGE_PASSWORD_TITLE": "Change password",
+        "CHANGE_PASSWORD": "Are you sure you want to change your password?",
+        "CHANGE_USER_PASSWORD": "Are you sure you want to save the changes and change {{user}}'s password?"
+    },
+    "DATE_PICKER": { "OPEN": "Open calendar" },
     "BUTTONS": {
         "ANTERIOR": "Previous",
         "SIGUIENTE": "Next"
@@ -138,7 +152,8 @@
         "POPUPS": {
             "CITAS": {
                 "EYEBROW": "Clinical area",
-                "SUBTITLE": "View the patient's appointments.",
+                "SUBTITLE": "Select an appointment to edit or delete it.",
+                "MODIFICAR_ELIMINAR": "Edit or delete",
                 "LOADING": "Loading appointments...",
                 "LOAD_ERROR": "Could not load appointments. Check your connection and try again.",
                 "EMPTY": "No appointments available",
@@ -229,7 +244,7 @@
     "ADMIN_CITA": {
         "PACIENTE": "Patient",
         "SELECCIONAR_PACIENTE": "Select a patient",
-        "DIA_HUECOS": "Day to check availability",
+        "DIA_HUECOS": "Appointment date and availability",
         "HUECOS": "Available times",
         "HUECOS_INSTRUCCIONES": "Choose a day, practitioner and duration to view available times.",
         "HUECOS_CARGANDO": "Looking for available times...",
@@ -238,10 +253,12 @@
         "HUECOS_VACIO": "No times are available for this day and duration.",
         "HUECOS_NOTA": "Start times are shown every 30 minutes. Availability is confirmed when saving.",
         "COMPROBANDO": "Checking availability...",
-        "DISPONIBLE": "The practitioner is available at this time.",
+        "DISPONIBLE": "The practitioner and patient are available at this time.",
         "ERROR_DISPONIBILIDAD": "Could not check availability. Change a field to try again.",
         "REQUERIDOS": "Complete all appointment fields.",
         "NO_DISPONIBLE": "The practitioner is unavailable: another appointment or holiday overlaps this time.",
+        "PACIENTE_OCUPADO": "The patient already has another appointment overlapping this time.",
+        "HORA": "Start time",
         "ERROR": "Could not save or delete the appointment. Please try again.",
         "ERROR_CARGA": "Could not load practitioners or services. Check your connection.",
         "TITULO": "Manage appointment",
@@ -249,7 +266,10 @@
         "HORARIO": "Monday, Wednesday and Friday: 16:00–20:00. Tuesday and Thursday: 09:30–13:30. Closed on weekends.",
         "FUERA_HORARIO": "The entire appointment must be within opening hours.",
         "FECHA": "Start date and time",
+        "FECHA_PASADA": "New appointments must be on or after today.",
         "DURACION": "Duration (minutes)",
+        "DURACION_SELECCIONAR": "Select a duration",
+        "DURACION_INVALIDA": "The previous duration is no longer valid. Select 30, 60 or 90 minutes.",
         "SERVICIO": "Service type",
         "MEDICO": "Practitioner",
         "ELIMINAR": "Delete"
@@ -294,6 +314,7 @@
         "ANTERIOR": "Previous week",
         "SIGUIENTE": "Next week",
         "HOY": "Current week",
+        "IR_A_FECHA": "Go to date",
         "CARGANDO": "Loading schedule...",
         "ERROR": "Could not load the schedule.",
         "REINTENTAR": "Retry",

@@ -6,7 +6,7 @@ import {
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { forkJoin, Observable, Subject } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfigService } from '../../../../services/config/config.service';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
@@ -62,23 +62,22 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.loadError = false;
 
-    const request: Observable<Persona[] | { users: Persona[]; staff: SessionStaff }> = this.data.patientAppointments
-      ? forkJoin({ users: this.http.get<Persona[]>(url), staff: this.http.get<SessionStaff>(this.configService.getApiUrl('/auth/me')) })
-      : this.http.get<Persona[]>(url);
+    const request = forkJoin({ users: this.http.get<Persona[]>(url), staff: this.http.get<SessionStaff>(this.configService.getApiUrl('/auth/me')) });
     request.pipe(takeUntil(this.destroy$)).subscribe(
       result => {
-        if (Array.isArray(result)) {
-          this.allUsers = result;
-        } else {
-          if (![1, 2, 3].includes(result.staff.idRolNativo)) {
-            this.loading = false;
-            this.loadError = true;
-            console.error('La sesión no tiene permiso para administrar citas.');
-            return;
-          }
-          this.staff = result.staff;
-          this.allUsers = result.users.filter(user => user.idRolNativo === 4);
+        if (![1, 2, 3].includes(result.staff.idRolNativo)) {
+          this.loading = false;
+          this.loadError = true;
+          console.error('La sesión no tiene permiso para administrar usuarios.');
+          return;
         }
+        this.staff = result.staff;
+        this.allUsers = result.users.filter(user =>
+          this.data.patientAppointments ? user.idRolNativo === 4 :
+          result.staff.idRolNativo === 1 ||
+          (result.staff.idRolNativo === 2 && (user.idRolNativo === 4 || user.idPersona === result.staff.idPersona)) ||
+          (result.staff.idRolNativo === 3 && [2, 4].includes(user.idRolNativo))
+        );
         this.applyFilter();
         this.loading = false;
       },
@@ -114,8 +113,9 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
       });
       return;
     }
+    if (!this.staff) return;
     const dialog = this.matDialog.open(UserDetailComponent, {
-      data: { selectedUser: user },
+      data: { selectedUser: user, staff: this.staff },
       width: '600px'
     });
     dialog.afterClosed().subscribe(() => {
@@ -123,17 +123,6 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
         this.dialogRef.close();
       }
       this.chargeList();
-    });
-  }
-
-  createPatient(): void {
-    if (!this.data.patientAppointments || !this.staff || ![1, 2, 3].includes(this.staff.idRolNativo)) return;
-    const dialog = this.matDialog.open(UserDetailComponent, {
-      data: { patientOnly: true },
-      width: '600px', maxWidth: '95vw'
-    });
-    dialog.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(created => {
-      if (created) this.chargeList();
     });
   }
 

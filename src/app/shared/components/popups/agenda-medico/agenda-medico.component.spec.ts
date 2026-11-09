@@ -6,6 +6,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { AdminCitasComponent } from '../admin-citas/admin-citas.component';
 import { AgendaMedicoComponent } from './agenda-medico.component';
+import { UserChangesService } from '../../../../services/users/user-changes.service';
+import { ClinicDatePickerModule } from '../../forms/clinic-date-picker/clinic-date-picker.module';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('Interactive weekly agenda', () => {
   let fixture: ComponentFixture<AgendaMedicoComponent>;
@@ -23,11 +26,11 @@ describe('Interactive weekly agenda', () => {
 
   beforeEach(async () => {
     jasmine.clock().install();
-    jasmine.clock().mockDate(new Date(2031, 1, 5, 12));
+    jasmine.clock().mockDate(new Date('2031-02-03T12:00:00Z'));
     dialog = jasmine.createSpyObj('MatDialog', ['open']);
     await TestBed.configureTestingModule({
       declarations: [AgendaMedicoComponent],
-      imports: [HttpClientTestingModule, FormsModule, TranslateModule.forRoot()],
+      imports: [HttpClientTestingModule, FormsModule, TranslateModule.forRoot(), ClinicDatePickerModule, NoopAnimationsModule],
       providers: [
         { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
         { provide: MatDialog, useValue: dialog }
@@ -110,9 +113,88 @@ describe('Interactive weekly agenda', () => {
     http.expectOne('http://localhost:3000/auth/me').flush('Error', { status: 500, statusText: 'Error' });
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
+    component.jumpToWeek('2031-04-19');
+    expect(component.error).toBeTrue();
     component.retry();
     http.expectOne('http://localhost:3000/auth/me').flush(doctor);
     agenda().flush(response);
     expect(component.error).toBeFalse();
+  });
+
+  it('updates professionals on user changes and keeps the selected doctor', () => {
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor]);
+    agenda().flush(response);
+    TestBed.inject(UserChangesService).notify();
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor, { ...doctor, idPersona: 5, nombre: 'Nuevo' }]);
+    http.expectNone(req => req.url.endsWith('/citas/agenda'));
+    fixture.detectChanges();
+    expect(component.selectedDoctor).toBe(2);
+    expect(fixture.nativeElement.querySelectorAll('select option').length).toBe(2);
+  });
+
+  it('refreshes automatically and selects another doctor when the previous one is removed', () => {
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor]);
+    agenda().flush(response);
+    fixture.detectChanges();
+    jasmine.clock().tick(30000);
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([{ ...doctor, idPersona: 5 }]);
+    agenda('2031-02-03', 5).flush(response);
+    expect(component.selectedDoctor).toBe(5);
+  });
+
+  it('reports professional refresh errors and retries', () => {
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor]);
+    agenda().flush(response);
+    jasmine.clock().tick(30000);
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush('Error', { status: 500, statusText: 'Error' });
+    expect(component.error).toBeTrue();
+    component.retry();
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor]);
+    agenda().flush(response);
+    expect(component.error).toBeFalse();
+  });
+
+  it('polls for new professionals without interrupting the current agenda', () => {
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor]);
+    agenda().flush(response);
+    const currentDays = component.days;
+    jasmine.clock().tick(30000);
+    expect(component.loading).toBeFalse();
+    expect(component.days).toBe(currentDays);
+    http.expectOne('http://localhost:3000/auth/me').flush({ ...doctor, idRolNativo: 3 });
+    http.expectOne('http://localhost:3000/persona').flush([doctor, { ...doctor, idPersona: 5 }]);
+    http.expectNone(req => req.url.endsWith('/citas/agenda'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('select option').length).toBe(2);
+    expect(fixture.nativeElement.querySelector('.agenda__refresh')).toBeNull();
+    expect(component.days).toBe(currentDays);
+  });
+
+  it('jumps to the week containing the chosen date, including weekends', () => {
+    loadDoctor();
+    component.jumpToWeek('2031-04-19');
+    agenda('2031-04-14').flush({ ...response, citas: [], vacaciones: [], huecos: {} });
+    expect(component.selectedWeekDate).toBe('2031-04-14');
+    component.today();
+    agenda().flush(response);
+    expect(component.selectedWeekDate).toBe('2031-02-03');
+  });
+
+  it('does not offer or create appointments before today but keeps existing appointments visible', () => {
+    loadDoctor();
+    jasmine.clock().mockDate(new Date('2031-02-04T12:00:00Z'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.agenda__free').length).toBe(0);
+    expect(fixture.nativeElement.querySelector('.agenda__appointment')).not.toBeNull();
+    component.createAppointment(component.days[0], '16:00');
+    expect(dialog.open).not.toHaveBeenCalled();
   });
 });

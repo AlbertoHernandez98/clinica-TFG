@@ -13,28 +13,48 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ## Citas de pacientes
 
-Tras iniciar sesión, «Citas de pacientes» permite buscar pacientes y consultar
-sus citas. La creación, modificación y eliminación se realizan únicamente desde
-«Administrar citas» en el encabezado. El médico puede gestionar citas para sí
-mismo; administración y recepción pueden gestionarlas con cualquier médico. En todos los casos,
-el servidor comprueba los solapamientos y las vacaciones antes de guardar.
+Tras iniciar sesión, «Citas de pacientes» permite buscar pacientes y consultar,
+modificar o eliminar sus citas. Las citas nuevas se crean desde
+«Administrar citas» en el encabezado. Los médicos solo pueden modificar o
+eliminar sus propias citas; administración y recepción pueden gestionar las
+citas de cualquier médico. En todos los casos,
+el servidor comprueba los solapamientos tanto del médico como del paciente y
+las vacaciones antes de guardar, incluso si las citas son con médicos distintos.
 Las citas deben comenzar y terminar dentro del horario de apertura: lunes,
 miércoles y viernes de 16:00 a 20:00; martes y jueves de 09:30 a 13:30.
 Sábados y domingos están cerrados. Las vacaciones solo afectan a días
 laborables, aunque su periodo pueda atravesar un fin de semana.
 El formulario muestra horas de inicio libres cada 30 minutos para el médico,
-el día y la duración elegidos. La disponibilidad se vuelve a validar al guardar.
+el día y la duración elegidos y, cuando hay paciente seleccionado, excluye
+también las horas que coinciden con sus otras citas. Los selectores de fecha
+utilizan el formato DD/MM/AAAA. Las citas nuevas o modificadas solo admiten
+duraciones de 30, 60 o 90 minutos. Las citas antiguas conservan su duración;
+si esta es distinta, hay que escoger una duración permitida al editarlas.
+La disponibilidad se vuelve a validar al guardar.
+Las citas nuevas solo se pueden crear desde el día actual en adelante,
+utilizando la fecha de la clínica en Madrid; las citas anteriores siguen
+disponibles para su consulta y edición.
 Desde «Administrar citas» se accede a una agenda semanal interactiva: el médico
 consulta únicamente su propia agenda; administración y recepción seleccionan el
 profesional. Se puede crear una cita pulsando un hueco libre de 30 minutos o
 abrir una cita existente para modificarla. El formulario permite elegir otra
 duración y vuelve a comprobar la disponibilidad.
-Desde «Citas de pacientes», administración, médicos y recepción también pueden
-añadir pacientes. Médicos y recepción no pueden crear usuarios de otros roles.
+El selector «Ir a la fecha» permite navegar directamente a cualquier semana.
+La lista de profesionales se actualiza automáticamente al gestionar usuarios
+y periódicamente para detectar cambios realizados desde otra sesión.
+Los pacientes se crean desde «Administrar usuarios». El médico puede crear y modificar
+pacientes y modificar sus propios datos, sin eliminar usuarios. Recepción puede
+crear, modificar y eliminar médicos y pacientes; administración puede gestionar
+todos los roles. Los pacientes no administran usuarios, aunque conservan el
+acceso a sus propios datos desde el perfil. El servidor comprueba los permisos
+y el rol del usuario afectado.
 
 Médicos y recepcionistas pueden gestionar sus propias vacaciones únicamente
 desde «Mi perfil». No pueden modificar las vacaciones de otros usuarios; las
 vacaciones de recepción no afectan a la disponibilidad de los médicos.
+La eliminación de usuarios, citas y periodos de vacaciones, así como los
+cambios de contraseña, requieren una confirmación antes de enviar la petición.
+Cancelar la confirmación no realiza ningún cambio.
 
 Al abrir una cita existente, «Abrir historial clínico» muestra las anotaciones
 del paciente y permite vincular una nueva anotación a esa cita. Médicos y

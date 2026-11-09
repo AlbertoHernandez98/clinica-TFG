@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -9,10 +9,14 @@ import { Persona } from '../../../models/persona.interface';
 import { documentValidator, emailValidator, phoneValidator, passwordValidator } from '../../../validators/custom.validators';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { CitasComponent } from '../citas/citas.component';
+import { UserChangesService } from '../../../../services/users/user-changes.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ConfirmActionService } from '../confirm-action/confirm-action.service';
 
 interface UserDetailData {
   selectedUser?: Persona;
-  patientOnly?: boolean;
+  staff: { idPersona: number; idRolNativo: number };
 }
 
 @Component({
@@ -20,7 +24,7 @@ interface UserDetailData {
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss'],
 })
-export class UserDetailComponent implements OnInit {
+export class UserDetailComponent implements OnInit, OnDestroy {
   readonly roles = [
     { idRol: 1, descripcion: 'Admin' },
     { idRol: 2, descripcion: 'Médico' },
@@ -32,6 +36,22 @@ export class UserDetailComponent implements OnInit {
   isHidden = false;
   modifyUser = false;
   saving = false;
+  private readonly destroyed = new Subject<void>();
+
+  get availableRoles(): typeof this.roles {
+    if (this.data.staff.idRolNativo === 2) return this.roles.filter(role => role.idRol === 4);
+    if (this.data.staff.idRolNativo === 3) return this.roles.filter(role => [2, 4].includes(role.idRol));
+    return this.roles;
+  }
+
+  get ownUser(): boolean {
+    return !!this.user && this.data.staff.idPersona === this.user.idPersona;
+  }
+
+  get canDelete(): boolean {
+    return this.data.staff.idRolNativo === 1 ||
+      (this.data.staff.idRolNativo === 3 && !!this.user && [2, 4].includes(this.user.idRolNativo));
+  }
 
   constructor(
     public dialogRef: MatDialogRef<UserDetailComponent>,
@@ -41,7 +61,9 @@ export class UserDetailComponent implements OnInit {
     private http: HttpClient,
     private translate: TranslateService,
     public router: Router,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private userChanges: UserChangesService,
+    private confirmAction: ConfirmActionService
   ) {}
 
   ngOnInit(): void {
@@ -50,7 +72,7 @@ export class UserDetailComponent implements OnInit {
     const validateDocument = documentValidator();
     this.form = this.formBuilder.group({
       password: ['', this.modifyUser ? [passwordValidator(), Validators.maxLength(45)] : [Validators.required, passwordValidator(), Validators.maxLength(45)]],
-      idRolNativo: [this.data.patientOnly ? 4 : this.user?.idRolNativo ?? null, Validators.required],
+      idRolNativo: [!this.user && this.data.staff.idRolNativo === 2 ? 4 : this.user?.idRolNativo ?? null, Validators.required],
       dni: [this.user?.dni || '', [Validators.required, (control: AbstractControl) =>
         control.value === this.user?.dni ? null : validateDocument(control)]],
       telefono: [this.user?.telefono === null || this.user?.telefono === undefined ? '' : String(this.user.telefono),
@@ -114,13 +136,23 @@ export class UserDetailComponent implements OnInit {
       telefono: values.telefono,
       email: values.email.trim() || null,
       idRolNativo: Number(values.idRolNativo),
-      ...(values.password ? { password: values.password } : {})
+      ...(values.password && (!this.ownUser || this.data.staff.idRolNativo === 1) ? { password: values.password } : {})
     };
     this.saving = true;
-    this.http.put(this.configService.getApiUrl('/persona/changeUser'), payload).subscribe({
+    const save = () => this.http.put(this.configService.getApiUrl('/persona/changeUser'), payload).subscribe({
       next: () => this.finish('SHARED.POPUPS.ADMIN_USERS.GUARDADO'),
       error: error => this.fail('SHARED.POPUPS.ADMIN_USERS.ERROR_GUARDAR', error)
     });
+    if (payload.password) {
+      this.confirmAction.confirm({
+        title: 'CONFIRM_ACTION.CHANGE_PASSWORD_TITLE',
+        message: 'CONFIRM_ACTION.CHANGE_USER_PASSWORD',
+        params: { user: `${this.user.nombre} ${this.user.apellidos}` }
+      }).pipe(takeUntil(this.destroyed)).subscribe(confirmed => {
+        if (confirmed) save();
+        else this.saving = false;
+      });
+    } else save();
   }
 
   onCreate(): void {
@@ -137,7 +169,7 @@ export class UserDetailComponent implements OnInit {
       apellidos: values.apellidos,
       telefono: values.telefono,
       email: values.email.trim(),
-      idRolNativo: this.data.patientOnly ? 4 : Number(values.idRolNativo)
+      idRolNativo: this.data.staff.idRolNativo === 2 ? 4 : Number(values.idRolNativo)
     }).subscribe({
       next: () => this.finish('SHARED.POPUPS.ADMIN_USERS.GUARDADO'),
       error: error => this.fail('SHARED.POPUPS.ADMIN_USERS.ERROR_GUARDAR', error)
@@ -145,15 +177,25 @@ export class UserDetailComponent implements OnInit {
   }
 
   onDelete(): void {
-    if (!this.user || this.saving) {
+    if (!this.user || this.saving || !this.canDelete) {
       return;
     }
     this.saving = true;
-    this.http.delete(this.configService.getApiUrl(`/persona/${this.user.idPersona}`)).subscribe({
-      next: () => this.finish('SHARED.POPUPS.ADMIN_USERS.ELIMINADO'),
-      error: error => this.fail('SHARED.POPUPS.ADMIN_USERS.ERROR_ELIMINAR', error)
+    const user = this.user;
+    this.confirmAction.confirm({
+      title: 'CONFIRM_ACTION.DELETE_USER_TITLE',
+      message: 'CONFIRM_ACTION.DELETE_USER',
+      params: { user: `${user.nombre} ${user.apellidos}` }
+    }).pipe(takeUntil(this.destroyed)).subscribe(confirmed => {
+      if (!confirmed) { this.saving = false; return; }
+      this.http.delete(this.configService.getApiUrl(`/persona/${user.idPersona}`)).subscribe({
+        next: () => this.finish('SHARED.POPUPS.ADMIN_USERS.ELIMINADO'),
+        error: error => this.fail('SHARED.POPUPS.ADMIN_USERS.ERROR_ELIMINAR', error)
+      });
     });
   }
+
+  ngOnDestroy(): void { this.destroyed.next(); this.destroyed.complete(); }
 
   close(): void {
     this.dialogRef.close();
@@ -170,6 +212,7 @@ export class UserDetailComponent implements OnInit {
 
   private finish(message: string): void {
     this.saving = false;
+    this.userChanges.notify();
     this.showMessage(message);
     this.dialogRef.close(true);
   }

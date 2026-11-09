@@ -1,6 +1,6 @@
 <div class="head">
   <h2 class="header">
-    {{ (data.patientOnly ? 'PACIENTES.CREAR' : 'SHARED.POPUPS.ADMIN_USERS.TITLE') | translate }}
+    {{ 'SHARED.POPUPS.ADMIN_USERS.TITLE' | translate }}
   </h2>
   <button type="button" (click)="close()" class="close" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
     <img src="assets/icons/svg/icon-close.svg" alt="" />
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Contraseña -->
-        <div class="form-column">
+        <div class="form-column" *ngIf="!ownUser || data.staff.idRolNativo === 1">
           <label for="password">Contraseña <span class="required" *ngIf="!modifyUser">*</span></label>
           <div class="password">
             <input
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Rol -->
-        <div class="form-column" *ngIf="!data.patientOnly">
+        <div class="form-column" *ngIf="!ownUser || data.staff.idRolNativo === 1">
           <label for="rol">Rol <span class="required">*</span></label>
           <select 
             id="rol"
@@ -131,7 +131,7 @@
             [class.error]="getTouchedAndError('idRolNativo')"
           >
             <option [value]="null" disabled selected>Selecciona un rol</option>
-            <option *ngFor="let role of roles" [value]="role.idRol">
+            <option *ngFor="let role of availableRoles" [value]="role.idRol">
               {{ role.idRol }} - {{ role.descripcion }}
             </option>
           </select>
@@ -144,6 +144,7 @@
     <div class="buttons">
       <div class="button" *ngIf="this.modifyUser">
         <app-button-base
+          *ngIf="canDelete"
           [disabled]="saving"
           (click)="onDelete()"
           label="{{ 'SHARED.POPUPS.ADMIN_USERS.ELIMINAR' | translate }}"
@@ -158,7 +159,7 @@
         <app-button-base
           [disabled]="!this.form.valid || saving"
           (click)="onCreate()"
-          label="{{ (data.patientOnly ? 'PACIENTES.CREAR' : 'SHARED.POPUPS.ADMIN_USERS.CREAR') | translate }}"
+          label="{{ 'SHARED.POPUPS.ADMIN_USERS.CREAR' | translate }}"
         ></app-button-base>
       </div>
     </div>

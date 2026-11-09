@@ -59,7 +59,7 @@
                 <a href="/login">{{ 'SHARED.HEADER.LOGIN' | translate }}</a>
             </button>
 
-            <button (click)="redirectToAdmin()" *ngIf="isAdmin" class="dropbtn">
+            <button (click)="redirectToAdmin()" *ngIf="isAdmin || isDoctor || isReceptionist" class="dropbtn">
                 <a>{{ 'SHARED.HEADER.ADMIN' | translate }}</a>
             </button>
 

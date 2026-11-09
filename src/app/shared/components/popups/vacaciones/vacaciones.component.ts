@@ -1,8 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConfigService } from '../../../../services/config/config.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ConfirmActionService } from '../confirm-action/confirm-action.service';
 
 interface Holiday {
   idVacacion: number;
@@ -15,12 +18,13 @@ interface Holiday {
   templateUrl: './vacaciones.component.html',
   styleUrls: ['./vacaciones.component.scss']
 })
-export class VacacionesComponent implements OnInit {
+export class VacacionesComponent implements OnInit, OnDestroy {
   holidays: Holiday[] = [];
   loading = true;
   saving = false;
   errorKey = '';
   warningCount = 0;
+  private readonly destroyed = new Subject<void>();
   form = this.fb.group({ fechaInicio: ['', Validators.required], fechaFin: ['', Validators.required] });
 
   constructor(
@@ -28,7 +32,8 @@ export class VacacionesComponent implements OnInit {
     public dialogRef: MatDialogRef<VacacionesComponent>,
     private fb: FormBuilder,
     private http: HttpClient,
-    private config: ConfigService
+    private config: ConfigService,
+    private confirmAction: ConfirmActionService
   ) {}
 
   get url(): string { return this.config.getApiUrl(`/medicos/${this.data.idMedico}/vacaciones`); }
@@ -73,10 +78,19 @@ export class VacacionesComponent implements OnInit {
   remove(holiday: Holiday): void {
     if (this.saving) return;
     this.saving = true;
-    this.errorKey = '';
-    this.http.delete(`${this.url}/${holiday.idVacacion}`).subscribe({
-      next: () => { this.saving = false; this.load(); },
-      error: error => { console.error('Error al eliminar vacaciones:', error); this.saving = false; this.errorKey = 'VACACIONES.ERROR_ELIMINAR'; }
+    this.confirmAction.confirm({
+      title: 'CONFIRM_ACTION.DELETE_HOLIDAY_TITLE',
+      message: 'CONFIRM_ACTION.DELETE_HOLIDAY',
+      params: { start: holiday.fechaInicio.split('-').reverse().join('/'), end: holiday.fechaFin.split('-').reverse().join('/') }
+    }).pipe(takeUntil(this.destroyed)).subscribe(confirmed => {
+      if (!confirmed) { this.saving = false; return; }
+      this.errorKey = '';
+      this.http.delete(`${this.url}/${holiday.idVacacion}`).subscribe({
+        next: () => { this.saving = false; this.load(); },
+        error: error => { console.error('Error al eliminar vacaciones:', error); this.saving = false; this.errorKey = 'VACACIONES.ERROR_ELIMINAR'; }
+      });
     });
   }
+
+  ngOnDestroy(): void { this.destroyed.next(); this.destroyed.complete(); }
 }

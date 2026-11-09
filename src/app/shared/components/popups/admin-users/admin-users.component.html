@@ -36,10 +36,10 @@
     </div>
   </div>
 
-  <footer class="admin-users__footer" *ngIf="!data.patientAppointments || (staff && !loading && !loadError)">
-    <button type="button" class="admin-users__create" (click)="data.patientAppointments ? createPatient() : userDetail()">
+  <footer class="admin-users__footer" *ngIf="!data.patientAppointments && staff && !loading && !loadError">
+    <button type="button" class="admin-users__create" (click)="userDetail()">
       <span aria-hidden="true">+</span>
-      {{ (data.patientAppointments ? 'PACIENTES.CREAR' : 'SHARED.POPUPS.ADMIN_USERS.CREAR') | translate }}
+      {{ 'SHARED.POPUPS.ADMIN_USERS.CREAR' | translate }}
     </button>
   </footer>
 </div>

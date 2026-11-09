@@ -6,6 +6,8 @@
 .agenda__doctor select { min-height: 42px; padding: 8px; border: 1px solid #cfe0e7; border-radius: 8px; background: white; font: inherit; }
 .agenda__navigation { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
 .agenda__period { align-self: center; margin-left: auto; color: #315267; }
+.agenda__date { display: flex; align-items: center; gap: 8px; color: #315267; font-weight: 700; }
+.agenda__date input { padding: 8px; border: 1px solid #cfe0e7; border-radius: 8px; font: inherit; }
 .agenda__navigation button, .agenda__error button {
   border: 1px solid #cfe0e7; border-radius: 8px; background: #fff;
   color: #087ba2; font-weight: 700; padding: 9px 13px; cursor: pointer;

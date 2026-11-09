@@ -4,6 +4,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { AdminCitasComponent } from './admin-citas.component';
+import { ClinicDatePickerModule } from '../../forms/clinic-date-picker/clinic-date-picker.module';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ConfirmActionService } from '../confirm-action/confirm-action.service';
+import { Subject, of } from 'rxjs';
 
 describe('AdminCitasComponent', () => {
   let fixture: ComponentFixture<AdminCitasComponent>;
@@ -14,10 +18,11 @@ describe('AdminCitasComponent', () => {
   beforeEach(async () => {
     dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot()],
+      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot(), ClinicDatePickerModule, NoopAnimationsModule],
       declarations: [AdminCitasComponent],
       providers: [
         { provide: MatDialogRef, useValue: dialogRef },
+        { provide: ConfirmActionService, useValue: { confirm: () => of(false) } },
         { provide: MAT_DIALOG_DATA, useValue: { selectedUser: { idPersona: 4 } } }
       ]
     }).compileComponents();
@@ -42,6 +47,17 @@ describe('AdminCitasComponent', () => {
     http.expectNone('http://localhost:3000/citas');
   }));
 
+  it('explains a patient conflict and blocks saving', fakeAsync(() => {
+    component.form.patchValue({ idServicio: 1, idMedico: 2, fechaInicio: '2031-02-03T16:00', duracion: 30 });
+    tick(300);
+    http.expectOne('http://localhost:3000/citas/huecos').flush({ huecos: [] });
+    http.expectOne('http://localhost:3000/citas/disponibilidad').flush({ disponible: false, motivo: 'paciente_ocupado' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('ADMIN_CITA.PACIENTE_OCUPADO');
+    component.onSubmit();
+    http.expectNone('http://localhost:3000/citas');
+  }));
+
   it('surfaces a conflict that happens after a successful availability check', fakeAsync(() => {
     component.form.patchValue({ idServicio: 1, idMedico: 2, fechaInicio: '2031-02-01T10:00', duracion: 30 });
     tick(300);
@@ -58,6 +74,31 @@ describe('AdminCitasComponent', () => {
     tick(300);
     http.expectOne('http://localhost:3000/citas/disponibilidad').flush({ disponible: true });
     expect(dialogRef.close).not.toHaveBeenCalled();
+  }));
+
+  it('explains a patient conflict detected while saving', fakeAsync(() => {
+    component.form.patchValue({ idServicio: 1, idMedico: 2, fechaInicio: '2031-02-03T16:00', duracion: 30 });
+    tick(300);
+    http.expectOne('http://localhost:3000/citas/huecos').flush({ huecos: [] });
+    http.expectOne('http://localhost:3000/citas/disponibilidad').flush({ disponible: true });
+    component.onSubmit();
+    http.expectOne('http://localhost:3000/citas').flush(
+      { code: 'PATIENT_CONFLICT' }, { status: 409, statusText: 'Conflict' });
+    expect(component.errorKey).toBe('ADMIN_CITA.PACIENTE_OCUPADO');
+    expect(component.availability).toBe('patient');
+    tick(300);
+    http.expectOne('http://localhost:3000/citas/huecos').flush({ huecos: [] });
+    expect(dialogRef.close).not.toHaveBeenCalled();
+  }));
+
+  it('combines the selected date and time into the existing API format', fakeAsync(() => {
+    component.dateControl.setValue('2031-02-04');
+    component.timeControl.setValue('10:30');
+    expect(component.form.controls.fechaInicio.value).toBe('2031-02-04T10:30');
+    component.timeControl.setValue('11:00');
+    expect(component.form.controls.fechaInicio.value).toBe('2031-02-04T11:00');
+    tick(300);
+    http.expectNone('http://localhost:3000/citas/disponibilidad');
   }));
 
   it('explains and prevents booking outside clinic hours', fakeAsync(() => {
@@ -77,7 +118,7 @@ describe('AdminCitasComponent', () => {
     component.dateControl.setValue('2031-02-04');
     tick(300);
     const slots = http.expectOne('http://localhost:3000/citas/huecos');
-    expect(slots.request.body).toEqual({ fecha: '2031-02-04', idMedico: 2, duracion: 60 });
+    expect(slots.request.body).toEqual({ fecha: '2031-02-04', idMedico: 2, duracion: 60, idCliente: 4 });
     slots.flush({ huecos: ['09:30', '10:30'] });
     http.expectNone('http://localhost:3000/citas/disponibilidad');
     fixture.detectChanges();
@@ -110,22 +151,49 @@ describe('AdminCitasComponent', () => {
     const previous = http.expectOne('http://localhost:3000/citas/huecos');
     component.dateControl.setValue('2031-02-05');
     expect(previous.cancelled).toBeTrue();
-    component.form.patchValue({ idMedico: 3, duracion: 45 });
+    component.form.patchValue({ idMedico: 3, duracion: 90 });
     tick(300);
     const current = http.expectOne('http://localhost:3000/citas/huecos');
-    expect(current.request.body).toEqual({ fecha: '2031-02-05', idMedico: 3, duracion: 45 });
+    expect(current.request.body).toEqual({ fecha: '2031-02-05', idMedico: 3, duracion: 90, idCliente: 4 });
     current.flush({ huecos: ['16:00'] });
     expect(component.slots).toEqual(['16:00']);
+  }));
+  it('offers only the allowed durations and refuses other values', fakeAsync(() => {
+    fixture.detectChanges();
+    const options: HTMLOptionElement[] = Array.from(fixture.nativeElement.querySelectorAll('select[formControlName="duracion"] option'));
+    expect(options.slice(1).map(option => option.textContent?.trim())).toEqual(['30', '60', '90']);
+    component.form.patchValue({ idServicio: 1, idMedico: 2, fechaInicio: '2031-02-04T10:00', duracion: 45 });
+    tick(300);
+    fixture.detectChanges();
+    expect(component.form.controls.duracion.hasError('duracionInvalida')).toBeTrue();
+    expect(fixture.nativeElement.textContent).toContain('ADMIN_CITA.DURACION_INVALIDA');
+    component.onSubmit();
+    http.expectNone('http://localhost:3000/citas/huecos');
+    http.expectNone('http://localhost:3000/citas/disponibilidad');
+    http.expectNone('http://localhost:3000/citas');
+  }));
+
+  it('rejects a new appointment before today without calling the API', fakeAsync(() => {
+    component.form.patchValue({ idServicio: 1, idMedico: 2, fechaInicio: '2000-01-03T16:00', duracion: 30 });
+    tick(300);
+    expect(component.form.controls.fechaInicio.hasError('fechaPasada')).toBeTrue();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('ADMIN_CITA.FECHA_PASADA');
+    component.onSubmit();
+    http.expectNone('http://localhost:3000/citas/huecos');
+    http.expectNone('http://localhost:3000/citas/disponibilidad');
+    http.expectNone('http://localhost:3000/citas');
   }));
 });
 
 describe('AdminCitasComponent editing an appointment', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot()],
+      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot(), ClinicDatePickerModule, NoopAnimationsModule],
       declarations: [AdminCitasComponent],
       providers: [
         { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
+        { provide: ConfirmActionService, useValue: jasmine.createSpyObj('ConfirmActionService', ['confirm']) },
         { provide: MAT_DIALOG_DATA, useValue: {
           selectedUser: { idPersona: 4 },
           appointment: { idCita: 9, idCliente: 4, idMedico: 2, idServicio: 1, fechaInicio: '2031-02-04T10:00:00', duracion: 30 }
@@ -151,15 +219,57 @@ describe('AdminCitasComponent editing an appointment', () => {
     fixture.destroy();
     http.verify();
   }));
+
+  it('deletes an existing appointment and reports the change to the list', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AdminCitasComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const dialogRef = TestBed.inject(MatDialogRef);
+    const confirmation = new Subject<boolean>();
+    const confirm = TestBed.inject(ConfirmActionService).confirm as jasmine.Spy;
+    confirm.and.returnValue(confirmation.asObservable());
+    fixture.detectChanges();
+    http.expectOne('http://localhost:3000/servicio').flush([]);
+    http.expectOne('http://localhost:3000/persona').flush([]);
+    fixture.nativeElement.querySelector('button.delete').click();
+    fixture.componentInstance.onDelete();
+    expect(confirm).toHaveBeenCalledTimes(1);
+    http.expectNone('http://localhost:3000/citas/9');
+    confirmation.next(true);
+    confirmation.complete();
+    const request = http.expectOne('http://localhost:3000/citas/9');
+    expect(request.request.method).toBe('DELETE');
+    request.flush(null);
+    expect(dialogRef.close).toHaveBeenCalledWith(true);
+    fixture.destroy();
+    tick(300);
+    http.verify();
+  }));
+
+  it('does not delete an appointment when confirmation is cancelled', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AdminCitasComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const confirm = TestBed.inject(ConfirmActionService).confirm as jasmine.Spy;
+    confirm.and.returnValue(of(false));
+    fixture.detectChanges();
+    http.expectOne('http://localhost:3000/servicio').flush([]);
+    http.expectOne('http://localhost:3000/persona').flush([]);
+    fixture.componentInstance.onDelete();
+    http.expectNone('http://localhost:3000/citas/9');
+    expect(fixture.componentInstance.saving).toBeFalse();
+    fixture.destroy();
+    tick(300);
+    http.verify();
+  }));
 });
 
 describe('AdminCitasComponent from a free agenda slot', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot()],
+      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot(), ClinicDatePickerModule, NoopAnimationsModule],
       declarations: [AdminCitasComponent],
       providers: [
         { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
+        { provide: ConfirmActionService, useValue: { confirm: () => of(false) } },
         { provide: MAT_DIALOG_DATA, useValue: {
           initialSlot: { idMedico: 2, fechaInicio: '2031-02-04T10:00' },
           fixedDoctor: { idPersona: 2, nombre: 'Doctora', apellidos: 'Ejemplo' }
@@ -186,6 +296,9 @@ describe('AdminCitasComponent from a free agenda slot', () => {
     expect(component.pacientes.length).toBe(1);
     component.patientControl.setValue(4);
     tick(300);
+    const updatedSlots = http.expectOne('http://localhost:3000/citas/huecos');
+    expect(updatedSlots.request.body.idCliente).toBe(4);
+    updatedSlots.flush({ huecos: ['10:00'] });
     const check = http.expectOne('http://localhost:3000/citas/disponibilidad');
     expect(check.request.body.idCliente).toBe(4);
     expect(check.request.body.fechaInicio).toBe('2031-02-04T10:00');
@@ -205,10 +318,11 @@ describe('AdminCitasComponent for a doctor', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot()],
+      imports: [HttpClientTestingModule, ReactiveFormsModule, TranslateModule.forRoot(), ClinicDatePickerModule, NoopAnimationsModule],
       declarations: [AdminCitasComponent],
       providers: [
         { provide: MatDialogRef, useValue: jasmine.createSpyObj('MatDialogRef', ['close']) },
+        { provide: ConfirmActionService, useValue: { confirm: () => of(false) } },
         { provide: MAT_DIALOG_DATA, useValue: {
           selectedUser: { idPersona: 4, nombre: 'Ana', apellidos: 'Pérez' },
           fixedDoctor: { idPersona: 2, nombre: 'Doctor', apellidos: 'Ejemplo' }

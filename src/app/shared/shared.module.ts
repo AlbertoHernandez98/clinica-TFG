@@ -28,6 +28,8 @@ import { AdminCitasComponent } from './components/popups/admin-citas/admin-citas
 import { VacacionesComponent } from './components/popups/vacaciones/vacaciones.component';
 import { AgendaMedicoComponent } from './components/popups/agenda-medico/agenda-medico.component';
 import { MisCitasComponent } from './components/popups/mis-citas/mis-citas.component';
+import { ClinicDatePickerModule } from './components/forms/clinic-date-picker/clinic-date-picker.module';
+import { ConfirmActionComponent } from './components/popups/confirm-action/confirm-action.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -55,7 +57,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         AdminCitasComponent,
         VacacionesComponent,
         AgendaMedicoComponent,
-        MisCitasComponent
+        MisCitasComponent,
+        ConfirmActionComponent
     ],
     imports: [
         CommonModule,
@@ -65,6 +68,7 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         MatProgressSpinnerModule,
         MatAutocompleteModule,
         MatInputModule,
+        ClinicDatePickerModule,
         TranslateModule.forChild({
             extend: true,
             defaultLanguage: 'es',

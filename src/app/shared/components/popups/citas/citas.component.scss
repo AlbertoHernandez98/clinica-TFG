@@ -34,6 +34,7 @@
   &__details { display: grid; flex: 1; min-width: 0; gap: 4px; overflow-wrap: anywhere; }
   &__item-label { font-weight: 700; }
   &__date { color: #647580; font-size: 13px; }
+  &__manage { border: 0; border-radius: 6px; background: #e1f5fc; color: #087ba2; padding: 8px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
   button:focus-visible { outline: 2px solid #087ba2; outline-offset: 2px; }
 }
 @media (max-width: 480px) {

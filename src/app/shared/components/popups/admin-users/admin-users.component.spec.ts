@@ -34,10 +34,15 @@ describe('AdminUsersComponent', () => {
 
   afterEach(() => http.verify());
 
+  function loadSession(role = 1): void {
+    http.expectOne('http://localhost:3000/auth/me').flush({ idPersona: 10, nombre: 'Test', apellidos: 'User', idRolNativo: role });
+  }
+
   it('filters users and restores results when the search is shortened', () => {
     http.expectOne('http://localhost:3000/persona').flush([
       { nombre: 'Ana', apellidos: 'Pérez' }, { nombre: 'Alberto', apellidos: 'Ruiz' }
     ]);
+    loadSession();
     component.form.controls.nombre.setValue('ana');
     expect(component.userList.map(user => user.nombre)).toEqual(['Ana']);
     component.form.controls.nombre.setValue('a');
@@ -45,6 +50,7 @@ describe('AdminUsersComponent', () => {
   });
 
   it('shows an error rather than an empty list when loading fails', () => {
+    http.expectOne('http://localhost:3000/auth/me');
     http.expectOne('http://localhost:3000/persona').flush('Error', { status: 500, statusText: 'Error' });
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeTruthy();
@@ -54,19 +60,35 @@ describe('AdminUsersComponent', () => {
   it('opens the selected user and refreshes the list after closing', () => {
     const user = { nombre: 'Ana', apellidos: 'Pérez' };
     http.expectOne('http://localhost:3000/persona').flush([user]);
+    loadSession();
     dialog.open.and.returnValue({ afterClosed: () => of(undefined) } as MatDialogRef<any>);
     fixture.detectChanges();
     fixture.nativeElement.querySelector('.admin-users__user').click();
     expect(dialog.open).toHaveBeenCalledWith(
       jasmine.any(Function),
-      jasmine.objectContaining({ data: { selectedUser: user }, width: '600px' })
+      jasmine.objectContaining({ data: jasmine.objectContaining({ selectedUser: user }), width: '600px' })
     );
     http.expectOne('http://localhost:3000/persona').flush([user]);
+    loadSession();
   });
 
   it('closes the dialog using the close button', () => {
     http.expectOne('http://localhost:3000/persona').flush([]);
+    loadSession();
     fixture.nativeElement.querySelector('.admin-users__close').click();
     expect(dialogRef.close).toHaveBeenCalled();
+  });
+
+  [2, 3].forEach(role => {
+    it(`filters managed users for role ${role}`, () => {
+      http.expectOne('http://localhost:3000/persona').flush([
+        { idPersona: 10, idRolNativo: 2, nombre: 'Self', apellidos: '' },
+        { idPersona: 11, idRolNativo: 2, nombre: 'Doctor', apellidos: '' },
+        { idPersona: 12, idRolNativo: 4, nombre: 'Patient', apellidos: '' },
+        { idPersona: 13, idRolNativo: 1, nombre: 'Admin', apellidos: '' }
+      ]);
+      loadSession(role);
+      expect(component.userList.map(user => user.nombre)).toEqual(role === 2 ? ['Self', 'Patient'] : ['Self', 'Doctor', 'Patient']);
+    });
   });
 });

@@ -1,4 +1,18 @@
 {
+  "CONFIRM_ACTION": {
+    "CANCEL": "Cancelar",
+    "CONFIRM": "Sí, confirmar",
+    "DELETE_USER_TITLE": "Eliminar usuario",
+    "DELETE_USER": "¿Seguro que quieres eliminar a {{user}}? Esta acción no se puede deshacer.",
+    "DELETE_APPOINTMENT_TITLE": "Eliminar cita",
+    "DELETE_APPOINTMENT": "¿Seguro que quieres eliminar la cita n.º {{id}}? Esta acción no se puede deshacer.",
+    "DELETE_HOLIDAY_TITLE": "Eliminar vacaciones",
+    "DELETE_HOLIDAY": "¿Seguro que quieres eliminar el periodo de vacaciones del {{start}} al {{end}}?",
+    "CHANGE_PASSWORD_TITLE": "Cambiar contraseña",
+    "CHANGE_PASSWORD": "¿Seguro que quieres cambiar tu contraseña?",
+    "CHANGE_USER_PASSWORD": "¿Seguro que quieres guardar los cambios y cambiar la contraseña de {{user}}?"
+  },
+  "DATE_PICKER": { "OPEN": "Abrir calendario" },
   "BUTTONS": {
     "ANTERIOR": "Anterior",
     "SIGUIENTE": "Siguiente"
@@ -165,7 +179,8 @@
       },
       "CITAS": {
         "EYEBROW": "Área clínica",
-        "SUBTITLE": "Consulta las citas del paciente.",
+        "SUBTITLE": "Selecciona una cita del paciente para modificarla o eliminarla.",
+        "MODIFICAR_ELIMINAR": "Modificar o eliminar",
         "LOADING": "Cargando citas...",
         "LOAD_ERROR": "No se han podido cargar las citas. Comprueba la conexión e inténtalo de nuevo.",
         "EMPTY": "No hay citas disponibles",
@@ -260,7 +275,7 @@
   "ADMIN_CITA": {
     "PACIENTE": "Paciente",
     "SELECCIONAR_PACIENTE": "Selecciona un paciente",
-    "DIA_HUECOS": "Día para consultar disponibilidad",
+    "DIA_HUECOS": "Fecha de la cita y disponibilidad",
     "HUECOS": "Horas disponibles",
     "HUECOS_INSTRUCCIONES": "Elige un día, un profesional y una duración para ver los huecos.",
     "HUECOS_CARGANDO": "Buscando horas disponibles...",
@@ -269,10 +284,12 @@
     "HUECOS_VACIO": "No hay horas disponibles para ese día y duración.",
     "HUECOS_NOTA": "Se muestran inicios cada 30 minutos. La disponibilidad se confirma al guardar.",
     "COMPROBANDO": "Comprobando disponibilidad...",
-    "DISPONIBLE": "El médico está disponible en este horario.",
+    "DISPONIBLE": "El médico y el paciente están disponibles en este horario.",
     "ERROR_DISPONIBILIDAD": "No se ha podido comprobar la disponibilidad. Cambia un campo para volver a intentarlo.",
     "REQUERIDOS": "Completa todos los campos de la cita.",
     "NO_DISPONIBLE": "El médico no está disponible en ese horario: tiene otra cita o está de vacaciones.",
+    "PACIENTE_OCUPADO": "El paciente ya tiene otra cita que coincide con ese horario.",
+    "HORA": "Hora de inicio",
     "ERROR": "No se ha podido guardar o eliminar la cita. Inténtalo de nuevo.",
     "ERROR_CARGA": "No se han podido cargar los médicos o servicios. Comprueba la conexión.",
     "TITULO": "Administrar cita",
@@ -280,7 +297,10 @@
     "HORARIO": "Lunes, miércoles y viernes: 16:00–20:00. Martes y jueves: 09:30–13:30. Fin de semana cerrado.",
     "FUERA_HORARIO": "La cita completa debe estar dentro del horario de apertura.",
     "FECHA": "Fecha de inicio",
+    "FECHA_PASADA": "Las citas nuevas deben ser de hoy o de un día posterior.",
     "DURACION": "Duración (minutos)",
+    "DURACION_SELECCIONAR": "Selecciona una duración",
+    "DURACION_INVALIDA": "La duración anterior ya no es válida. Selecciona 30, 60 o 90 minutos.",
     "SERVICIO": "Tipo de servicio",
     "MEDICO": "Profesional",
     "ELIMINAR": "Eliminar"
@@ -325,6 +345,7 @@
     "ANTERIOR": "Semana anterior",
     "SIGUIENTE": "Semana siguiente",
     "HOY": "Semana actual",
+    "IR_A_FECHA": "Ir a la fecha",
     "CARGANDO": "Cargando agenda...",
     "ERROR": "No se ha podido cargar la agenda.",
     "REINTENTAR": "Reintentar",

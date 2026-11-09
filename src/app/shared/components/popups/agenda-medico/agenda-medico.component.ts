@@ -2,10 +2,12 @@ import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { Subject, of } from 'rxjs';
-import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { Subject, interval, merge, of } from 'rxjs';
+import { catchError, map, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfigService } from '../../../../services/config/config.service';
+import { UserChangesService } from '../../../../services/users/user-changes.service';
 import { AdminCitasComponent } from '../admin-citas/admin-citas.component';
+import { clinicToday } from '../../../classes/clinic-date';
 
 interface Appointment {
   idCita: number;
@@ -42,8 +44,9 @@ export class AgendaMedicoComponent implements OnInit, OnDestroy {
   staff?: Staff;
   doctors: Staff[] = [];
   selectedDoctor: number | null = null;
-  weekStart = this.monday(new Date());
+  weekStart = this.monday(clinicToday());
   private readonly changes = new Subject<void>();
+  private readonly staffRefresh = new Subject<void>();
   private readonly destroyed = new Subject<void>();
 
   constructor(
@@ -52,12 +55,14 @@ export class AgendaMedicoComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private http: HttpClient,
     private config: ConfigService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private userChanges: UserChangesService
   ) {}
 
   ngOnInit(): void {
     this.changes.pipe(
       switchMap(() => {
+        if (!this.staff) return of(null);
         this.loading = true;
         this.error = false;
         this.days = [];
@@ -81,44 +86,51 @@ export class AgendaMedicoComponent implements OnInit, OnDestroy {
     this.translate.onLangChange.pipe(takeUntil(this.destroyed)).subscribe(() => {
       this.days.forEach(day => day.label = this.dayLabel(day.date));
     });
-    this.loadStaff();
-  }
-
-  private loadStaff(): void {
-    this.loading = true;
-    this.error = false;
-    this.http.get<Staff>(this.config.getApiUrl('/auth/me')).pipe(
-      switchMap(staff => {
-        if (![1, 2, 3].includes(staff.idRolNativo)) throw new Error('La sesión no puede administrar citas');
-        this.staff = staff;
-        if (staff.idRolNativo === 2) return of([staff]);
-        return this.http.get<Staff[]>(this.config.getApiUrl('/persona'));
+    merge(this.staffRefresh, this.userChanges.changes$, interval(30000)).pipe(
+      startWith(undefined),
+      switchMap(() => {
+        if (!this.staff) {
+          this.loading = true;
+          this.error = false;
+        }
+        return this.http.get<Staff>(this.config.getApiUrl('/auth/me')).pipe(
+          switchMap(staff => {
+            if (![1, 2, 3].includes(staff.idRolNativo)) throw new Error('La sesión no puede administrar citas');
+            if (staff.idRolNativo === 2) return of({ staff, users: [staff] });
+            return this.http.get<Staff[]>(this.config.getApiUrl('/persona')).pipe(map(users => ({ staff, users })));
+          }),
+          catchError(error => {
+            console.error('Error al cargar profesionales:', error);
+            this.staff = undefined;
+            this.loading = false;
+            this.error = true;
+            return of(null);
+          })
+        );
       }),
       takeUntil(this.destroyed)
-    ).subscribe({
-      next: users => {
-        this.doctors = users.filter(user => user.idRolNativo === 2);
+    ).subscribe(result => {
+      if (!result) return;
+      const needsReload = !this.staff;
+      this.staff = result.staff;
+      this.doctors = result.users.filter(user => user.idRolNativo === 2);
+      const previousDoctor = this.selectedDoctor;
+      if (this.selectedDoctor === null || !this.doctors.some(doctor => doctor.idPersona === Number(this.selectedDoctor))) {
         this.selectedDoctor = this.doctors.length ? this.doctors[0].idPersona : null;
-        this.changes.next();
-      },
-      error: error => {
-        console.error('Error al cargar profesionales:', error);
-        this.staff = undefined;
-        this.loading = false;
-        this.error = true;
       }
+      if (needsReload || previousDoctor !== this.selectedDoctor) this.changes.next();
     });
   }
 
   retry(): void {
-    if (!this.staff) this.loadStaff();
+    if (!this.staff) this.staffRefresh.next();
     else this.changes.next();
   }
 
   changeDoctor(): void { this.changes.next(); }
 
   createAppointment(day: DayView, hour: string): void {
-    if (this.selectedDoctor === null || !day.slots.includes(hour) || day.holiday) return;
+    if (this.selectedDoctor === null || !this.canCreateOn(day.date) || !day.slots.includes(hour) || day.holiday) return;
     const ref = this.dialog.open(AdminCitasComponent, {
       data: {
         initialSlot: { fechaInicio: `${day.date}T${hour}`, idMedico: Number(this.selectedDoctor) },
@@ -149,9 +161,21 @@ export class AgendaMedicoComponent implements OnInit, OnDestroy {
   }
 
   today(): void {
-    this.weekStart = this.monday(new Date());
+    this.weekStart = this.monday(clinicToday());
     this.changes.next();
   }
+
+  get selectedWeekDate(): string { return this.dateKey(this.weekStart); }
+
+  jumpToWeek(value: string): void {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return;
+    const date = new Date(`${value}T00:00:00Z`);
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return;
+    this.weekStart = this.monday(value);
+    this.changes.next();
+  }
+
+  canCreateOn(date: string): boolean { return date >= clinicToday(); }
 
   get weekLabel(): string {
     const format = new Intl.DateTimeFormat(this.translate.currentLang || 'es', {
@@ -160,8 +184,8 @@ export class AgendaMedicoComponent implements OnInit, OnDestroy {
     return `${format.format(this.weekStart)} – ${format.format(this.addDays(this.weekStart, 4))}`;
   }
 
-  private monday(date: Date): Date {
-    const utc = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  private monday(date: string): Date {
+    const utc = new Date(`${date}T00:00:00Z`);
     return this.addDays(utc, -((utc.getUTCDay() + 6) % 7));
   }
 

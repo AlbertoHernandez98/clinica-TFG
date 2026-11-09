@@ -19,15 +19,22 @@
       </select>
     </label>
     <label>{{ 'ADMIN_CITA.DIA_HUECOS' | translate }}
-      <input type="date" [formControl]="dateControl" />
+      <app-clinic-date-picker [formControl]="dateControl" [min]="data.appointment ? null : today" [label]="'ADMIN_CITA.FECHA' | translate"></app-clinic-date-picker>
+      <span class="appointment-error" *ngIf="form.controls.fechaInicio.hasError('fechaPasada')" role="alert">
+        {{ 'ADMIN_CITA.FECHA_PASADA' | translate }}
+      </span>
     </label>
-    <label>{{ 'ADMIN_CITA.FECHA' | translate }}
-      <input type="datetime-local" formControlName="fechaInicio" />
+    <label>{{ 'ADMIN_CITA.HORA' | translate }}
+      <input type="time" [formControl]="timeControl" />
     </label>
     <label>{{ 'ADMIN_CITA.DURACION' | translate }}
       <select formControlName="duracion">
+        <option [ngValue]="null">{{ 'ADMIN_CITA.DURACION_SELECCIONAR' | translate }}</option>
         <option *ngFor="let item of duraciones" [value]="item">{{ item }}</option>
       </select>
+      <span class="appointment-error" *ngIf="form.controls.duracion.hasError('duracionInvalida')" role="alert">
+        {{ 'ADMIN_CITA.DURACION_INVALIDA' | translate }}
+      </span>
     </label>
     <label>{{ 'ADMIN_CITA.SERVICIO' | translate }}
       <select formControlName="idServicio">
@@ -63,6 +70,7 @@
   <p class="appointment-status" role="status" *ngIf="availability === 'checking'">{{ 'ADMIN_CITA.COMPROBANDO' | translate }}</p>
   <p class="appointment-status" role="status" *ngIf="availability === 'available'">{{ 'ADMIN_CITA.DISPONIBLE' | translate }}</p>
   <p class="appointment-error" role="alert" *ngIf="availability === 'unavailable'">{{ 'ADMIN_CITA.NO_DISPONIBLE' | translate }}</p>
+  <p class="appointment-error" role="alert" *ngIf="availability === 'patient'">{{ 'ADMIN_CITA.PACIENTE_OCUPADO' | translate }}</p>
   <p class="appointment-error" role="alert" *ngIf="availability === 'outside'">{{ 'ADMIN_CITA.FUERA_HORARIO' | translate }}</p>
   <p class="appointment-error" role="alert" *ngIf="availability === 'error'">{{ 'ADMIN_CITA.ERROR_DISPONIBILIDAD' | translate }}</p>
   <div class="actions">
@@ -71,6 +79,6 @@
       {{ 'HISTORIAL.ABRIR_DESDE_CITA' | translate }}
     </a>
     <button type="button" class="delete" *ngIf="data.appointment" [disabled]="saving" (click)="onDelete()">{{ 'ADMIN_CITA.ELIMINAR' | translate }}</button>
-    <button type="button" class="save" [disabled]="saving || loadError || availability === 'checking' || availability === 'unavailable' || availability === 'outside' || availability === 'error'" (click)="onSubmit()">{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}</button>
+    <button type="button" class="save" [disabled]="saving || loadError || availability === 'checking' || availability === 'unavailable' || availability === 'patient' || availability === 'outside' || availability === 'error'" (click)="onSubmit()">{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}</button>
   </div>
 </div>

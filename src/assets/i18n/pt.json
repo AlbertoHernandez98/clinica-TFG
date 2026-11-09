@@ -1,4 +1,18 @@
 {
+    "CONFIRM_ACTION": {
+        "CANCEL": "Cancelar",
+        "CONFIRM": "Sim, confirmar",
+        "DELETE_USER_TITLE": "Eliminar usuário",
+        "DELETE_USER": "Tem certeza de que deseja eliminar {{user}}? Esta ação não pode ser desfeita.",
+        "DELETE_APPOINTMENT_TITLE": "Eliminar consulta",
+        "DELETE_APPOINTMENT": "Tem certeza de que deseja eliminar a consulta n.º {{id}}? Esta ação não pode ser desfeita.",
+        "DELETE_HOLIDAY_TITLE": "Eliminar férias",
+        "DELETE_HOLIDAY": "Tem certeza de que deseja eliminar o período de férias de {{start}} a {{end}}?",
+        "CHANGE_PASSWORD_TITLE": "Alterar senha",
+        "CHANGE_PASSWORD": "Tem certeza de que deseja alterar sua senha?",
+        "CHANGE_USER_PASSWORD": "Tem certeza de que deseja salvar as alterações e alterar a senha de {{user}}?"
+    },
+    "DATE_PICKER": { "OPEN": "Abrir calendário" },
     "BUTTONS": {
         "ANTERIOR": "Anterior",
         "SIGUIENTE": "Siguiente"
@@ -138,7 +152,8 @@
         "POPUPS": {
             "CITAS": {
                 "EYEBROW": "Área clínica",
-                "SUBTITLE": "Consulte os agendamentos do paciente.",
+                "SUBTITLE": "Selecione um agendamento para modificá-lo ou eliminá-lo.",
+                "MODIFICAR_ELIMINAR": "Modificar ou eliminar",
                 "LOADING": "Carregando agendamentos...",
                 "LOAD_ERROR": "Não foi possível carregar os agendamentos. Verifique a conexão e tente novamente.",
                 "EMPTY": "Não há agendamentos disponíveis",
@@ -229,7 +244,7 @@
     "ADMIN_CITA": {
         "PACIENTE": "Paciente",
         "SELECCIONAR_PACIENTE": "Selecione um paciente",
-        "DIA_HUECOS": "Dia para consultar disponibilidade",
+        "DIA_HUECOS": "Data da consulta e disponibilidade",
         "HUECOS": "Horários disponíveis",
         "HUECOS_INSTRUCCIONES": "Escolha um dia, profissional e duração para ver os horários.",
         "HUECOS_CARGANDO": "Buscando horários disponíveis...",
@@ -238,10 +253,12 @@
         "HUECOS_VACIO": "Não há horários disponíveis para esse dia e duração.",
         "HUECOS_NOTA": "Os horários de início são exibidos a cada 30 minutos. A disponibilidade é confirmada ao salvar.",
         "COMPROBANDO": "Verificando disponibilidade...",
-        "DISPONIBLE": "O profissional está disponível neste horário.",
+        "DISPONIBLE": "O profissional e o paciente estão disponíveis neste horário.",
         "ERROR_DISPONIBILIDAD": "Não foi possível verificar a disponibilidade. Altere um campo para tentar novamente.",
         "REQUERIDOS": "Preencha todos os campos do agendamento.",
         "NO_DISPONIBLE": "O profissional não está disponível: há outro agendamento ou férias nesse horário.",
+        "PACIENTE_OCUPADO": "O paciente já tem outra consulta que coincide com esse horário.",
+        "HORA": "Hora de início",
         "ERROR": "Não foi possível salvar ou excluir o agendamento. Tente novamente.",
         "ERROR_CARGA": "Não foi possível carregar profissionais ou serviços. Verifique a conexão.",
         "TITULO": "Gerenciar agendamento",
@@ -249,7 +266,10 @@
         "HORARIO": "Segunda, quarta e sexta: 16:00–20:00. Terça e quinta: 09:30–13:30. Fechado no fim de semana.",
         "FUERA_HORARIO": "Todo o agendamento deve estar dentro do horário de funcionamento.",
         "FECHA": "Data e hora de início",
+        "FECHA_PASADA": "Novos agendamentos devem ser para hoje ou uma data posterior.",
         "DURACION": "Duração (minutos)",
+        "DURACION_SELECCIONAR": "Selecione uma duração",
+        "DURACION_INVALIDA": "A duração anterior já não é válida. Selecione 30, 60 ou 90 minutos.",
         "SERVICIO": "Tipo de serviço",
         "MEDICO": "Profissional",
         "ELIMINAR": "Excluir"
@@ -294,6 +314,7 @@
         "ANTERIOR": "Semana anterior",
         "SIGUIENTE": "Próxima semana",
         "HOY": "Semana atual",
+        "IR_A_FECHA": "Ir para a data",
         "CARGANDO": "Carregando agenda...",
         "ERROR": "Não foi possível carregar a agenda.",
         "REINTENTAR": "Tentar novamente",

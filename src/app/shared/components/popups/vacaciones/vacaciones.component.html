@@ -20,8 +20,8 @@
     </li>
   </ul>
   <form [formGroup]="form" (ngSubmit)="add()">
-    <label>{{ 'VACACIONES.INICIO' | translate }}<input type="date" formControlName="fechaInicio" /></label>
-    <label>{{ 'VACACIONES.FIN' | translate }}<input type="date" formControlName="fechaFin" /></label>
+    <label>{{ 'VACACIONES.INICIO' | translate }}<app-clinic-date-picker formControlName="fechaInicio" [label]="'VACACIONES.INICIO' | translate"></app-clinic-date-picker></label>
+    <label>{{ 'VACACIONES.FIN' | translate }}<app-clinic-date-picker formControlName="fechaFin" [label]="'VACACIONES.FIN' | translate"></app-clinic-date-picker></label>
     <button class="save" type="submit" [disabled]="saving || loading">{{ 'VACACIONES.ANADIR' | translate }}</button>
   </form>
 </div>

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -10,15 +10,19 @@ import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from '../../../../services/config/config.service';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { getSessionUser } from 'src/app/shared/classes/session-user';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ConfirmActionService } from '../confirm-action/confirm-action.service';
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss'],
 })
-export class ChangePasswordComponent {
+export class ChangePasswordComponent implements OnDestroy {
   public static readonly id = 'change-password';
   submitting = false;
+  private readonly destroyed = new Subject<void>();
 
   constructor(
     public dialogRef: MatDialogRef<ChangePasswordComponent>,
@@ -27,7 +31,8 @@ export class ChangePasswordComponent {
     public matDialog: MatDialog,
     private http: HttpClient,
     private translate: TranslateService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private confirmAction: ConfirmActionService
   ) {}
 
   form = this.formBuilder.group({
@@ -86,34 +91,43 @@ export class ChangePasswordComponent {
     }
 
     this.submitting = true;
-    this.http.put(this.configService.getApiUrl('/persona/changePassword'), {
+    const payload = {
       dni,
       password: this.form.controls.password.value,
       newPassword: this.form.controls.newPassword.value,
-    }).subscribe({
-      next: () => {
-        this.submitting = false;
-        this.matDialog.open(ErrorSuccessComponent, {
-          data: {
-            icon: this.success,
-            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
-            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-          },
-        });
-        this.dialogRef.close();
-      },
-      error: error => {
-        this.submitting = false;
-        console.error('Error al cambiar la contraseña:', error);
-        this.matDialog.open(ErrorSuccessComponent, {
-          data: {
-            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-          },
-        });
-      }
+    };
+    this.confirmAction.confirm({
+      title: 'CONFIRM_ACTION.CHANGE_PASSWORD_TITLE',
+      message: 'CONFIRM_ACTION.CHANGE_PASSWORD'
+    }).pipe(takeUntil(this.destroyed)).subscribe(confirmed => {
+      if (!confirmed) { this.submitting = false; return; }
+      this.http.put(this.configService.getApiUrl('/persona/changePassword'), payload).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.matDialog.open(ErrorSuccessComponent, {
+            data: {
+              icon: this.success,
+              text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
+              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+            },
+          });
+          this.dialogRef.close();
+        },
+        error: error => {
+          this.submitting = false;
+          console.error('Error al cambiar la contraseña:', error);
+          this.matDialog.open(ErrorSuccessComponent, {
+            data: {
+              text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
+              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+            },
+          });
+        }
+      });
     });
   }
+
+  ngOnDestroy(): void { this.destroyed.next(); this.destroyed.complete(); }
 
   close() {
     this.dialogRef.close();
