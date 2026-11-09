@@ -200,3 +200,36 @@ h1 {
         font-size: 20px;
     }
 }
+
+@media (max-width: 800px) {
+        .contenido-main {
+            margin: 2em 1em;
+        }
+
+        .grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .card-child {
+            min-width: 0;
+            margin: 16px auto 0;
+        }
+
+        .text {
+            width: min(100%, 22em);
+            margin-bottom: 16px;
+        }
+
+        .a, .b, .c, .d, .e, .f {
+            grid-column: auto;
+            grid-row: auto;
+        }
+
+        .a { order: 1; }
+        .d { order: 2; }
+        .b { order: 3; }
+        .e { order: 4; }
+        .c { order: 5; }
+        .f { order: 6; }
+}

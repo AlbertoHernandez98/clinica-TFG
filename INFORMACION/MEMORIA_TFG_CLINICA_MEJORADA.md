@@ -22,7 +22,7 @@ Este Trabajo Fin de Grado presenta el análisis, diseño e implementación de un
 
 La aplicación tiene una arquitectura cliente-servidor. El frontend utiliza Angular 13.3 e Ionic 6 y el backend NestJS, TypeORM y una base de datos compatible con MySQL/MariaDB. Dispone de autenticación JWT, archivos de traducción en español, inglés y portugués, gestión de usuarios con correo electrónico y gestión de citas con comprobación de disponibilidad y vacaciones. No se almacenan domicilios ni se integra un buscador de direcciones.
 
-La agenda semanal interactiva permite gestionar citas teniendo en cuenta el horario de apertura, las vacaciones y las citas existentes. El paciente puede consultar sus citas y su historial; desde una cita existente se puede abrir el historial del paciente y añadir una anotación según el rol. La reserva pública de citas todavía no está implementada.
+La agenda semanal interactiva permite gestionar citas teniendo en cuenta el horario de apertura, las vacaciones y los solapamientos tanto del médico como del paciente. Los permisos dependen del rol y las operaciones destructivas requieren confirmación en la interfaz. El paciente puede consultar sus citas y su historial; desde una cita existente se puede abrir el historial del paciente y añadir una anotación según el rol. La reserva pública de citas todavía no está implementada.
 
 Los casos de uso y pruebas descritos más adelante incluyen propuestas históricas y no constituyen una prueba de cobertura completa ni de una tasa de éxito medida. Se han realizado pruebas focalizadas y comprobaciones locales, pero quedan pendientes una revisión integral de seguridad y validaciones adicionales antes de un uso real.
 
@@ -38,7 +38,7 @@ This Final Degree Project presents the analysis, design and implementation of a 
 
 The client uses Angular 13.3 and Ionic 6; the backend uses NestJS, TypeORM and a MySQL/MariaDB-compatible database. It includes JWT authentication, translation files for Spanish, English and Portuguese, user email, and appointment availability and holiday checks. Addresses are not stored and address autocomplete is not integrated.
 
-An interactive weekly schedule supports appointment management using opening hours, holidays and existing appointments. Patients can consult their appointments and medical records; an existing appointment provides access to its patient's record, where authorised users can add a linked note. Public appointment booking is not implemented.
+An interactive weekly schedule supports appointment management using opening hours, holidays and both practitioner and patient conflicts. Role-based permissions and confirmation dialogs govern management and destructive actions. Patients can consult their appointments and medical records; an existing appointment provides access to its patient's record, where authorised users can add a linked note. Public appointment booking is not implemented.
 
 Use cases and test cases include historical proposals; complete coverage and a success rate have not been established. Focused automated tests and local database checks have been performed, but further validation and a comprehensive security review are required before real-world use.
 
@@ -129,13 +129,15 @@ This thesis documents requirements, design, implementation and proposed validati
 
 - Las pantallas actuales de citas e historial utilizan la API principal en `http://localhost:3000`. Sigue existiendo una configuración antigua para una API clínica en el puerto 8080, pero el historial actualizado ya no la utiliza.
 - El inicio de sesión usa `POST /auth/login`; el token se guarda en `sessionStorage` y el interceptor lo añade a las peticiones correspondientes. `GET /auth/me` permite recuperar la identidad y el rol autenticados.
-- Administrador, médico y recepción acceden a la gestión de citas de pacientes. Al crear, el médico queda asignado a sí mismo y selecciona un paciente; administrador y recepción pueden seleccionar médico. La API valida disponibilidad al guardar.
-- Desde «Citas de pacientes», los tres roles pueden dar de alta pacientes. El servidor solo autoriza a médicos y recepcionistas a crear personas con rol paciente; la creación de otros roles queda reservada al administrador.
-- «Administrar citas» ofrece una agenda semanal interactiva de lunes a viernes con navegación entre semanas, citas existentes, vacaciones y huecos. El médico solo consulta su propia agenda; administración y recepción seleccionan entre los médicos de la clínica. Pulsar un hueco libre abre el formulario para asignar paciente y servicio; pulsar una cita permite administrarla. Los registros antiguos con datos incompletos se señalan.
-- Los huecos de la agenda representan una duración inicial de 30 minutos. El formulario permite duraciones de 15, 30, 45, 60, 75 y 90 minutos y consulta inicios cada 30 minutos para el día, médico y duración seleccionados; al editar se excluye la propia cita. El servidor comprueba de nuevo la disponibilidad al guardar.
+- Administrador, médico y recepción acceden a la gestión de citas. El médico crea, modifica y elimina solo las citas asignadas a sí mismo y no puede reasignarlas; administración y recepción gestionan las de cualquier médico. El servidor verifica estas restricciones.
+- El alta de pacientes se realiza desde «Administrar usuarios», no desde «Citas de pacientes». El administrador gestiona todos los roles; el médico crea y modifica pacientes y modifica su propio perfil, sin eliminar usuarios; recepción crea, modifica o elimina médicos y pacientes, pero no administradores. El paciente no administra usuarios.
+- «Administrar citas» se abre desde el encabezado y ofrece una agenda semanal interactiva con navegación entre semanas y salto directo a una fecha. El médico solo consulta su propia agenda; administración y recepción seleccionan profesional. Los profesionales se actualizan automáticamente tras cambios locales y mediante consultas periódicas, sin botón de actualización. Pulsar un hueco abre el formulario; una cita existente también puede administrarse desde «Citas de pacientes», donde las citas ajenas a un médico se muestran sin edición.
+- Los huecos de la agenda representan una duración inicial de 30 minutos. Al crear o editar se admiten solo 30, 60 y 90 minutos, con inicios cada 30 minutos. Al editar se excluye la propia cita del cálculo; la API vuelve a comprobar horario, vacaciones y solapamientos del médico y del paciente, incluso con distintos médicos. Las citas antiguas conservan su duración, pero al editarlas debe seleccionarse una admitida.
+- Solo se pueden crear citas de hoy en adelante según la fecha de la clínica en `Europe/Madrid`; las anteriores se pueden consultar y editar. No se restringen por este motivo las horas ya transcurridas del día actual. Los selectores muestran las fechas como `DD/MM/AAAA` y la API utiliza `AAAA-MM-DD`.
 - El paciente puede consultar desde su perfil las citas asignadas a su cuenta, incluidas las pasadas. La API filtra por la identidad autenticada; esta vista no permite modificar ni cancelar citas.
 - Desde una cita existente se puede abrir el historial clínico del paciente y vincular una anotación a la cita. Médicos y administradores pueden escribir; médicos, administración y recepción pueden consultar historiales y el paciente solo el suyo. El autor se obtiene de la sesión autenticada. El servidor comprueba que la cita corresponda al paciente y al servicio indicados.
-- Las vacaciones afectan a días laborables completos; el intervalo puede cruzar fines de semana, pero debe incluir al menos un día de lunes a viernes. Puede registrarlas un administrador o el médico titular; si hay citas existentes se informa, sin cancelarlas. Las nuevas citas se comprueban contra otras citas, vacaciones y el horario de la clínica. Las operaciones usan transacciones y bloqueo de la fila del médico.
+- Médicos y recepcionistas gestionan exclusivamente sus propias vacaciones desde «Mi perfil»; no existe gestión de vacaciones de otros profesionales desde la ficha de usuario. Los periodos deben incluir algún día laborable y pueden cruzar fines de semana. Las vacaciones del médico afectan a su disponibilidad; las de recepción no. Si existen citas afectadas se informa, sin cancelarlas.
+- La interfaz solicita confirmación explícita antes de eliminar una persona, una cita o un periodo de vacaciones, y antes de cambiar una contraseña desde el perfil o la ficha de usuario. Cancelar o cerrar el diálogo no envía la operación; esta confirmación no sustituye a la autorización del servidor.
 - El horario de citas es lunes, miércoles y viernes de 16:00 a 20:00, y martes y jueves de 09:30 a 13:30; sábados y domingos la clínica está cerrada. La cita debe finalizar dentro de la franja. La agenda muestra el horario en intervalos de media hora.
 - La creación de usuarios incluye correo electrónico; los registros antiguos pueden tenerlo vacío. No hay envío de correo implementado. El domicilio no forma parte del modelo actual y se ha retirado de los formularios y del buscador.
 - El menú de servicios conserva las categorías de quiropodia y biomecánica y muestra directamente el contenido de otras categorías sin la opción «Atrás» que no tenía efecto. El servicio a domicilio puede figurar como información de la clínica, sin que ello suponga almacenar la dirección del paciente.
@@ -469,8 +471,8 @@ El propósito de este capítulo es describir de forma verificable y precisa las 
 El sistema permite gestionar una clínica desde una aplicación web. Incluye:
 
 ✅ **Dentro del alcance:**
-- Registro e inicio de sesión de usuarios
-- Gestión de perfiles con foto, datos personales
+- Alta de usuarios por personal autorizado e inicio de sesión
+- Gestión de perfiles y datos personales; integración de foto pendiente de verificar
 - Catálogo de servicios clínicos
 - Gestión de disponibilidad profesional
 - Creación, modificación y eliminación de citas por personal autorizado; consulta de citas propias por el paciente
@@ -522,22 +524,22 @@ La solución se concibe como una aplicación web independiente que no requiere i
    - Visualización de datos personales
    - Edición de nombre, apellidos, DNI, teléfono y correo electrónico
    - Cambio de contraseña con validación
-   - Subida y cambio de foto de perfil
+   - La vinculación de una foto de perfil no está acreditada.
 
 3. **Servicios**
    - Consultar el catálogo y la información disponible.
    - La administración completa del catálogo y de las especialidades no está acreditada como implementada.
 
-4. **Gestión de Disponibilidad (Médico/Admin)**
+4. **Gestión de Disponibilidad (Médico/Recepción/Administrador)**
    - Consultar la agenda semanal y los huecos calculados a partir del horario común, citas y vacaciones.
-   - Registrar vacaciones por el médico titular o un administrador.
+   - Médicos y recepcionistas gestionan sus propios periodos de vacaciones desde el perfil; solo los del médico afectan a su disponibilidad.
    - Las franjas de apertura son comunes y no se configuran individualmente desde esta pantalla.
 
 5. **Reserva de Citas (Cliente)**
    - La reserva directa por el paciente es una propuesta pendiente, no una funcionalidad disponible.
 
 6. **Gestión de Citas (Médico/Recepcionista/Administrador)**
-   - Consultar la agenda, crear, modificar o eliminar citas.
+   - Consultar la agenda desde el encabezado y crear citas desde un hueco; consultar, modificar o eliminar las existentes desde la agenda o la lista de citas de pacientes, respetando los permisos del profesional.
    - El paciente dispone de «Mis citas», una vista de consulta que incluye citas pasadas.
 
 7. **Gestión de Historial Clínico**
@@ -545,13 +547,12 @@ La solución se concibe como una aplicación web independiente que no requiere i
    - Médico y administrador pueden crear anotaciones, también desde una cita existente.
    - Filtrar por profesional y servicio y ordenar por fecha.
 
-8. **Administración de Usuarios (Admin)**
-   - Listar usuarios con filtros
-   - Crear nuevo usuario
-   - Editar datos de usuario
-   - Cambiar rol de usuario
-   - Eliminar usuario; no se acredita un mecanismo de baja lógica
-   - Validar campos obligatorios
+8. **Administración de usuarios**
+   - El administrador puede crear, modificar y eliminar usuarios de todos los roles.
+   - El médico puede crear y modificar pacientes y modificar su perfil, sin eliminar usuarios.
+   - Recepción puede crear, modificar y eliminar médicos y pacientes, pero no administrar cuentas de administrador.
+   - El paciente no administra usuarios y puede editar sus propios datos desde el perfil.
+   - Eliminar usuarios o cambiar contraseñas requiere confirmación en la interfaz; no hay baja lógica acreditada.
 
 #### 4.2.3 Características de los Usuarios
 
@@ -567,11 +568,11 @@ La solución se concibe como una aplicación web independiente que no requiere i
 
 **Restricciones:**
 - Las citas solo pueden reservarse dentro de franjas disponibles confirmadas
-- No se permite sobreagendamiento de médicos
+- No se permite el solapamiento de citas de un médico ni de un paciente, incluso con distintos médicos.
 - Los historiales clínicos son privados (acces limitado por rol y propiedad)
 - Los datos solicitados en registro son obligatorios
-- El email debe ser único en el sistema
-- La contraseña debe cumplir requisitos mínimos (6+ caracteres, mayúscula, minúscula, número)
+- El correo se valida, pero el servidor no impone su unicidad.
+- Las reglas de validación de contraseña dependen del formulario; no se acredita una política uniforme de complejidad.
 
 **Suposiciones:**
 - Los usuarios disponen de credenciales válidas
@@ -597,32 +598,35 @@ La solución se concibe como una aplicación web independiente que no requiere i
 
 | Código | Requisito | Prioridad | Descripción |
 |--------|-----------|-----------|------------|
-| **RF-001** | Registrar usuario | **ALTA** | El sistema permitirá crear una cuenta proporcionando DNI/NIE/Pasaporte, nombre, apellidos, email, teléfono y contraseña. El email debe ser único. |
+| **RF-001** | Registrar usuario | **ALTA** | El personal autorizado crea usuarios desde administración; el DNI no puede duplicarse y el correo no tiene requisito de unicidad en el servidor. |
 | **RF-002** | Autenticar usuario | **ALTA** | El sistema valida las credenciales y entrega un JWT almacenado en sessionStorage. |
 | **RF-003** | Renovar sesión | **ALTA** | Propuesta pendiente: no existe actualmente una ruta de renovación de token. |
 | **RF-004** | Gestionar perfil | **MEDIA** | El usuario puede consultar y actualizar nombre, apellidos, DNI, teléfono y email. |
-| **RF-005** | Subir foto de perfil | **MEDIA** | El usuario podrá seleccionar imagen (JPG/PNG, máx 5MB) y cambiar foto de perfil. Sistema comprime antes de guardar. |
-| **RF-006** | Cambiar contraseña | **MEDIA** | El usuario puede solicitar el cambio; el almacenamiento seguro mediante hashing está pendiente. |
+| **RF-005** | Subir foto de perfil | **MEDIA** | Pendiente de acreditar la integración del flujo de subida con el perfil. |
+| **RF-006** | Cambiar contraseña | **MEDIA** | El usuario introduce contraseña actual y nueva, y confirma antes de enviar; el almacenamiento mediante hashing está pendiente. |
 | **RF-007** | Domicilio | — | Retirado: el modelo actual no almacena domicilio y no existe buscador activo. |
-| **RF-008** | Crear servicio (Admin) | **ALTA** | El administrador podrá crear nuevo servicio clínico con nombre y descripción. |
-| **RF-009** | Modificar servicio (Admin) | **MEDIA** | El administrador podrá editar nombre y descripción de servicio existente. |
-| **RF-010** | Eliminar servicio (Admin) | **MEDIA** | El administrador podrá eliminar servicio si no hay citas asociadas. Si hay, requiere confirmación. |
-| **RF-011** | Asignar médicos a servicio (Admin) | **ALTA** | El administrador podrá asignar múltiples médicos a un servicio (relación N:M). |
+| **RF-008** | Crear servicio (Admin) | **ALTA** | Propuesta pendiente: no se acredita un CRUD de servicios en la interfaz. |
+| **RF-009** | Modificar servicio (Admin) | **MEDIA** | Propuesta pendiente. |
+| **RF-010** | Eliminar servicio (Admin) | **MEDIA** | Propuesta pendiente. |
+| **RF-011** | Asignar médicos a servicio (Admin) | **ALTA** | Propuesta pendiente de interfaz y validación. |
 | **RF-012** | Horario de clínica | **ALTA** | Lunes, miércoles y viernes de 16:00 a 20:00; martes y jueves de 09:30 a 13:30. Fin de semana cerrado. |
-| **RF-013** | Gestionar vacaciones | **MEDIA** | Un médico gestiona sus vacaciones y administración puede gestionarlas por médico; el periodo debe incluir días laborables. |
-| **RF-014** | Comprobar disponibilidad | **ALTA** | La agenda muestra huecos de 30 minutos y el formulario calcula inicios según la duración; la API vuelve a comprobar conflictos, vacaciones y horario al guardar. |
-| **RF-015** | Gestionar citas de pacientes | **ALTA** | Administrador y recepción pueden seleccionar médico; el médico crea citas asignadas a sí mismo para pacientes. La reserva pública está pendiente. |
+| **RF-013** | Gestionar vacaciones | **MEDIA** | Médico y recepcionista gestionan únicamente sus propios periodos desde el perfil; deben incluir algún día laborable. |
+| **RF-014** | Comprobar disponibilidad | **ALTA** | El formulario calcula huecos según horario, duración, médico y paciente seleccionado; el servidor comprueba de nuevo los conflictos al guardar. |
+| **RF-015** | Gestionar citas de pacientes | **ALTA** | La creación se realiza desde la agenda del encabezado, desde hoy en adelante; el médico se asigna a sí mismo y administración y recepción seleccionan profesional. |
 | **RF-016** | Ver citas propias | **ALTA** | El paciente consulta las citas asignadas a su cuenta, incluidas las pasadas, sin modificarlas desde esa vista. |
-| **RF-017** | Modificar cita | **MEDIA** | El personal autorizado modifica una cita; se comprueba de nuevo la disponibilidad y se excluye la propia cita. |
-| **RF-018** | Eliminar cita | **ALTA** | El personal autorizado puede eliminar una cita; no se implementa un estado de cancelación lógica. |
+| **RF-017** | Modificar cita | **MEDIA** | Administración y recepción gestionan todas las citas; el médico solo las propias. Se permiten duraciones de 30, 60 o 90 minutos y se excluye la cita editada al comprobar conflictos. |
+| **RF-018** | Eliminar cita | **ALTA** | El personal autorizado confirma la eliminación desde la agenda o lista; no existe estado de cancelación lógica. |
 | **RF-019** | Crear anotación clínica | **ALTA** | Médico o administrador crea una anotación vinculada al paciente y servicio, opcionalmente a una cita existente. |
 | **RF-020** | Consultar historial clínico | **ALTA** | Médicos, administración y recepción consultan historiales; cada paciente solo consulta el suyo. Se puede filtrar por servicio y profesional. |
 | **RF-021** | Modificar historial | **MEDIA** | Pendiente: no hay edición de anotaciones implementada. |
 | **RF-022** | Eliminar historial | **BAJA** | Pendiente: no hay eliminación de anotaciones implementada. |
-| **RF-023** | Crear usuario (Admin) | **ALTA** | El administrador crea usuario nuevo indicando rol, email, contraseña temporal. Sistema valida campos. |
-| **RF-024** | Listar usuarios (Admin) | **ALTA** | El administrador visualiza listado de usuarios con filtros por rol, estado, nombre. |
-| **RF-025** | Editar usuario (Admin) | **MEDIA** | El administrador puede cambiar datos, rol o estado de usuario. Operación auditable. |
-| **RF-026** | Eliminar usuario (Admin) | **MEDIA** | El administrador puede desactivar (soft delete) usuario. Datos se conservan, acceso bloqueado. |
+| **RF-023** | Crear usuario | **ALTA** | Administrador: todos los roles; médico: pacientes; recepción: médicos y pacientes. |
+| **RF-024** | Listar usuarios | **ALTA** | El personal autorizado consulta la lista y busca por nombre; el alcance depende del rol y la pantalla. |
+| **RF-025** | Editar usuario | **MEDIA** | Administración edita todos los roles; médico edita pacientes y su perfil; recepción edita médicos y pacientes. Los cambios de contraseña requieren confirmación. |
+| **RF-026** | Eliminar usuario | **MEDIA** | Administración elimina cualquier usuario y recepción médicos o pacientes, previa confirmación. No se acredita baja lógica ni auditoría completa. |
+| **RF-027** | Navegar y actualizar agenda | **MEDIA** | Selección directa de semana mediante fecha y actualización automática de profesionales, conservando la selección si sigue siendo válida. |
+| **RF-028** | Confirmar acciones sensibles | **ALTA** | Confirmación previa a la eliminación de usuarios, citas y vacaciones y al cambio de contraseña; cancelar no envía la petición. |
+| **RF-029** | Formato de fecha | **MEDIA** | Los selectores presentan `DD/MM/AAAA`; los formularios y la API intercambian fechas ISO. |
 
 ### 4.4 Requisitos No Funcionales
 
@@ -656,9 +660,16 @@ Los requisitos de esta tabla son objetivos, no garantías alcanzadas: en particu
 **Actualización funcional de los casos de uso:** las fichas históricas siguientes incluyen flujos propuestos que no corresponden necesariamente al código actual. En particular, CU-006, CU-008, CU-009, CU-010, CU-011 y CU-012 deben interpretarse conforme a los flujos actuales siguientes; la reserva pública, cancelación por paciente y configuración individual de franjas no están implementadas. CU-017 y CU-018 (editar/eliminar anotaciones) son propuestas pendientes.
 
 1. **Crear cita:** desde «Administrar citas», el personal elige médico cuando corresponde, navega por semanas y pulsa un hueco libre. Selecciona paciente, servicio y duración; la API verifica el horario y conflictos antes de guardar.
-2. **Consultar y administrar cita:** el paciente consulta «Mis citas» desde su perfil. El personal puede abrir una cita existente desde la agenda, modificarla o eliminarla. Al editar, el cálculo de huecos excluye la cita seleccionada.
-3. **Vacaciones:** el médico titular o un administrador registra un periodo que incluya días laborables. Si ya hay citas, se informa sin cancelarlas automáticamente.
+2. **Consultar y administrar cita:** el paciente consulta «Mis citas» desde su perfil. El personal puede abrir una cita existente desde la agenda o la lista de citas de pacientes; administración y recepción gestionan todas, y el médico solo las propias. Al editar, el cálculo de huecos excluye la cita seleccionada.
+3. **Vacaciones:** el médico o recepcionista registra sus propios periodos desde el perfil; no administra los de otras personas. Si hay citas afectadas por vacaciones médicas, se informa sin cancelarlas automáticamente.
 4. **Historial clínico:** desde una cita existente se abre el historial del paciente. Médico y administración pueden añadir una anotación; el servidor vincula autor y, opcionalmente, cita, y comprueba paciente y servicio. Recepción consulta sin escribir; el paciente consulta solo su propio historial.
+
+| Rol | Usuarios | Citas | Vacaciones |
+|---|---|---|---|
+| Administrador | Crear, modificar y eliminar cualquier rol | Gestionar las de cualquier médico | No administra vacaciones de terceros mediante los endpoints actuales |
+| Médico | Crear y modificar pacientes; modificar su propio perfil; no eliminar usuarios | Gestionar únicamente las asignadas a él, sin reasignarlas | Gestionar exclusivamente las propias desde el perfil |
+| Recepcionista | Crear, modificar y eliminar médicos y pacientes, no administradores | Gestionar las de cualquier médico | Gestionar exclusivamente las propias desde el perfil |
+| Paciente | Sin administración de usuarios; acceso a su perfil | Consultar únicamente sus propias citas | Sin gestión de vacaciones |
 
 Los casos de uso describen la interacción entre actores y el sistema. Se aplica plantilla uniforme basada en especificación formal.
 
@@ -671,10 +682,10 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | El personal autorizado crea una persona en el sistema. |
 | **Actores** | Administrador, médico o recepcionista autenticado |
 | **Precondiciones** | Sesión válida; DNI no existente; acceso al formulario de alta. |
-| **Flujo Principal** | 1. El administrador abre la gestión de usuarios o el médico/recepcionista accede a «Citas de pacientes».<br/>2. Selecciona la creación de usuario o «Añadir paciente».<br/>3. Introduce los datos solicitados.<br/>4. El servidor comprueba el rol y los datos admitidos.<br/>5. Se guarda la persona y se comunica el resultado. |
+| **Flujo Principal** | 1. El personal abre «Administrar usuarios».<br/>2. Selecciona la creación de usuario.<br/>3. Introduce los datos y selecciona un rol permitido.<br/>4. El servidor comprueba el rol y los datos admitidos.<br/>5. Se guarda la persona y se comunica el resultado. |
 | **Flujos Alternativos** | DNI duplicado, correo inválido, datos incompletos, fallo de conexión o falta de permiso: se muestra el error y no se completa el alta. |
 | **Postcondiciones** | La persona queda registrada. No se inicia automáticamente una sesión en su nombre. |
-| **Observaciones** | El administrador puede crear otros roles; médico y recepción solo pueden crear pacientes. El servidor no exige que el correo sea único. |
+| **Observaciones** | El administrador puede crear cualquier rol; el médico solo pacientes y recepción médicos o pacientes. El servidor no exige que el correo sea único. «Citas de pacientes» no ofrece el alta. |
 
 ### 5.2 Iniciar Sesión
 
@@ -699,10 +710,10 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | Permitir a usuario autenticado cambiar su contraseña. |
 | **Actores** | Usuario autenticado (cualquier rol) |
 | **Precondiciones** | Usuario debe estar autenticado. Sessionactiva. |
-| **Flujo Principal** | 1. El usuario abre «Cambiar contraseña» desde el perfil.<br/>2. Introduce la contraseña actual y la nueva con su confirmación.<br/>3. El cliente valida los campos y el servidor comprueba la contraseña actual.<br/>4. Se guarda el cambio y se informa del resultado. |
-| **Flujos Alternativos** | **4a.** Contraseña actual incorrecta → error sin permitir cambio<br/>**4b.** Nueva contraseña no cumple requisitos → mostrar validación específica<br/>**4c.** Las 2 repeticiones de nueva contraseña no coinciden → error |
+| **Flujo Principal** | 1. El usuario abre «Cambiar contraseña» desde el perfil.<br/>2. Introduce la contraseña actual y la nueva repetida.<br/>3. El cliente valida los campos y solicita una segunda confirmación.<br/>4. Tras confirmarla, el servidor comprueba la contraseña actual.<br/>5. Se guarda el cambio y se informa del resultado. |
+| **Flujos Alternativos** | Cancelar o cerrar la confirmación no envía la petición. Contraseña actual incorrecta, nueva contraseña igual a la actual o repetición distinta: se muestra el error correspondiente. |
 | **Postcondiciones** | La contraseña queda actualizada y puede utilizarse en el siguiente inicio de sesión. |
-| **Observaciones** | El almacenamiento seguro mediante hashing y una auditoría completa están pendientes. |
+| **Observaciones** | El cambio de contraseña desde la ficha de usuario también exige confirmación antes de enviar la petición. El almacenamiento seguro mediante hashing y una auditoría completa están pendientes. |
 
 ### 5.4 Editar Perfil
 
@@ -741,10 +752,10 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | El personal consulta la agenda y crea una cita para un paciente. |
 | **Actores** | Administrador, médico y recepcionista autenticados |
 | **Precondiciones** | Hay sesión válida, paciente, médico y servicio disponibles. |
-| **Flujo Principal** | 1. El usuario abre «Administrar citas».<br/>2. El médico ve su agenda; administración y recepción seleccionan profesional.<br/>3. Navega por semanas y pulsa un hueco libre.<br/>4. Selecciona paciente, servicio y duración.<br/>5. El formulario muestra inicios disponibles para el día y duración elegidos.<br/>6. El servidor comprueba horario, vacaciones y solapamientos y guarda la cita. |
-| **Flujos Alternativos** | Si no hay huecos se informa; si cambia la disponibilidad antes de guardar se indica el conflicto y se recargan los huecos; ante fallo de red se muestra un error. |
+| **Flujo Principal** | 1. El usuario abre «Administrar citas» desde el encabezado.<br/>2. El médico ve su agenda; administración y recepción seleccionan profesional.<br/>3. Navega por semanas o elige una fecha y pulsa un hueco de hoy en adelante.<br/>4. Selecciona paciente, servicio y duración de 30, 60 o 90 minutos.<br/>5. El formulario muestra inicios disponibles para médico y paciente.<br/>6. El servidor comprueba horario, vacaciones y solapamientos de ambos y guarda la cita. |
+| **Flujos Alternativos** | Fecha anterior a hoy, duración no admitida, citas solapadas o fuera del horario: se rechaza. Si cambia la disponibilidad antes de guardar se informa y se recargan los huecos; ante fallo de red se muestra un error. |
 | **Postcondiciones** | Cita registrada; la agenda se actualiza al cerrar el formulario tras guardar. |
-| **Observaciones** | El paciente no reserva directamente; no hay envío de confirmaciones por correo. La aplicación no garantiza impedir fechas pasadas. |
+| **Observaciones** | El paciente no reserva directamente; no hay envío de confirmaciones por correo. La fecha actual se determina en la zona horaria de Madrid; una hora ya pasada de hoy no se rechaza por esa regla. |
 
 ### 5.7 Ver Mis Citas
 
@@ -769,10 +780,10 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | Usuario autorizado puede cambiar fecha/hora de cita si hay disponibilidad. |
 | **Actores** | Administrador, médico y recepcionista |
 | **Precondiciones** | Cita existente y sesión de personal válida. |
-| **Flujo Principal** | 1. Se abre una cita desde la agenda o el listado.<br/>2. Se modifican los datos permitidos.<br/>3. Se consultan huecos para el día, médico y duración.<br/>4. El servidor excluye la propia cita de la comprobación y valida de nuevo al guardar.<br/>5. Se actualiza la cita y se refresca la vista. |
+| **Flujo Principal** | 1. Se abre una cita desde la agenda o «Citas de pacientes».<br/>2. Se modifican los datos permitidos.<br/>3. Se consultan huecos para el día, médico, paciente y duración.<br/>4. El servidor excluye la propia cita y valida de nuevo al guardar.<br/>5. Se actualiza la cita y se refresca la vista. |
 | **Flujos Alternativos** | Conflicto de disponibilidad, horario fuera de apertura o fallo de conexión: se informa y no se guarda. |
 | **Postcondiciones** | Cita actualizada si las comprobaciones se superan. |
-| **Observaciones** | El paciente no modifica citas desde «Mis citas». La autorización de edición del backend debe revisarse antes de producción. |
+| **Observaciones** | El médico solo modifica las citas asignadas a él, sin reasignarlas; administración y recepción pueden modificar las de cualquier médico. El paciente no modifica citas desde «Mis citas». Las antiguas se pueden editar. |
 
 ### 5.9 Eliminar cita
 
@@ -783,10 +794,10 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | El personal elimina una cita existente desde su formulario. |
 | **Actores** | Administrador, médico y recepcionista |
 | **Precondiciones** | Sesión de personal válida y cita existente. |
-| **Flujo Principal** | 1. El usuario abre la cita.<br/>2. Pulsa «Eliminar».<br/>3. El servidor ejecuta la eliminación.<br/>4. Se actualiza la vista al cerrarse el formulario. |
-| **Flujos Alternativos** | Si falla la operación se muestra un error. |
+| **Flujo Principal** | 1. El usuario abre la cita desde agenda o lista.<br/>2. Pulsa «Eliminar» y confirma la acción.<br/>3. El servidor comprueba permisos y elimina el registro.<br/>4. Se actualiza la vista al cerrarse el formulario. |
+| **Flujos Alternativos** | Cancelar o cerrar la confirmación no envía la petición. Si falla la operación se muestra un error. |
 | **Postcondiciones** | El registro de la cita se elimina; el hueco deja de estar ocupado por ella. |
-| **Observaciones** | No hay estado de cancelación lógica ni se acredita auditoría de la eliminación. El paciente no puede eliminar desde «Mis citas». |
+| **Observaciones** | El médico solo elimina citas propias; administración y recepción pueden eliminar las de cualquier médico. No hay estado de cancelación lógica ni se acredita auditoría. El paciente no elimina desde «Mis citas». |
 
 ### 5.10 Gestionar Disponibilidad Profesional
 
@@ -795,12 +806,12 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Código** | CU-010 |
 | **Nombre** | Gestionar Disponibilidad |
 | **Descripción** | Consulta de disponibilidad y gestión de vacaciones dentro del horario común de la clínica. |
-| **Actores** | Médico, Admin (autenticados) |
-| **Precondiciones** | Usuario autenticado como médico titular o administrador para gestionar vacaciones. |
-| **Flujo Principal** | 1. El médico accede a sus vacaciones desde el perfil; el administrador accede desde la ficha del médico.<br/>2. Indica un periodo y lo guarda.<br/>3. El servidor comprueba que incluya días laborables y que no se solape con otras vacaciones.<br/>4. La agenda y las consultas de huecos reflejan la ausencia. |
+| **Actores** | Médico o recepcionista autenticado |
+| **Precondiciones** | Sesión válida y acceso al propio perfil. |
+| **Flujo Principal** | 1. El médico o recepcionista abre «Mis vacaciones» desde su perfil.<br/>2. Indica un periodo y lo guarda.<br/>3. El servidor comprueba identidad, días laborables y solapamientos.<br/>4. Las vacaciones médicas se reflejan en la agenda y en los huecos. Para eliminar un periodo, el titular confirma la operación. |
 | **Flujos Alternativos** | Periodo inválido, sin días laborables o solapado: se rechaza. Si existen citas afectadas se informa de ellas sin cancelarlas. |
-| **Postcondiciones** | Vacaciones registradas para el médico. |
-| **Observaciones** | El horario común está fijado en el código; no existe edición individual de franjas. Los periodos pueden atravesar fines de semana. |
+| **Postcondiciones** | Vacaciones registradas o eliminadas para el propio usuario. |
+| **Observaciones** | Recepción no puede gestionar vacaciones médicas y sus propias vacaciones no bloquean la agenda médica. El horario común está fijado en el código; los periodos pueden atravesar fines de semana. |
 
 ### 5.11 Registrar Historial Clínico
 
@@ -836,13 +847,13 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 |----------|-------|
 | **Código** | CU-013 |
 | **Nombre** | Administrar usuarios |
-| **Descripción** | El administrador gestiona personas registradas. |
-| **Actores** | Administrador autenticado |
+| **Descripción** | El personal autorizado crea, modifica o elimina personas según su rol. |
+| **Actores** | Administrador, médico y recepcionista autenticados |
 | **Precondiciones** | Sesión válida y acceso a la gestión de usuarios. |
-| **Flujo Principal** | 1. Abre la gestión de usuarios.<br/>2. Consulta la lista o abre el formulario de alta o edición.<br/>3. Introduce los datos y guarda. |
-| **Flujos Alternativos** | DNI duplicado, correo inválido, falta de permiso o error del servidor: se informa del problema. |
-| **Postcondiciones** | La persona se crea o modifica según la operación realizada. |
-| **Observaciones** | La API dispone de eliminación física para administración; no se acredita un flujo de eliminación en la interfaz ni borrado lógico o auditoría completa. No se genera automáticamente una contraseña temporal. |
+| **Flujo Principal** | 1. Abre la gestión de usuarios.<br/>2. Busca una persona o abre el formulario de alta.<br/>3. Crea o edita según sus permisos, o confirma la eliminación de un usuario permitido.<br/>4. El servidor valida y comunica el resultado. |
+| **Flujos Alternativos** | Cancelar la confirmación no envía cambios. DNI duplicado, correo inválido, falta de permiso o error del servidor: se informa del problema. |
+| **Postcondiciones** | La persona se crea, modifica o elimina según la operación autorizada. |
+| **Observaciones** | Administración gestiona todos los roles; médico crea y modifica pacientes y su perfil, sin eliminar; recepción crea, modifica o elimina médicos y pacientes. No hay borrado lógico ni auditoría completa acreditados. |
 
 ### 5.14 Gestionar Servicios Médicos
 
@@ -923,7 +934,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | Visualización de la disponibilidad calculada dentro del horario común. |
 | **Actores** | Médico (su propia agenda), administrador y recepción (selección de médico) |
 | **Precondiciones** | Usuario autenticado y médico existente en la base de datos. |
-| **Flujo Principal** | 1. Se abre la agenda semanal.<br/>2. Se selecciona profesional cuando el rol lo permite.<br/>3. La agenda presenta horario, citas, vacaciones y huecos disponibles.<br/>4. Se selecciona un hueco para abrir el formulario de cita. |
+| **Flujo Principal** | 1. Se abre la agenda semanal desde el encabezado.<br/>2. Se selecciona profesional cuando el rol lo permite; la lista se actualiza automáticamente.<br/>3. Se navega por semanas o se elige una fecha directamente.<br/>4. La agenda presenta horario, citas, vacaciones y huecos disponibles.<br/>5. Se selecciona un hueco para abrir el formulario de cita. |
 | **Flujos Alternativos** | Si no hay disponibilidad se muestra el estado correspondiente; un fallo de carga se comunica al usuario. |
 | **Postcondiciones** | Se visualiza la disponibilidad; no se modifica el horario común. |
 | **Observaciones** | Lunes, miércoles y viernes: 16:00–20:00; martes y jueves: 09:30–13:30; fin de semana cerrado. No existe configuración individual de franjas. |
@@ -951,10 +962,37 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | El personal consulta los inicios disponibles para médico, fecha y duración. |
 | **Actores** | Médico, administrador y recepcionista |
 | **Precondiciones** | Sesión de personal válida y médico existente. |
-| **Flujo Principal** | 1. Se abre el formulario de cita desde la agenda.<br/>2. Se seleccionan fecha, médico y duración.<br/>3. El cliente solicita `POST /citas/huecos`.<br/>4. El servidor aplica el horario, descuenta vacaciones y comprueba solapamientos con las citas.<br/>5. Se presentan los inicios disponibles para seleccionar uno. |
+| **Flujo Principal** | 1. Se abre el formulario de cita desde la agenda.<br/>2. Se seleccionan fecha, médico, duración y paciente cuando corresponda.<br/>3. El cliente solicita `POST /citas/huecos`.<br/>4. El servidor aplica el horario, descuenta vacaciones y comprueba solapamientos del médico y, si se indicó, del paciente.<br/>5. Se presentan los inicios disponibles para seleccionar uno. |
 | **Flujos Alternativos** | Sin huecos o fallo de carga: se comunica el estado; si el hueco deja de estar disponible, el guardado se rechaza y se vuelve a consultar. |
 | **Postcondiciones** | Lista de inicios disponibles presentada, sin crear una cita hasta confirmar el formulario. |
-| **Observaciones** | Los inicios se calculan cada 30 minutos y la cita debe terminar dentro del horario. Al editar se excluye la propia cita. |
+| **Observaciones** | Los inicios se calculan cada 30 minutos; las duraciones permitidas son 30, 60 y 90 minutos. Al editar se excluye la propia cita. La disponibilidad se comprueba de nuevo al guardar. |
+
+### 5.22 Confirmar una operación sensible
+
+| Atributo | Valor |
+|----------|-------|
+| **Código** | CU-022 |
+| **Nombre** | Confirmar una operación sensible |
+| **Descripción** | Evitar operaciones accidentales mediante una confirmación adicional en la interfaz. |
+| **Actores** | Usuario autenticado con permiso para la operación elegida |
+| **Precondiciones** | El usuario ha iniciado la eliminación de una cita, usuario o periodo de vacaciones, o un cambio de contraseña. |
+| **Flujo principal** | 1. El sistema muestra un diálogo que identifica la acción y, cuando corresponde, el elemento afectado.<br/>2. El usuario confirma explícitamente.<br/>3. Se envía la petición y se muestra el resultado. |
+| **Flujos alternativos** | Al cancelar o cerrar el diálogo no se envía la petición. Un error del servidor se comunica sin dar la operación por realizada. |
+| **Postcondiciones** | Solo se ejecuta la petición después de confirmar. |
+| **Observaciones** | La confirmación es una protección de usabilidad del cliente, no una autenticación adicional ni una sustitución de los permisos del servidor. |
+
+### 5.23 Navegar directamente a una semana
+
+| Atributo | Valor |
+|----------|-------|
+| **Código** | CU-023 |
+| **Nombre** | Seleccionar semana de la agenda |
+| **Actores** | Médico, recepcionista y administrador autenticados |
+| **Precondiciones** | Acceso a «Administrar citas» desde el encabezado. |
+| **Flujo principal** | 1. El usuario introduce o selecciona una fecha en formato `DD/MM/AAAA`.<br/>2. La agenda calcula el lunes de esa semana y solicita los datos del profesional seleccionado.<br/>3. Se muestran las fechas, citas, vacaciones y huecos correspondientes. |
+| **Flujos alternativos** | Si la fecha es inválida no se navega; si la carga falla, se informa del error. Las fechas pasadas se pueden consultar, pero no se ofrecen para crear citas nuevas. |
+| **Postcondiciones** | La semana seleccionada queda visible sin recorrer manualmente las semanas intermedias. |
+| **Observaciones** | La selección de profesional se mantiene al actualizar la lista siempre que dicho profesional siga disponible. |
 
 ---
 
@@ -974,12 +1012,12 @@ graph TB
     end
     
     subgraph Medico["🩺 MÉDICO"]
-        MD["<b>Funciones:</b><br/>• Gestionar su agenda<br/>• Registrar historial<br/>• Gestionar vacaciones"]
+        MD["<b>Funciones:</b><br/>• Gestionar sus citas<br/>• Crear y modificar pacientes<br/>• Registrar historial<br/>• Gestionar vacaciones propias"]
         style MD fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
     end
     
     subgraph Recepcionista["👨‍💼 RECEPCIONISTA"]
-        REC["<b>Funciones:</b><br/>• Gestionar citas<br/>• Atender consultas<br/>• Visualizar información"]
+        REC["<b>Funciones:</b><br/>• Gestionar citas<br/>• Gestionar médicos y pacientes<br/>• Consultar historial<br/>• Gestionar vacaciones propias"]
         style REC fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
     end
     
@@ -1024,9 +1062,9 @@ graph TB
 
 - **Actores Principales:**
   - **Paciente/Cliente:** Consulta sus citas e historial clínico y gestiona su perfil; no reserva directamente.
-  - **Médico:** Gestiona su agenda y vacaciones y registra anotaciones en historiales clínicos.
-  - **Recepcionista:** Gestiona citas, da de alta pacientes y consulta historiales clínicos.
-  - **Administrador:** Administra usuarios, gestiona citas y vacaciones y consulta o registra historiales.
+  - **Médico:** Gestiona sus propias citas y vacaciones, crea y modifica pacientes y registra anotaciones en historiales clínicos.
+  - **Recepcionista:** Gestiona citas de cualquier médico, administra médicos y pacientes, consulta historiales y gestiona sus propias vacaciones.
+  - **Administrador:** Administra usuarios, gestiona citas de cualquier médico y consulta o registra historiales; la gestión de vacaciones de terceros no está disponible.
 
 - **Sistema Central:**
   - Aplicación web responsiva construida con Angular 13.3 e Ionic 6.7 para el cliente
@@ -1036,7 +1074,7 @@ graph TB
 
 - **Sistemas Externos:**
   - **MariaDB:** base de datos relacional utilizada por el backend en el entorno comprobado.
-  - La disponibilidad al guardar citas se comprueba mediante transacciones y bloqueo de la fila del médico.
+  - Al guardar citas, el backend comprueba los conflictos en una transacción con bloqueo de las filas del médico y del paciente; al modificar una cita también bloquea su registro.
 
 El frontend se comunica con el backend mediante HTTP; las operaciones protegidas adjuntan el JWT. El inicio de sesión no requiere un token previo. Las comprobaciones de permisos varían por operación y no constituyen una garantía integral de seguridad.
 
@@ -1061,21 +1099,23 @@ graph TB
     end
     
     subgraph Medico["🩺 Médico"]
-        UC6["Consultar Agenda"]
+        UC6["Gestionar citas propias"]
         UC7["Registrar Anotación"]
         UC8["Ver Historial Paciente"]
-        UC9["Gestionar vacaciones"]
+        UC9["Gestionar vacaciones propias"]
+        UC17["Crear y modificar pacientes"]
     end
     
     subgraph Recepcionista["👨‍💼 Recepcionista"]
         UC10["Gestionar Citas"]
-        UC11["Listar Pacientes"]
+        UC11["Gestionar médicos y pacientes"]
         UC12["Consultar historial"]
+        UC16["Gestionar vacaciones propias"]
     end
     
     subgraph Administrador["🔐 Administrador"]
         UC13["Gestionar Usuarios"]
-        UC14["Gestionar citas y vacaciones"]
+        UC14["Gestionar citas"]
         UC15["Registrar historial"]
     end
     
@@ -1093,10 +1133,12 @@ graph TB
     style UC7 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
     style UC8 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
     style UC9 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    style UC17 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
     
     style UC10 fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
     style UC11 fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
     style UC12 fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style UC16 fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
     
     style UC13 fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#fff
     style UC14 fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#fff
@@ -1598,13 +1640,15 @@ Las rutas protegidas pueden responder con **401** si falta autenticación válid
 | `GET /citas/agenda?inicio=AAAA-MM-DD&idMedico=ID` | Semana del profesional, con citas, vacaciones y huecos de 30 minutos; el médico solo puede pedir la suya y administración y recepción pueden seleccionar médico. |
 | `GET /citas/mi-agenda?inicio=AAAA-MM-DD` | Devuelve la agenda del médico autenticado. |
 | `GET /citas/mis-citas` | Devuelve únicamente las citas del paciente autenticado. |
-| `POST /citas/huecos` | Calcula inicios libres para fecha, médico y duración; admite `idCita` al editar y no devuelve datos de otros pacientes. |
-| `POST /citas/disponibilidad` | Comprueba si una cita concreta encaja en el horario y no entra en conflicto. |
-| `POST /citas`, `PUT /citas/:id`, `DELETE /citas/:id` | Creación, modificación y eliminación por los roles de gestión admitidos; al guardar se valida nuevamente la disponibilidad. |
-| `GET /medicos/:id/vacaciones`, `POST /medicos/:id/vacaciones`, `DELETE /medicos/:id/vacaciones/:holidayId` | Consulta, registro y eliminación de vacaciones por médico titular o administrador. |
+| `POST /citas/huecos` | Recibe `fecha`, `idMedico`, `duracion` y, opcionalmente, `idCita` para excluir la cita editada e `idCliente` para filtrar los conflictos del paciente. No devuelve datos de otros pacientes. |
+| `POST /citas/disponibilidad` | Comprueba horario, vacaciones y conflictos del médico y del paciente; puede indicar `motivo: paciente_ocupado`. |
+| `POST /citas`, `PUT /citas/:id`, `DELETE /citas/:id` | Administración y recepción gestionan citas de cualquier médico; el médico solo las propias y no puede reasignarlas. Una creación no puede ser anterior a la fecha actual de Madrid. Al guardar se vuelve a validar la disponibilidad. |
+| `GET /medicos/:id/vacaciones`, `POST /medicos/:id/vacaciones`, `DELETE /medicos/:id/vacaciones/:holidayId` | Médico o recepcionista consulta, registra y elimina únicamente sus propios periodos. No se permite al administrador gestionar los de otro usuario por estas rutas. |
 | `GET /historialclinico/paciente/:id` | Devuelve el historial del paciente si el rol y la identidad lo permiten. |
 | `GET /historialclinico/cita/:id` | Obtiene la relación entre cita, paciente y servicio para el personal autorizado. |
 | `POST /historialclinico` | Médico o administrador añade una anotación; el servidor obtiene el autor de la sesión y valida la cita opcional. |
+
+Las duraciones válidas son 30, 60 y 90 minutos; la cita debe terminar dentro del horario de apertura. Un conflicto del paciente al guardar se comunica con HTTP 409 y `code: PATIENT_CONFLICT`. El servidor bloquea en la transacción las filas del médico y paciente al comprobar y guardar; la edición y eliminación también bloquean la cita para verificar sus permisos. Las citas antiguas incompletas se tratan conservadoramente para evitar ofrecer disponibilidad dudosa. La confirmación previa es una función de interfaz y no sustituye la autorización de la API.
 
 **Advertencia:** el inventario de 20 rutas y los ejemplos que siguen son históricos; incluyen rutas, métodos y respuestas que han cambiado o no existen. No deben utilizarse como documentación actual de la API ni como instrucciones de prueba.
 
@@ -2313,9 +2357,20 @@ El servicio público de Nominatim prohíbe el autocompletado y solicita no envia
 
 **Comprobaciones focalizadas recientes:** en esta sesión se verificaron las compilaciones de frontend y backend; 33 pruebas backend relativas a agenda, disponibilidad, citas y horario; y 27 pruebas frontend de agenda, formulario y selección de pacientes. Después, para el historial, pasaron 18 pruebas backend focalizadas y 20 pruebas frontend de historial, citas y perfil. Las agrupaciones se solapan y no deben sumarse como pruebas distintas ni como cobertura global. Se comprobó también la escritura y lectura de una anotación vinculada en MariaDB dentro de una transacción revertida, así como la respuesta 401 sin autenticación. Estas verificaciones no equivalen a una auditoría de seguridad ni a pruebas funcionales completas de todos los roles.
 
+**Verificaciones posteriores de los cambios de citas y confirmación:** se registró la ejecución satisfactoria de 10 suites y 83 pruebas backend con `npm test -- --runInBand citas`, además de `npm run build` en el backend. En el frontend se completaron `npm run build -- --configuration development` y la comprobación de tipos `npx tsc --noEmit -p tsconfig.spec.json`. Las pruebas frontend nuevas de confirmación se comprobaron a nivel de tipos, pero **no se ejecutaron**. En el navegador se comprobó que cancelar las confirmaciones de eliminación de usuario, eliminación de cita y cambio de contraseña no realizaba la operación, sin modificar datos reales. Estas comprobaciones corresponden al trabajo previo, no a una nueva ejecución al actualizar esta memoria.
+
+| Escenario de validación | Estado de la evidencia |
+|---|---|
+| Reglas backend de citas, disponibilidad y conflictos | Ejecución focalizada de 83 pruebas de citas registrada; no equivale a cobertura integral. |
+| Confirmar y cancelar eliminaciones y cambios de contraseña en todos los roles y pantallas | Pendiente de ejecución completa de las pruebas frontend; se verificaron manualmente las cancelaciones indicadas. |
+| Crear citas con duración no permitida, fecha anterior a hoy o conflicto de médico o paciente | Escenarios que deben incluirse en la regresión funcional y de API. |
+| Editar o eliminar citas propias y ajenas para cada rol; impedir reasignación por médico | Escenario de regresión por rol pendiente de validación integral de extremo a extremo. |
+| Vacaciones propias de médico y recepción, periodos con fines de semana y citas afectadas | Escenario de regresión funcional por rol pendiente de validación integral. |
+| Salto directo de semana, actualización automática de profesionales y formato de fecha | Escenario de regresión visual y funcional pendiente de ejecución completa. |
+
 **Nota sobre el contenido histórico:** las cifras, ejemplos y supuesta cobertura completa de los apartados siguientes son propuestas o resultados sin evidencia reproducible asociada. En particular, el ejemplo de bcrypt no describe la implementación actual. No se acredita un porcentaje global de éxito ni la ejecución de todos los casos PF.
 
-Los 21 casos de uso y 20 casos de prueba funcionales históricos se conservan como material de revisión, no como prueba de cobertura completa. La consulta de historiales ha cambiado y ahora requiere autenticación y comprueba el rol y, para el paciente, la identidad. El almacenamiento de contraseñas sigue requiriendo una solución segura.
+Los casos de prueba funcionales históricos se conservan como material de revisión, no como prueba de cobertura completa de los 23 casos de uso actuales. La consulta de historiales requiere autenticación y comprueba el rol y, para el paciente, la identidad. El almacenamiento de contraseñas sigue requiriendo una solución segura.
 
 ### 9.1 Estrategia de Pruebas
 
@@ -2992,9 +3047,10 @@ BACKUP_DIR=/data/backups
 
 - Arquitectura cliente-servidor y autenticación mediante JWT.
 - Gestión de usuarios y perfil con correo electrónico.
-- Gestión de citas con comprobación de solapamientos y vacaciones médicas.
-- Agenda semanal interactiva con selección de profesional según el rol y acceso a los huecos libres.
-- Consulta de citas propias del paciente y alta de pacientes por médicos y recepción.
+- Gestión de citas con duraciones de 30, 60 o 90 minutos, comprobación de solapamientos de médico y paciente y vacaciones médicas.
+- Agenda semanal con selección de profesional según el rol, actualización automática y salto directo a una fecha.
+- Permisos por rol para gestionar usuarios y citas, vacaciones propias desde el perfil y consulta de citas propias del paciente.
+- Confirmaciones antes de operaciones sensibles y selectores de fecha con formato `DD/MM/AAAA`.
 - Acceso al historial desde una cita y creación de anotaciones vinculadas, con permisos comprobados en el servidor.
 - Archivos de traducción para español, inglés y portugués.
 - Pruebas automatizadas focalizadas; no se acredita cobertura completa.
@@ -3212,27 +3268,15 @@ Este enfoque dual garantiza que:
 
 ### Anexo B: Instalación y Configuración Rápida
 
-**Prerrequisitos:**
-- Node.js 16+ 
-- Git
-- Docker + Docker Compose
-- MySQL Client (opcional)
+El frontend y el backend se mantienen en repositorios separados; ambos deben obtenerse en el equipo de destino. Se necesitan Git, Node.js y npm compatibles con las dependencias del proyecto, y un servidor MariaDB. Docker no es obligatorio.
 
-**Pasos:**
-```bash
-# 1. Backend
-cd clinica-tfg-back
-npm install
-npm run start:dev
+1. Preparar una base de datos MariaDB y revisar el script inicial `instalacion/CODIGO OK SQL SCRIPT BBDD.sql` del repositorio frontend antes de importarlo. Comprobar el esquema existente y hacer copia de seguridad antes de actuar sobre datos previos.
+2. En el repositorio backend, revisar la conexión de `src/app.module.ts`: actualmente apunta a MariaDB local, puerto 3306 y base `test`. Ajustar la configuración al entorno sin publicar credenciales. Revisar y aplicar, según el esquema de partida, las migraciones `001` a `004` de la carpeta `migrations`; no aplicarlas a ciegas sobre un esquema ya migrado.
+3. Configurar `JWT_SECRET` como una clave larga, impredecible y estable, sin incorporarla al repositorio. Sin ella se genera una clave temporal al arrancar y las sesiones anteriores dejan de ser válidas tras un reinicio.
+4. En una terminal abierta en la raíz del backend, ejecutar `npm install` y después `npm run start:dev`.
+5. En otra terminal abierta en la raíz del frontend, ejecutar `npm install` y después `npm start`; acceder a `http://localhost:4200`. Las pantallas actuales de citas e historial utilizan la API en `http://localhost:3000`.
 
-# 2. Frontend (en otra terminal)
-cd clinica-tfg
-npm install
-npm start
-
-# 3. Base de Datos (si no usa Docker)
-mysql -u root -p < instalacion/CODIGO\ OK\ SQL\ SCRIPT\ BBDD.sql
-```
+Estos pasos son una orientación de desarrollo y deben contrastarse con el entorno de destino y los README de ambos repositorios. El enlace a una guía independiente de otro PC que figura en el README del frontend no está disponible actualmente. La configuración descrita, con contraseñas almacenadas en texto plano, no es apta para producción.
 
 ### Anexo C: Validadores Matemáticos
 

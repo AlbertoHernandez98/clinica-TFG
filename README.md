@@ -11,6 +11,16 @@ para configurar el frontend, el backend separado y la base de datos.
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Fotografías de servicios
+
+Las fichas de servicios muestran fotografías locales con un marco centrado y
+una proporción uniforme, adaptada al tamaño de la pantalla.
+
+Las páginas principales adaptan su distribución a móvil y tableta. La agenda
+semanal conserva desplazamiento horizontal para consultar todos los días en
+pantallas estrechas. En Contacto se muestra la dirección y un mapa de Google
+Maps en blanco y negro, cuya carga depende del servicio externo.
+
 ## Citas de pacientes
 
 Tras iniciar sesión, «Citas de pacientes» permite buscar pacientes y consultar,

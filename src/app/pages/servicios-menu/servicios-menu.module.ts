@@ -26,6 +26,7 @@ import { CirugiaOseaComponent } from './components/cirugia-osea/cirugia-osea.com
 import { PodologiaInfantilComponent } from './components/podologia-infantil/podologia-infantil.component';
 import { PodologiaGeriatricaComponent } from './components/podologia-geriatrica/podologia-geriatrica.component';
 import { ServicioDomicilioComponent } from './components/servicio-domicilio/servicio-domicilio.component';
+import { ImagenServicioComponent } from './components/imagen-servicio/imagen-servicio.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -54,7 +55,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
     CirugiaOseaComponent,
     PodologiaInfantilComponent,
     PodologiaGeriatricaComponent,
-    ServicioDomicilioComponent
+    ServicioDomicilioComponent,
+    ImagenServicioComponent
   ],
   imports: [
     ReactiveFormsModule,

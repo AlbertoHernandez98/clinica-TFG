@@ -62,7 +62,9 @@
             display: flex;
             justify-items: center;
         }
+
     }
+
     &__articulo {
         display: flex;
         flex-direction: column;
@@ -77,6 +79,24 @@
         &__texto {
             text-align: center;
             line-height: 1.6;
+        }
+    }
+}
+
+@media (max-width: 800px) {
+    .card-container {
+        width: calc(100% - 32px);
+        min-width: 0;
+    }
+
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+        padding: 24px;
+
+        &__imagen {
+            display: flex;
+            justify-content: center;
         }
     }
 }

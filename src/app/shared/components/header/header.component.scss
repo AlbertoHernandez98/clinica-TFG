@@ -176,10 +176,52 @@
 }
 
 /* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
     display: block;
 }
 
 .login-option {
     display: flex;
+}
+
+@media (max-width: 1024px) {
+    .content {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        row-gap: 4px;
+        padding: 8px;
+        margin-top: 0;
+        max-height: none;
+    }
+
+    .clinica-logo {
+        width: 56px;
+        margin: 0;
+    }
+
+    .div-cabecera, .login-option, .login-option > .dropdown:last-child {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .div-cabecera, .login-option {
+        width: 100%;
+    }
+
+    .dropbtn {
+        padding: 8px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .dropdown-content {
+        top: 100%;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        animation: none;
+    }
 }

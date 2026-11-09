@@ -3,6 +3,7 @@
 .content {
     padding-bottom: 4em;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: $gap-form;
     &__boton-atras {
         padding: 3em 5em 0;
@@ -43,7 +44,7 @@
 
     &__descripcion {
         display: flex;
-        padding: $gap-form 8rem;
+        padding: $gap-form clamp(1rem, 5vw, 8rem);
         justify-content: center;
         color: $color-dark-gray;
         text-align: justify;

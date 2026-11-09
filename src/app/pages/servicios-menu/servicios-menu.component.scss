@@ -100,6 +100,29 @@
         justify-content: center;
         margin-bottom: 100px;
     }
+
+    @media (max-width: 800px) {
+        .services-wrap {
+            margin-bottom: 48px;
+
+            &__list {
+                justify-content: center;
+            }
+        }
+
+        .content__servicio {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 24px;
+            padding: 0 16px;
+
+            &__item__producto {
+                width: min(330px, 100%);
+                height: auto;
+                aspect-ratio: 11 / 10;
+                object-fit: cover;
+            }
+        }
+    }
     &__detalle {
         width: 100%;
     }

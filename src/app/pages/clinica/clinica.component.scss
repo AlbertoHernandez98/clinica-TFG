@@ -75,6 +75,7 @@
                     transition: all 0.5s ease;
                     transform-style: preserve-3d;
                 }
+
                 &__a:after {
                     content: "Clínica Lara Suarez Diaz";
                     position: absolute;
@@ -108,6 +109,36 @@
                     height: 300px;
                     // background-position: 50% 50%;
                     // background-size: cover;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .content {
+        gap: 24px;
+        padding: 2em 16px;
+
+        &__servicio,
+        &__servicio__item {
+            width: min(330px, 100%);
+        }
+
+        &__servicio__item {
+            height: auto;
+            grid-template-columns: minmax(0, 1fr);
+
+            &__producto {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 11 / 10;
+                object-fit: cover;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
                 }
             }
         }

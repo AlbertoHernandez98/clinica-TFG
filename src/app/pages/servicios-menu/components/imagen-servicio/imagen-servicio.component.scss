@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  justify-self: center;
+  width: min(560px, calc(100% - 32px));
+  margin: 40px auto 0;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 2px solid #ececed;
+}
+
+img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
+}
