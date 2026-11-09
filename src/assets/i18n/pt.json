@@ -138,7 +138,7 @@
         "POPUPS": {
             "CITAS": {
                 "EYEBROW": "Área clínica",
-                "SUBTITLE": "Consulte e gerencie os agendamentos do paciente.",
+                "SUBTITLE": "Consulte os agendamentos do paciente.",
                 "LOADING": "Carregando agendamentos...",
                 "LOAD_ERROR": "Não foi possível carregar os agendamentos. Verifique a conexão e tente novamente.",
                 "EMPTY": "Não há agendamentos disponíveis",
@@ -259,7 +259,7 @@
         "CREAR": "Adicionar paciente",
         "EYEBROW": "Área médica",
         "TITULO": "Selecione um paciente",
-        "DESCRIPCION": "Pesquise e selecione um paciente para criar um agendamento com você.",
+        "DESCRIPCION": "Pesquise e selecione um paciente para consultar seus agendamentos.",
         "DESCRIPCION_ADMIN": "Pesquise um paciente para consultar, criar ou alterar seus agendamentos.",
         "ERROR": "Não foi possível carregar os pacientes ou sua sessão. Verifique a conexão e tente novamente.",
         "VACIO": "Nenhum paciente encontrado.",
@@ -311,7 +311,7 @@
         "SERVICIO_DESCONOCIDO": "Serviço indisponível"
     },
     "VACACIONES": {
-        "TITULO": "Férias do profissional",
+        "TITULO": "Minhas férias",
         "DESCRIPCION": "Informe o período de férias. Apenas dias úteis são afetados; fins de semana podem estar incluídos.",
         "CARGANDO": "Carregando férias...",
         "ERROR_CARGA": "Não foi possível carregar as férias.",

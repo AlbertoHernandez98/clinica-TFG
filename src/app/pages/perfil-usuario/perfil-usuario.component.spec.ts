@@ -6,6 +6,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { PerfilUsuarioComponent } from './perfil-usuario.component';
 import { MisCitasComponent } from 'src/app/shared/components/popups/mis-citas/mis-citas.component';
+import { VacacionesComponent } from 'src/app/shared/components/popups/vacaciones/vacaciones.component';
 
 describe('PerfilUsuarioComponent', () => {
   let fixture: ComponentFixture<PerfilUsuarioComponent>;
@@ -70,6 +71,34 @@ describe('PerfilUsuarioComponent', () => {
     expect(fixture.nativeElement.textContent).not.toContain('MIS_CITAS.TITULO');
     component.openMisCitas();
     expect(TestBed.inject(MatDialog).open).not.toHaveBeenCalled();
+  });
+
+  [2, 3].forEach(role => {
+    it(`offers only the signed-in user's vacations for role ${role}`, () => {
+      http.expectOne('http://localhost:3000/persona').flush([
+        { idPersona: 7, dni: 'TEST123', nombre: 'Ana', apellidos: 'Pérez', telefono: null, email: null, idRolNativo: role }
+      ]);
+      fixture.detectChanges();
+      const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
+      const button = buttons.find(item => item.textContent?.includes('VACACIONES.TITULO'));
+      expect(button).toBeTruthy();
+      button!.click();
+      expect(TestBed.inject(MatDialog).open).toHaveBeenCalledWith(VacacionesComponent, jasmine.objectContaining({
+        data: { idMedico: 7, nombre: 'Ana Pérez' }
+      }));
+    });
+  });
+
+  [1, 4].forEach(role => {
+    it(`does not offer vacations to role ${role}`, () => {
+      http.expectOne('http://localhost:3000/persona').flush([
+        { idPersona: 7, dni: 'TEST123', nombre: 'Ana', apellidos: 'Pérez', telefono: null, email: null, idRolNativo: role }
+      ]);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.textContent).not.toContain('VACACIONES.TITULO');
+      component.openVacaciones();
+      expect(TestBed.inject(MatDialog).open).not.toHaveBeenCalled();
+    });
   });
 
   it('saves the original DNI and preserves the user role', () => {

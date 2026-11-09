@@ -9,7 +9,6 @@ import { Persona } from '../../../models/persona.interface';
 import { documentValidator, emailValidator, phoneValidator, passwordValidator } from '../../../validators/custom.validators';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { CitasComponent } from '../citas/citas.component';
-import { VacacionesComponent } from '../vacaciones/vacaciones.component';
 
 interface UserDetailData {
   selectedUser?: Persona;
@@ -167,13 +166,6 @@ export class UserDetailComponent implements OnInit {
 
   openCita(user: Persona): void {
     this.matDialog.open(CitasComponent, { data: { selectedUser: user }, width: '500px' });
-  }
-
-  openVacaciones(user: Persona): void {
-    this.matDialog.open(VacacionesComponent, {
-      data: { idMedico: user.idPersona, nombre: `${user.nombre} ${user.apellidos}` },
-      width: '560px', maxWidth: '95vw'
-    });
   }
 
   private finish(message: string): void {

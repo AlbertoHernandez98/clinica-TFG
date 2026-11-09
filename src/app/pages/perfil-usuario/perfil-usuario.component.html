@@ -47,7 +47,7 @@
       <button type="button" class="profile__secondary" (click)="changePassword()" [disabled]="!usuarioEncontrado">
         {{ 'SHARED.POPUPS.CHANGE_PASSWORD.TITLE' | translate }}
       </button>
-      <button type="button" class="profile__secondary" *ngIf="usuarioEncontrado?.idRolNativo === 2" (click)="openVacaciones()">
+      <button type="button" class="profile__secondary" *ngIf="usuarioEncontrado?.idRolNativo === 2 || usuarioEncontrado?.idRolNativo === 3" (click)="openVacaciones()">
         {{ 'VACACIONES.TITULO' | translate }}
       </button>
       <button type="button" class="profile__secondary" *ngIf="usuarioEncontrado?.idRolNativo === 4" (click)="openMisCitas()">

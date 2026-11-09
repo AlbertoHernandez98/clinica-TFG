@@ -13,9 +13,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ## Citas de pacientes
 
-Tras iniciar sesión, el acceso «Citas de pacientes» permite buscar pacientes.
-El médico puede crear citas para sí mismo; administración y recepción pueden
-consultar, crear y modificar citas con cualquier médico. En todos los casos,
+Tras iniciar sesión, «Citas de pacientes» permite buscar pacientes y consultar
+sus citas. La creación, modificación y eliminación se realizan únicamente desde
+«Administrar citas» en el encabezado. El médico puede gestionar citas para sí
+mismo; administración y recepción pueden gestionarlas con cualquier médico. En todos los casos,
 el servidor comprueba los solapamientos y las vacaciones antes de guardar.
 Las citas deben comenzar y terminar dentro del horario de apertura: lunes,
 miércoles y viernes de 16:00 a 20:00; martes y jueves de 09:30 a 13:30.
@@ -28,8 +29,12 @@ consulta únicamente su propia agenda; administración y recepción seleccionan 
 profesional. Se puede crear una cita pulsando un hueco libre de 30 minutos o
 abrir una cita existente para modificarla. El formulario permite elegir otra
 duración y vuelve a comprobar la disponibilidad.
-Desde esta pantalla, administración, médicos y recepción también pueden
+Desde «Citas de pacientes», administración, médicos y recepción también pueden
 añadir pacientes. Médicos y recepción no pueden crear usuarios de otros roles.
+
+Médicos y recepcionistas pueden gestionar sus propias vacaciones únicamente
+desde «Mi perfil». No pueden modificar las vacaciones de otros usuarios; las
+vacaciones de recepción no afectan a la disponibilidad de los médicos.
 
 Al abrir una cita existente, «Abrir historial clínico» muestra las anotaciones
 del paciente y permite vincular una nueva anotación a esa cita. Médicos y

@@ -3,7 +3,7 @@
     <div>
       <p class="admin-users__eyebrow">{{ (data.patientAppointments ? 'PACIENTES.EYEBROW' : 'SHARED.POPUPS.ADMIN_USERS.EYEBROW') | translate }}</p>
       <h2 class="admin-users__title">{{ (data.patientAppointments ? 'PACIENTES.TITULO' : 'SHARED.POPUPS.ADMIN_USERS.TITLE') | translate }}</h2>
-      <p class="admin-users__subtitle">{{ (data.patientAppointments ? (staff?.idRolNativo === 2 ? 'PACIENTES.DESCRIPCION' : 'PACIENTES.DESCRIPCION_ADMIN') : 'SHARED.POPUPS.ADMIN_USERS.SUBTITLE') | translate }}</p>
+      <p class="admin-users__subtitle">{{ (data.patientAppointments ? 'PACIENTES.DESCRIPCION' : 'SHARED.POPUPS.ADMIN_USERS.SUBTITLE') | translate }}</p>
     </div>
     <button type="button" class="admin-users__close" (click)="close()"
       [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">

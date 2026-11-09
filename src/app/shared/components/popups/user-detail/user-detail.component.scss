@@ -14,8 +14,6 @@
 }
 .buttons { display: flex; justify-content: center; }
 .button { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 16px 0; }
-.vacation-button { min-height: 40px; padding: 8px 16px; border: 0; border-radius: 8px; background: $color-primary; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
-.vacation-button:hover { background: #008bbc; }
 .form-column {
   display: grid;
   gap: 4px;

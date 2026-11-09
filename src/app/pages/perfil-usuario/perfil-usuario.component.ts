@@ -92,7 +92,7 @@ export class PerfilUsuarioComponent implements OnInit {
   }
 
   openVacaciones(): void {
-    if (!this.usuarioEncontrado || this.usuarioEncontrado.idRolNativo !== 2) return;
+    if (!this.usuarioEncontrado || ![2, 3].includes(this.usuarioEncontrado.idRolNativo)) return;
     this.matDialog.open(VacacionesComponent, {
       data: { idMedico: this.usuarioEncontrado.idPersona, nombre: `${this.usuarioEncontrado.nombre} ${this.usuarioEncontrado.apellidos}` },
       width: '560px', maxWidth: '95vw'

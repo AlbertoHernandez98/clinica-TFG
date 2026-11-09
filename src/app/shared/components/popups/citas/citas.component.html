@@ -25,10 +25,9 @@
           </svg>
         </span>
         <p>{{ 'SHARED.POPUPS.CITAS.EMPTY' | translate }}</p>
-        <span>{{ 'SHARED.POPUPS.CITAS.EMPTY_HINT' | translate }}</span>
       </div>
       <ng-container *ngIf="!loading && !loadError">
-        <button type="button" class="appointments__item" *ngFor="let user of citasList" (click)="administrarCita(user)">
+        <div class="appointments__item" *ngFor="let user of citasList">
           <span class="appointments__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="5" width="18" height="16" rx="2"></rect>
@@ -39,15 +38,9 @@
             <span class="appointments__item-label">{{ 'SHARED.POPUPS.CITAS.SERVICIO' | translate }} {{ user.idServicio }}</span>
             <span class="appointments__date">{{ user.fechaInicio ? (user.fechaInicio | date:'dd/MM/yyyy HH:mm') : ('PERFIL.NO_DISPONIBLE' | translate) }}</span>
           </span>
-          <span class="appointments__arrow" aria-hidden="true">›</span>
-        </button>
+        </div>
       </ng-container>
     </div>
   </div>
 
-  <footer class="appointments__footer">
-    <button type="button" class="appointments__create" (click)="administrarCita()">
-      <span aria-hidden="true">+</span> {{ 'SHARED.POPUPS.CITAS.CREAR' | translate }}
-    </button>
-  </footer>
 </div>

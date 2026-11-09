@@ -1,9 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConfigService } from '../../../../services/config/config.service';
-import { AdminCitasComponent } from '../admin-citas/admin-citas.component';
-import { AgendaMedicoComponent } from '../agenda-medico/agenda-medico.component';
 
 interface Appointment {
   idCita: number;
@@ -28,7 +26,6 @@ export class CitasComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<CitasComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { selectedUser: { idPersona: number } },
-    public matDialog: MatDialog,
     private http: HttpClient,
     private configService: ConfigService
   ) {}
@@ -50,21 +47,6 @@ export class CitasComponent implements OnInit {
         console.error('Error al cargar las citas:', error);
       }
     });
-  }
-
-  administrarCita(appointment?: Appointment): void {
-    if (!appointment) {
-      const dialog = this.matDialog.open(AgendaMedicoComponent, {
-        data: { selectedUser: this.data.selectedUser }, width: '1200px', maxWidth: '98vw', maxHeight: '95vh'
-      });
-      dialog.afterClosed().subscribe(() => this.chargeList());
-      return;
-    }
-    const dialog = this.matDialog.open(AdminCitasComponent, {
-      data: { selectedUser: this.data.selectedUser, appointment },
-      width: '500px', maxWidth: '95vw'
-    });
-    dialog.afterClosed().subscribe(() => this.chargeList());
   }
 
   close(): void { this.dialogRef.close(); }

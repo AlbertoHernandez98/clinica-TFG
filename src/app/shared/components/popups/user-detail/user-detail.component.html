@@ -19,9 +19,6 @@
           (click)="openCita(selectedUser)"
           label="{{ 'SHARED.POPUPS.CITAS.TITLE' | translate }}"
         ></app-button-base>
-        <button type="button" class="vacation-button" *ngIf="selectedUser.idRolNativo === 2" (click)="openVacaciones(selectedUser)">
-          {{ 'VACACIONES.TITULO' | translate }}
-        </button>
       </div>
     </div>
     <form class="form" action="" [formGroup]="form">

@@ -11,7 +11,6 @@ import { takeUntil } from 'rxjs/operators';
 import { ConfigService } from '../../../../services/config/config.service';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { Persona } from '../../../models/persona.interface';
-import { AgendaMedicoComponent } from '../agenda-medico/agenda-medico.component';
 import { CitasComponent } from '../citas/citas.component';
 
 interface AdminUsersData { patientAppointments?: boolean; }
@@ -109,17 +108,10 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
   public async userDetail(user?: Persona) {
     if (this.data.patientAppointments) {
       if (!user || !this.staff) return;
-      if (this.staff.idRolNativo === 2) {
-        this.matDialog.open(AgendaMedicoComponent, {
-          data: { selectedUser: user },
-          width: '1200px', maxWidth: '98vw', maxHeight: '95vh'
-        });
-      } else {
-        this.matDialog.open(CitasComponent, {
-          data: { selectedUser: user },
-          width: '500px', maxWidth: '95vw'
-        });
-      }
+      this.matDialog.open(CitasComponent, {
+        data: { selectedUser: user },
+        width: '500px', maxWidth: '95vw'
+      });
       return;
     }
     const dialog = this.matDialog.open(UserDetailComponent, {

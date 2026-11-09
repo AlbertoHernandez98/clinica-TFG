@@ -28,26 +28,16 @@
   }
   &__item {
     display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px;
-    border: 0; border-bottom: 1px solid #e7eff2; background: #fff; color: inherit; text-align: left; font: inherit; cursor: pointer;
+    border-bottom: 1px solid #e7eff2; background: #fff; color: inherit;
     &:last-child { border-bottom: 0; }
-    &:hover { background: #eef9fd; }
   }
   &__details { display: grid; flex: 1; min-width: 0; gap: 4px; overflow-wrap: anywhere; }
   &__item-label { font-weight: 700; }
   &__date { color: #647580; font-size: 13px; }
-  &__arrow { color: #61818f; font-size: 26px; line-height: 1; }
-  &__footer { display: flex; justify-content: flex-end; padding-top: 20px; }
-  &__create {
-    display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 18px;
-    border: 0; border-radius: 8px; background: $color-primary; color: #fff; font: inherit; font-weight: 700; cursor: pointer;
-    span { font-size: 22px; line-height: 1; }
-    &:hover { background: #008bbc; }
-  }
   button:focus-visible { outline: 2px solid #087ba2; outline-offset: 2px; }
 }
 @media (max-width: 480px) {
   .appointments {
     &__title { font-size: 21px; }
-    &__footer, &__create { width: 100%; }
   }
 }

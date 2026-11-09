@@ -4,7 +4,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { AdminUsersComponent } from './admin-users.component';
-import { AgendaMedicoComponent } from '../agenda-medico/agenda-medico.component';
 import { CitasComponent } from '../citas/citas.component';
 import { UserDetailComponent } from '../user-detail/user-detail.component';
 import { of } from 'rxjs';
@@ -43,12 +42,12 @@ describe('Patient appointment selection', () => {
     fixture.detectChanges();
   }
 
-  it('only lists patients and opens the interactive agenda for the doctor', () => {
+  it('only lists patients and opens the read-only appointment list for the doctor', () => {
     load(2);
     expect(fixture.nativeElement.querySelectorAll('.admin-users__user').length).toBe(1);
     expect(fixture.nativeElement.querySelector('.admin-users__create')).not.toBeNull();
     fixture.nativeElement.querySelector('.admin-users__user').click();
-    expect(dialog.open).toHaveBeenCalledWith(AgendaMedicoComponent, jasmine.objectContaining({
+    expect(dialog.open).toHaveBeenCalledWith(CitasComponent, jasmine.objectContaining({
       data: { selectedUser: patient }
     }));
   });

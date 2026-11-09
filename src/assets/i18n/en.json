@@ -138,7 +138,7 @@
         "POPUPS": {
             "CITAS": {
                 "EYEBROW": "Clinical area",
-                "SUBTITLE": "View and manage the patient's appointments.",
+                "SUBTITLE": "View the patient's appointments.",
                 "LOADING": "Loading appointments...",
                 "LOAD_ERROR": "Could not load appointments. Check your connection and try again.",
                 "EMPTY": "No appointments available",
@@ -259,7 +259,7 @@
         "CREAR": "Add patient",
         "EYEBROW": "Medical area",
         "TITULO": "Select a patient",
-        "DESCRIPCION": "Find and select a patient to create an appointment with you.",
+        "DESCRIPCION": "Find and select a patient to view their appointments.",
         "DESCRIPCION_ADMIN": "Find a patient to view, create or edit their appointments.",
         "ERROR": "Could not load patients or your session. Check your connection and try again.",
         "VACIO": "No patients found.",
@@ -311,7 +311,7 @@
         "SERVICIO_DESCONOCIDO": "Service unavailable"
     },
     "VACACIONES": {
-        "TITULO": "Practitioner holidays",
+        "TITULO": "My holidays",
         "DESCRIPCION": "Enter the holiday period. Only weekdays are affected; weekends may be included.",
         "CARGANDO": "Loading holidays...",
         "ERROR_CARGA": "Could not load holidays.",

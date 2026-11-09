@@ -165,7 +165,7 @@
       },
       "CITAS": {
         "EYEBROW": "Área clínica",
-        "SUBTITLE": "Consulta y gestiona las citas del paciente.",
+        "SUBTITLE": "Consulta las citas del paciente.",
         "LOADING": "Cargando citas...",
         "LOAD_ERROR": "No se han podido cargar las citas. Comprueba la conexión e inténtalo de nuevo.",
         "EMPTY": "No hay citas disponibles",
@@ -290,7 +290,7 @@
     "CREAR": "Añadir paciente",
     "EYEBROW": "Área médica",
     "TITULO": "Selecciona un paciente",
-    "DESCRIPCION": "Busca un paciente y selecciónalo para crear una cita a tu nombre.",
+    "DESCRIPCION": "Busca un paciente y selecciónalo para consultar sus citas.",
     "DESCRIPCION_ADMIN": "Busca un paciente para consultar, crear o modificar sus citas.",
     "ERROR": "No se han podido cargar los pacientes o tu sesión. Comprueba la conexión e inténtalo de nuevo.",
     "VACIO": "No se han encontrado pacientes.",
@@ -342,7 +342,7 @@
     "SERVICIO_DESCONOCIDO": "Servicio no disponible"
   },
   "VACACIONES": {
-    "TITULO": "Vacaciones del médico",
+    "TITULO": "Mis vacaciones",
     "DESCRIPCION": "Indica el periodo de ausencia. Solo se aplicará de lunes a viernes; puedes incluir fines de semana.",
     "CARGANDO": "Cargando vacaciones...",
     "ERROR_CARGA": "No se han podido cargar las vacaciones.",
