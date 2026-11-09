@@ -1,29 +1,53 @@
-<div class="head">
-  <h2 class="header">
-    {{ 'SHARED.POPUPS.CITAS.LISTA' | translate }}
-  </h2>
-  <i (click)="close()" class="close">
-    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
-  </i>
-</div>
-
-<div class="container">
-  <form action="" [formGroup]="form">
-    <div class="form-wrap">
-      <div class="user-list">
-        <div class="list-row-noContent" *ngIf="listaLength">
-          {{ "HISTORIAL.TABLA_VACIA" | translate }}
-        </div>
-        <div class="users" *ngFor="let user of citasList" (click)="administrarCita(user)">
-          <p id="lista">{{user.idServicio}} {{fechaFormateada}}</p>
-        </div>
-      </div>
+<div class="appointments">
+  <header class="appointments__header">
+    <div>
+      <p class="appointments__eyebrow">{{ 'SHARED.POPUPS.CITAS.EYEBROW' | translate }}</p>
+      <h2 class="appointments__title">{{ 'SHARED.POPUPS.CITAS.LISTA' | translate }}</h2>
+      <p class="appointments__subtitle">{{ 'SHARED.POPUPS.CITAS.SUBTITLE' | translate }}</p>
     </div>
-  </form>
-  <div class="buttons">
-    <app-button-base
-    label="{{ 'SHARED.POPUPS.CITAS.CREAR' | translate }}"
-    (click)="administrarCita()"
-    ></app-button-base>
+    <button type="button" class="appointments__close" (click)="close()"
+      [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+      <img src="assets/icons/svg/icon-close.svg" alt="" />
+    </button>
+  </header>
+
+  <div class="appointments__body">
+    <div class="appointments__list" aria-live="polite">
+      <p class="appointments__state" *ngIf="loading">{{ 'SHARED.POPUPS.CITAS.LOADING' | translate }}</p>
+      <p class="appointments__state appointments__state--error" *ngIf="loadError" role="alert">
+        {{ 'SHARED.POPUPS.CITAS.LOAD_ERROR' | translate }}
+      </p>
+      <div class="appointments__empty" *ngIf="!loading && !loadError && listaLength">
+        <span class="appointments__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+            <path d="M7 3v4M17 3v4M3 10h18"></path>
+          </svg>
+        </span>
+        <p>{{ 'SHARED.POPUPS.CITAS.EMPTY' | translate }}</p>
+        <span>{{ 'SHARED.POPUPS.CITAS.EMPTY_HINT' | translate }}</span>
+      </div>
+      <ng-container *ngIf="!loading && !loadError">
+        <button type="button" class="appointments__item" *ngFor="let user of citasList" (click)="administrarCita(user)">
+          <span class="appointments__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+              <path d="M7 3v4M17 3v4M3 10h18"></path>
+            </svg>
+          </span>
+          <span class="appointments__details">
+            <span class="appointments__item-label">{{ 'SHARED.POPUPS.CITAS.SERVICIO' | translate }} {{ user.idServicio }}</span>
+            <span class="appointments__date">{{ user.fechaInicio ? (user.fechaInicio | date:'dd/MM/yyyy HH:mm') : ('PERFIL.NO_DISPONIBLE' | translate) }}</span>
+          </span>
+          <span class="appointments__arrow" aria-hidden="true">›</span>
+        </button>
+      </ng-container>
+    </div>
   </div>
+
+  <footer class="appointments__footer">
+    <button type="button" class="appointments__create" (click)="administrarCita()">
+      <span aria-hidden="true">+</span> {{ 'SHARED.POPUPS.CITAS.CREAR' | translate }}
+    </button>
+  </footer>
 </div>

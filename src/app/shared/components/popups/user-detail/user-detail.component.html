@@ -1,24 +1,27 @@
 <div class="head">
   <h2 class="header">
-    {{ "SHARED.POPUPS.ADMIN_USERS.TITLE" | translate }}
+    {{ (data.patientOnly ? 'PACIENTES.CREAR' : 'SHARED.POPUPS.ADMIN_USERS.TITLE') | translate }}
   </h2>
-  <i (click)="close()" class="close">
-    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
-  </i>
+  <button type="button" (click)="close()" class="close" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+    <img src="assets/icons/svg/icon-close.svg" alt="" />
+  </button>
 </div>
 
 <div class="container">
   <div class="form-wrap">
-    <div class="buttons" *ngIf="this.modifyUser">
+    <div class="buttons" *ngIf="user as selectedUser">
       <div class="button">
         <app-button-base
-          (click)="openHistorial(user)"
+          (click)="openHistorial(selectedUser)"
           label="{{ 'HISTORIAL.TITULO' | translate }}"
         ></app-button-base>
         <app-button-base
-          (click)="openCita(user)"
+          (click)="openCita(selectedUser)"
           label="{{ 'SHARED.POPUPS.CITAS.TITLE' | translate }}"
         ></app-button-base>
+        <button type="button" class="vacation-button" *ngIf="selectedUser.idRolNativo === 2" (click)="openVacaciones(selectedUser)">
+          {{ 'VACACIONES.TITULO' | translate }}
+        </button>
       </div>
     </div>
     <form class="form" action="" [formGroup]="form">
@@ -68,12 +71,13 @@
 
         <!-- Contraseña -->
         <div class="form-column">
-          <label for="password">Contraseña <span class="required">*</span></label>
+          <label for="password">Contraseña <span class="required" *ngIf="!modifyUser">*</span></label>
           <div class="password">
             <input
               id="password"
               [type]="isHidden ? 'text' : 'password'"
               formControlName="password"
+              [placeholder]="modifyUser ? ('SHARED.POPUPS.ADMIN_USERS.PASSWORD_OPCIONAL' | translate) : ''"
               [class.error]="getTouchedAndError('password')"
             />
             <button
@@ -94,16 +98,10 @@
           </p>
         </div>
 
-        <!-- Email -->
         <div class="form-column">
-          <label for="email">Email <span class="required">*</span></label>
-          <input 
-            id="email"
-            type="email" 
-            formControlName="email"
-            [class.error]="getTouchedAndError('email')"
-            placeholder="usuario@dominio.com"
-          />
+          <label for="email">Email <span class="required" *ngIf="!modifyUser">*</span></label>
+          <input id="email" type="email" formControlName="email" maxlength="254"
+            [class.error]="getTouchedAndError('email')" autocomplete="email" />
           <p class="form-error" *ngIf="getTouchedAndError('email')">
             {{ getErrorMessage('email') }}
           </p>
@@ -126,42 +124,8 @@
           </p>
         </div>
 
-        <!-- Domicilio con Autocomplete -->
-        <div class="form-column">
-          <label for="domicilio">Domicilio <span class="required">*</span></label>
-          <div class="autocomplete-container">
-            <input 
-              id="domicilio"
-              type="text" 
-              [formControl]="domicilioControl"
-              [class.error]="getTouchedAndError('domicilio')"
-              (focus)="showPredictions = true"
-              (blur)="closePredictions()"
-              autocomplete="off"
-            />
-            <div class="loading-spinner" *ngIf="isLoadingPredictions">
-              <span>Buscando...</span>
-            </div>
-            <ul class="predictions-list" *ngIf="showPredictions && filteredPredictions.length > 0">
-              <li 
-                *ngFor="let prediction of filteredPredictions"
-                (mousedown)="onSelectPrediction(prediction)"
-                class="prediction-item"
-              >
-                <div class="prediction-main">{{ prediction.display_name }}</div>
-              </li>
-            </ul>
-            <div class="no-results" *ngIf="showPredictions && filteredPredictions.length === 0 && !isLoadingPredictions">
-              No se encontraron direcciones
-            </div>
-          </div>
-          <p class="form-error" *ngIf="getTouchedAndError('domicilio')">
-            {{ getErrorMessage('domicilio') }}
-          </p>
-        </div>
-
         <!-- Rol -->
-        <div class="form-column">
+        <div class="form-column" *ngIf="!data.patientOnly">
           <label for="rol">Rol <span class="required">*</span></label>
           <select 
             id="rol"
@@ -183,19 +147,21 @@
     <div class="buttons">
       <div class="button" *ngIf="this.modifyUser">
         <app-button-base
+          [disabled]="saving"
           (click)="onDelete()"
           label="{{ 'SHARED.POPUPS.ADMIN_USERS.ELIMINAR' | translate }}"
         ></app-button-base>
         <app-button-base
+          [disabled]="saving"
           (click)="onSubmit()"
           label="{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}"
         ></app-button-base>
       </div>
       <div class="button" *ngIf="!this.modifyUser">
         <app-button-base
-          [disabled]="!this.form.valid"
+          [disabled]="!this.form.valid || saving"
           (click)="onCreate()"
-          label="{{ 'SHARED.POPUPS.ADMIN_USERS.CREAR' | translate }}"
+          label="{{ (data.patientOnly ? 'PACIENTES.CREAR' : 'SHARED.POPUPS.ADMIN_USERS.CREAR') | translate }}"
         ></app-button-base>
       </div>
     </div>

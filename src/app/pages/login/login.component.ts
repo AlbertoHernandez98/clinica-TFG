@@ -8,9 +8,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 interface User {
   dni: string;
   nombre: string;
-  password: string;
   idRolNativo: number;
-  [key: string]: any;
 }
 
 @Component({
@@ -27,6 +25,7 @@ export class LoginComponent {
   ) { }
 
   loginError: boolean = false;
+  apiError = false;
   isHidden!: boolean;
   usuarioEncontrado: User | undefined;
   loginBool = false;
@@ -41,6 +40,14 @@ export class LoginComponent {
   }
 
   login(): void {
+    this.loginError = false;
+    this.apiError = false;
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.loadUsername(this.form.controls.dni.value || '');
   }
 
@@ -48,50 +55,22 @@ export class LoginComponent {
     this.loginError = true;
   }
 
-  private loadUserRol(userLogged: User) {
-    console.log('Usuario a verificar:', userLogged);
-    console.log('Contraseña ingresada:', this.form.controls.password.value);
-    console.log('Contraseña en BD:', userLogged.password);
-    
-    if (userLogged.password === this.form.controls.password.value) {
-      this.loginBool = true;
-      document.cookie = `idRol=${userLogged.idRolNativo}`;
-      document.cookie = `sessionToken=${Math.random()}`;
-      window.location.href = '/access-menu';
-    } else {
-      this.loginFailed();
-      console.error('Contraseñas no coinciden');
-    }
-  }
-
   private loadUsername(dni: string) {
-    const url = this.configService.getApiUrl('/persona');
-
-    this.http.get<User[]>(url).subscribe(
-      (parsedData: User[]) => {
-        console.log('Data:', parsedData);
-        console.log('DNI:', dni);
-        
-        // Handle both arrays and single objects
-        const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
-        this.usuarioEncontrado = dataArray.find((user: User) => user.dni === dni);
-        
-        if (this.usuarioEncontrado) {
-          document.cookie = `user=${this.usuarioEncontrado.dni}`;
-          document.cookie = `nombre=${this.usuarioEncontrado.nombre}`;
-
-          console.log('Usuario encontrado:', this.usuarioEncontrado);
-          console.log('Contraseña:', this.usuarioEncontrado.password);
-
-          this.loadUserRol(this.usuarioEncontrado);
-        } else {
-          this.loginFailed();
-          console.error('Usuario no encontrado con DNI:', dni);
-        }
+    this.http.post<{ access_token: string; user: User }>(this.configService.getApiUrl('/auth/login'), {
+      username: dni, password: this.form.controls.password.value
+    }).subscribe(
+      ({ access_token, user }) => {
+        sessionStorage.setItem('accessToken', access_token);
+        document.cookie = `user=${encodeURIComponent(user.dni)}; path=/; SameSite=Lax`;
+        document.cookie = `nombre=${encodeURIComponent(user.nombre)}; path=/; SameSite=Lax`;
+        document.cookie = `idRol=${user.idRolNativo}; path=/; SameSite=Lax`;
+        document.cookie = 'sessionToken=active; path=/; SameSite=Lax';
+        this.loginBool = true;
+        window.location.href = '/access-menu';
       },
-      (error) => {
-        console.error('Error:', error);
-        this.loginFailed();
+      error => {
+        if (error.status === 401) this.loginFailed();
+        else this.apiError = true;
       }
     );
   }
@@ -99,6 +78,7 @@ export class LoginComponent {
   changesForm() {
     this.form.valueChanges.subscribe((res) => {
       this.loginError = false;
+      this.apiError = false;
     });
   }
 

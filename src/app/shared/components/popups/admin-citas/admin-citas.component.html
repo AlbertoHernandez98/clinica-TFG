@@ -1,55 +1,76 @@
 <div class="head">
-  <h2 class="header">
-    {{ "SHARED.POPUPS.CITAS.TITLE" | translate }}
-  </h2>
-  <i (click)="close()" class="close">
-    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
-  </i>
+  <div>
+    <h2 class="header">{{ 'ADMIN_CITA.TITULO' | translate }}</h2>
+    <p class="subtitle">{{ 'ADMIN_CITA.DESCRIPCION' | translate }}</p>
+    <p class="subtitle">{{ 'ADMIN_CITA.HORARIO' | translate }}</p>
+    <p class="subtitle" *ngIf="data.selectedUser && data.fixedDoctor">{{ 'PACIENTES.SELECCIONADO' | translate }}: {{ data.selectedUser.nombre }} {{ data.selectedUser.apellidos }}</p>
+  </div>
+  <button type="button" (click)="close()" class="close" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+    <img src="assets/icons/svg/icon-close.svg" alt="" />
+  </button>
 </div>
 
 <div class="container">
-  <form class="form" action="" [formGroup]="form">
-    <div class="user-list">
-      <div class="form-column">
-        <p>FECHA INCIO</p>
-        <input type="datetime-local" formControlName="fechaInicio" />
-      </div>
-      <div class="form-column">
-        <p>DURACION</p>
-        <select formControlName="duracion" class="servicio">
-          <option *ngFor="let item of duraciones" [value]="item">
-            {{ item }}
-          </option>
-        </select>
-      </div>
-      <div class="form-column">
-        <p>TIPO DE SERVICIO</p>
-        <select formControlName="idServicio" class="servicio">
-          <option *ngFor="let item of servicios" [value]="item.idServicio">
-            {{ item.servicio }}
-          </option>
-        </select>
-      </div>
-      <div class="form-column">
-        <p>MEDICO</p>
-        <select formControlName="idMedico" class="servicio">
-          <option *ngFor="let item of listaMedicos" [value]="item.idPersona">
-            {{ item.username }}
-          </option>
-        </select>
-      </div>
-    </div>
+  <form class="appointment-form" [formGroup]="form">
+    <label *ngIf="!data.selectedUser">{{ 'ADMIN_CITA.PACIENTE' | translate }}
+      <select [formControl]="patientControl">
+        <option [ngValue]="null">{{ 'ADMIN_CITA.SELECCIONAR_PACIENTE' | translate }}</option>
+        <option *ngFor="let patient of pacientes" [value]="patient.idPersona">{{ patient.nombre }} {{ patient.apellidos }}</option>
+      </select>
+    </label>
+    <label>{{ 'ADMIN_CITA.DIA_HUECOS' | translate }}
+      <input type="date" [formControl]="dateControl" />
+    </label>
+    <label>{{ 'ADMIN_CITA.FECHA' | translate }}
+      <input type="datetime-local" formControlName="fechaInicio" />
+    </label>
+    <label>{{ 'ADMIN_CITA.DURACION' | translate }}
+      <select formControlName="duracion">
+        <option *ngFor="let item of duraciones" [value]="item">{{ item }}</option>
+      </select>
+    </label>
+    <label>{{ 'ADMIN_CITA.SERVICIO' | translate }}
+      <select formControlName="idServicio">
+        <option *ngFor="let item of servicios" [value]="item.idServicio">{{ item.servicio }}</option>
+      </select>
+    </label>
+    <label *ngIf="!data.fixedDoctor">{{ 'ADMIN_CITA.MEDICO' | translate }}
+      <select formControlName="idMedico">
+        <option *ngFor="let item of listaMedicos" [value]="item.idPersona">{{ item.nombre }} {{ item.apellidos }}</option>
+      </select>
+    </label>
+    <label *ngIf="data.fixedDoctor">{{ 'ADMIN_CITA.MEDICO' | translate }}
+      <input type="text" [value]="data.fixedDoctor.nombre + ' ' + data.fixedDoctor.apellidos" readonly />
+    </label>
   </form>
-  <div class="buttons">
-    <div class="button">
-      <app-button-base
-        (click)="onDelete()"
-        label="{{ 'SHARED.POPUPS.ADMIN_USERS.ELIMINAR' | translate }}"
-      ></app-button-base>
-      <app-button-base
-        (click)="onSubmit()"
-        label="{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}"
-      ></app-button-base>
+  <section class="slots" [attr.aria-label]="'ADMIN_CITA.HUECOS' | translate">
+    <h3>{{ 'ADMIN_CITA.HUECOS' | translate }}</h3>
+    <p *ngIf="slotsState === 'idle'">{{ 'ADMIN_CITA.HUECOS_INSTRUCCIONES' | translate }}</p>
+    <p *ngIf="slotsState === 'loading'" role="status">{{ 'ADMIN_CITA.HUECOS_CARGANDO' | translate }}</p>
+    <div *ngIf="slotsState === 'error'" role="alert">
+      <p class="appointment-error">{{ 'ADMIN_CITA.HUECOS_ERROR' | translate }}</p>
+      <button type="button" class="slots__retry" (click)="refreshSlots()">{{ 'ADMIN_CITA.HUECOS_REINTENTAR' | translate }}</button>
     </div>
+    <p *ngIf="slotsState === 'ready' && !slots.length">{{ 'ADMIN_CITA.HUECOS_VACIO' | translate }}</p>
+    <div *ngIf="slotsState === 'ready' && slots.length" class="slots__list">
+      <button type="button" *ngFor="let slot of slots" (click)="selectSlot(slot)"
+        [attr.aria-pressed]="form.controls.fechaInicio.value?.slice(11, 16) === slot">{{ slot }}</button>
+    </div>
+    <p class="slots__note">{{ 'ADMIN_CITA.HUECOS_NOTA' | translate }}</p>
+  </section>
+  <p class="appointment-error" role="alert" *ngIf="loadError">{{ 'ADMIN_CITA.ERROR_CARGA' | translate }}</p>
+  <p class="appointment-error" role="alert" *ngIf="errorKey">{{ errorKey | translate }}</p>
+  <p class="appointment-status" role="status" *ngIf="availability === 'checking'">{{ 'ADMIN_CITA.COMPROBANDO' | translate }}</p>
+  <p class="appointment-status" role="status" *ngIf="availability === 'available'">{{ 'ADMIN_CITA.DISPONIBLE' | translate }}</p>
+  <p class="appointment-error" role="alert" *ngIf="availability === 'unavailable'">{{ 'ADMIN_CITA.NO_DISPONIBLE' | translate }}</p>
+  <p class="appointment-error" role="alert" *ngIf="availability === 'outside'">{{ 'ADMIN_CITA.FUERA_HORARIO' | translate }}</p>
+  <p class="appointment-error" role="alert" *ngIf="availability === 'error'">{{ 'ADMIN_CITA.ERROR_DISPONIBILIDAD' | translate }}</p>
+  <div class="actions">
+    <a *ngIf="data.appointment && data.appointment.idCliente" class="history-link"
+      [href]="'/historial;dato=' + data.appointment.idCliente + '?cita=' + data.appointment.idCita">
+      {{ 'HISTORIAL.ABRIR_DESDE_CITA' | translate }}
+    </a>
+    <button type="button" class="delete" *ngIf="data.appointment" [disabled]="saving" (click)="onDelete()">{{ 'ADMIN_CITA.ELIMINAR' | translate }}</button>
+    <button type="button" class="save" [disabled]="saving || loadError || availability === 'checking' || availability === 'unavailable' || availability === 'outside' || availability === 'error'" (click)="onSubmit()">{{ 'SHARED.POPUPS.CHANGE_PASSWORD.ACEPTAR' | translate }}</button>
   </div>
 </div>

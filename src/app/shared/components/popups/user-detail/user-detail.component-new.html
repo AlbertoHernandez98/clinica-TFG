@@ -122,39 +122,6 @@
           </p>
         </div>
 
-        <!-- Domicilio con Autocomplete -->
-        <div class="form-column">
-          <label for="domicilio">Domicilio <span class="required">*</span></label>
-          <div class="autocomplete-container">
-            <input 
-              id="domicilio"
-              type="text" 
-              [formControl]="domicilioControl"
-              [class.error]="getTouchedAndError('domicilio')"
-              autocomplete="off"
-            />
-            <div class="loading-spinner" *ngIf="isLoadingPredictions">
-              <span>Buscando...</span>
-            </div>
-            <ul class="predictions-list" *ngIf="showPredictions && filteredPredictions.length > 0">
-              <li 
-                *ngFor="let prediction of filteredPredictions"
-                (mousedown)="onSelectPrediction(prediction)"
-                class="prediction-item"
-              >
-                <div class="prediction-main">{{ prediction.main_text }}</div>
-                <div class="prediction-secondary">{{ prediction.secondary_text }}</div>
-              </li>
-            </ul>
-            <div class="no-results" *ngIf="showPredictions && filteredPredictions.length === 0 && !isLoadingPredictions">
-              No se encontraron direcciones
-            </div>
-          </div>
-          <p class="form-error" *ngIf="getTouchedAndError('domicilio')">
-            {{ getErrorMessage('domicilio') }}
-          </p>
-        </div>
-
         <!-- Rol -->
         <div class="form-column">
           <label for="rol">Rol <span class="required">*</span></label>

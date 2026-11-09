@@ -1,7 +1,7 @@
 <div class="page">
     <div class="page__container">
       <mat-dialog-content class="page__container__content">
-        <img src="{{ data.icon }}" width="20px" />
+        <img *ngIf="data.icon" [src]="data.icon" width="36" alt="" />
         <h3>{{ data.text }}</h3>
         <app-button-base
           label="{{ data.buttonLabel }}"

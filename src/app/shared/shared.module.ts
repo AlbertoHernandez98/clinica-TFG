@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -25,6 +25,9 @@ import { AdminUsersComponent } from './components/popups/admin-users/admin-users
 import { UserDetailComponent } from './components/popups/user-detail/user-detail.component';
 import { CitasComponent } from './components/popups/citas/citas.component';
 import { AdminCitasComponent } from './components/popups/admin-citas/admin-citas.component';
+import { VacacionesComponent } from './components/popups/vacaciones/vacaciones.component';
+import { AgendaMedicoComponent } from './components/popups/agenda-medico/agenda-medico.component';
+import { MisCitasComponent } from './components/popups/mis-citas/mis-citas.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -49,12 +52,14 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         AdminUsersComponent,
         UserDetailComponent,
         CitasComponent,
-        AdminCitasComponent
+        AdminCitasComponent,
+        VacacionesComponent,
+        AgendaMedicoComponent,
+        MisCitasComponent
     ],
     imports: [
         CommonModule,
         FormsModule,
-        HttpClientModule,
         ReactiveFormsModule,
         MatDialogModule,
         MatProgressSpinnerModule,

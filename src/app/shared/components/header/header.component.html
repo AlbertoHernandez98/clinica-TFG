@@ -63,6 +63,14 @@
                 <a>{{ 'SHARED.HEADER.ADMIN' | translate }}</a>
             </button>
 
+            <button type="button" (click)="openPatientAppointments()" *ngIf="isAdmin || isDoctor || isReceptionist" class="dropbtn">
+                {{ 'PACIENTES.ACCESO' | translate }}
+            </button>
+
+            <button type="button" (click)="openAgenda()" *ngIf="isAdmin || isDoctor || isReceptionist" class="dropbtn">
+                {{ 'AGENDA.ADMINISTRAR' | translate }}
+            </button>
+
             <button *ngIf="isLogged" (click)="redirectToProfile()" class="dropbtn">
                 <a>{{ 'SHARED.HEADER.PERFIL' | translate }}</a>
             </button>

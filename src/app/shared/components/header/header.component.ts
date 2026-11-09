@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LangService } from 'src/app/services/lang/lang';
 import { AdminUsersComponent } from '../popups/admin-users/admin-users.component';
 import { MatDialog } from '@angular/material/dialog';
+import { AgendaMedicoComponent } from '../popups/agenda-medico/agenda-medico.component';
 
 @Component({
   selector: 'app-header',
@@ -16,6 +17,8 @@ export class HeaderComponent implements OnInit {
   idioma: string = 'es';
   isLogged = false;
   isAdmin = false;
+  isDoctor = false;
+  isReceptionist = false;
 
   constructor(
     private translate: TranslateService,
@@ -29,23 +32,25 @@ export class HeaderComponent implements OnInit {
   }
 
   logFunctions() {
-    if (document.cookie) {
+    if (sessionStorage.getItem('accessToken')) {
       this.isLogged = true;
     } else {
       this.isLogged = false;
     }
     const str = document.cookie;
 
-    const match: any = str.match(/idRol=(.*?);/);
+    const match = str.match(/(?:^|;\s*)idRol=([^;]*)/);
     
     if (match) {
       const idRolValue = match[1].trim();
 
-      if(idRolValue == 1) {
-        this.isAdmin = true;
-      }
+      this.isAdmin = this.isLogged && idRolValue === '1';
+      this.isDoctor = this.isLogged && idRolValue === '2';
+      this.isReceptionist = this.isLogged && idRolValue === '3';
     } else {
       this.isAdmin = false;
+      this.isDoctor = false;
+      this.isReceptionist = false;
     }
   }
 
@@ -62,8 +67,20 @@ export class HeaderComponent implements OnInit {
     });
   }
 
+  public openPatientAppointments(): void {
+    this.matDialog.open(AdminUsersComponent, {
+      data: { patientAppointments: true },
+      width: '600px',
+      maxWidth: '95vw'
+    });
+  }
+
+  public openAgenda(): void {
+    this.matDialog.open(AgendaMedicoComponent, { width: '1200px', maxWidth: '98vw', maxHeight: '95vh' });
+  }
 
   public logout(): void {
+    sessionStorage.removeItem('accessToken');
     // Delete sessionToken cookie
     document.cookie = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     var cookies = document.cookie.split(";");

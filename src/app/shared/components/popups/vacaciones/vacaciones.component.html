@@ -1,0 +1,27 @@
+<div class="head">
+  <div>
+    <h2 class="header">{{ 'VACACIONES.TITULO' | translate }}</h2>
+    <p class="subtitle">{{ data.nombre }}</p>
+    <p class="subtitle">{{ 'VACACIONES.DESCRIPCION' | translate }}</p>
+  </div>
+  <button type="button" class="close" (click)="dialogRef.close()" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+    <img src="assets/icons/svg/icon-close.svg" alt="" />
+  </button>
+</div>
+<div class="container">
+  <p *ngIf="loading" role="status">{{ 'VACACIONES.CARGANDO' | translate }}</p>
+  <p class="error" *ngIf="errorKey" role="alert">{{ errorKey | translate }}</p>
+  <p class="warning" *ngIf="warningCount" role="alert">{{ 'VACACIONES.AVISO_CITAS' | translate:{ count: warningCount } }}</p>
+  <p *ngIf="!loading && !errorKey && !holidays.length">{{ 'VACACIONES.VACIO' | translate }}</p>
+  <ul *ngIf="holidays.length">
+    <li *ngFor="let holiday of holidays">
+      <span>{{ holiday.fechaInicio }} — {{ holiday.fechaFin }}</span>
+      <button type="button" class="remove" [disabled]="saving" (click)="remove(holiday)">{{ 'VACACIONES.ELIMINAR' | translate }}</button>
+    </li>
+  </ul>
+  <form [formGroup]="form" (ngSubmit)="add()">
+    <label>{{ 'VACACIONES.INICIO' | translate }}<input type="date" formControlName="fechaInicio" /></label>
+    <label>{{ 'VACACIONES.FIN' | translate }}<input type="date" formControlName="fechaFin" /></label>
+    <button class="save" type="submit" [disabled]="saving || loading">{{ 'VACACIONES.ANADIR' | translate }}</button>
+  </form>
+</div>

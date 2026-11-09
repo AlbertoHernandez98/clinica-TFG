@@ -1,0 +1,92 @@
+<div class="agenda">
+  <header class="head">
+    <div>
+      <h2 class="header">{{ 'AGENDA.ADMINISTRAR' | translate }}</h2>
+      <p class="agenda__subtitle">{{ 'AGENDA.INTERACTIVA' | translate }}</p>
+    </div>
+    <button type="button" class="close" (click)="dialogRef.close()" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+      <img src="assets/icons/svg/icon-close.svg" alt="" />
+    </button>
+  </header>
+
+  <div class="agenda__doctor" *ngIf="staff">
+    <label *ngIf="staff.idRolNativo !== 2">
+      {{ 'AGENDA.PROFESIONAL' | translate }}
+      <select [(ngModel)]="selectedDoctor" (ngModelChange)="changeDoctor()">
+        <option *ngFor="let doctor of doctors" [ngValue]="doctor.idPersona">{{ doctor.nombre }} {{ doctor.apellidos }}</option>
+      </select>
+    </label>
+    <p *ngIf="staff.idRolNativo === 2">{{ 'AGENDA.PROFESIONAL' | translate }}: {{ staff.nombre }} {{ staff.apellidos }}</p>
+    <p *ngIf="!doctors.length" role="status">{{ 'AGENDA.SIN_MEDICOS' | translate }}</p>
+  </div>
+
+  <nav class="agenda__navigation" [attr.aria-label]="'AGENDA.NAVEGACION' | translate">
+    <button type="button" (click)="changeWeek(-1)">‹ {{ 'AGENDA.ANTERIOR' | translate }}</button>
+    <button type="button" (click)="today()">{{ 'AGENDA.HOY' | translate }}</button>
+    <button type="button" (click)="changeWeek(1)">{{ 'AGENDA.SIGUIENTE' | translate }} ›</button>
+    <strong class="agenda__period" aria-live="polite">{{ weekLabel }}</strong>
+  </nav>
+
+  <p *ngIf="loading" role="status">{{ 'AGENDA.CARGANDO' | translate }}</p>
+  <div *ngIf="error" class="agenda__error" role="alert">
+    {{ 'AGENDA.ERROR' | translate }}
+    <button type="button" (click)="retry()">{{ 'AGENDA.REINTENTAR' | translate }}</button>
+  </div>
+  <ng-container *ngIf="!loading && !error">
+    <p *ngIf="withoutDate" class="agenda__notice" role="status">
+      {{ 'AGENDA.SIN_FECHA' | translate:{ count: withoutDate } }}
+    </p>
+    <div class="agenda__scroll" tabindex="0" [attr.aria-label]="'AGENDA.TITULO' | translate">
+      <table class="agenda__table">
+        <thead>
+          <tr>
+            <th scope="col">{{ 'AGENDA.HORA' | translate }}</th>
+            <th scope="col" *ngFor="let day of days" [class.agenda__holiday]="day.holiday">
+              {{ day.label }}
+              <span *ngIf="day.holiday" class="agenda__holiday-label">{{ 'AGENDA.VACACIONES' | translate }}</span>
+              <span *ngIf="day.closed" class="agenda__holiday-label">{{ 'AGENDA.CERRADO' | translate }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="days.length">
+            <th scope="row">{{ 'AGENDA.OTRAS' | translate }}</th>
+            <td *ngFor="let day of days" [class.agenda__holiday]="day.holiday">
+              <button type="button" class="agenda__appointment" *ngFor="let appointment of day.noTime" (click)="editAppointment(appointment)" [disabled]="appointment.idCliente === null || appointment.idServicio === null">
+                <strong>{{ appointment.nombre || ('AGENDA.PACIENTE_DESCONOCIDO' | translate) }} {{ appointment.apellidos }}</strong>
+                <span>{{ appointment.servicio || ('AGENDA.SERVICIO_DESCONOCIDO' | translate) }}</span>
+                <span>{{ 'AGENDA.SIN_HORA' | translate }}</span>
+              </button>
+              <button type="button" class="agenda__appointment" *ngFor="let appointment of day.outside" (click)="editAppointment(appointment)" [disabled]="appointment.idCliente === null || appointment.idServicio === null">
+                <strong>{{ appointment.nombre || ('AGENDA.PACIENTE_DESCONOCIDO' | translate) }} {{ appointment.apellidos }}</strong>
+                <span>{{ appointment.servicio || ('AGENDA.SERVICIO_DESCONOCIDO' | translate) }}</span>
+                <span>{{ 'AGENDA.FUERA_HORARIO' | translate }}: {{ appointment.fechaInicio?.slice(11, 16) }}</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngFor="let hour of hours; let i = index">
+            <th scope="row">{{ hour }}</th>
+            <td *ngFor="let day of days" [class.agenda__holiday]="day.holiday" [class.agenda__closed]="!isOpen(day, i)">
+              <button type="button" class="agenda__appointment" *ngFor="let event of day.hours[i]" (click)="editAppointment(event.appointment)"
+                [disabled]="event.appointment.idCliente === null || event.appointment.idServicio === null">
+                <strong>{{ event.appointment.nombre || ('AGENDA.PACIENTE_DESCONOCIDO' | translate) }} {{ event.appointment.apellidos }}</strong>
+                <span>{{ event.appointment.servicio || ('AGENDA.SERVICIO_DESCONOCIDO' | translate) }}</span>
+                <span *ngIf="!event.continued">{{ event.time }}</span>
+                <span *ngIf="event.continued">{{ 'AGENDA.CONTINUA' | translate }} {{ event.time }}</span>
+                <span *ngIf="event.appointment.duracion !== null">{{ 'AGENDA.DURACION' | translate:{ minutes: event.appointment.duracion } }}</span>
+                <span *ngIf="event.appointment.duracion === null">{{ 'AGENDA.DURACION_DESCONOCIDA' | translate }}</span>
+              </button>
+              <button type="button" class="agenda__free" *ngIf="isOpen(day, i) && !day.holiday && day.slots.includes(hour) && !day.hours[i].length"
+                (click)="createAppointment(day, hour)" [attr.aria-label]="('AGENDA.CREAR_HORA' | translate) + ' ' + day.label + ' ' + hour">
+                {{ 'AGENDA.LIBRE' | translate }}
+              </button>
+              <span class="agenda__unavailable" *ngIf="isOpen(day, i) && !day.holiday && !day.slots.includes(hour) && !day.hours[i].length">
+                {{ 'AGENDA.NO_DISPONIBLE' | translate }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</div>

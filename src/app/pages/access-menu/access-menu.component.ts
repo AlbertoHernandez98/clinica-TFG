@@ -21,6 +21,7 @@ export class AccessMenuComponent implements OnInit{
   }
 
   logout(): void {
+    sessionStorage.removeItem('accessToken');
     // Delete sessionToken cookie
     document.cookie = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 

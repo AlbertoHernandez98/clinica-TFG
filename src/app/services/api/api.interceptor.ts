@@ -25,7 +25,10 @@ export class ApiInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    
+    const token = sessionStorage.getItem('accessToken');
+    if (token && request.url.startsWith(`${this.configService.getApiBaseUrl()}/`)) {
+      request = request.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+    }
     // Don't intercept external URLs, assets, or i18n translation files
     if (request.url.startsWith('http') || request.url.includes('assets/') || request.url.includes('i18n/')) {
       return next.handle(request);

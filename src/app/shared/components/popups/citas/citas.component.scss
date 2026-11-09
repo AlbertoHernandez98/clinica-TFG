@@ -1,57 +1,53 @@
 @import "src/assets/theme/_variables.scss";
 
-* {
-    font-family: Karla;
- }
-.head{
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 30px;
+:host { display: block; color: #233747; font-family: Karla, Arial, sans-serif; }
+
+.appointments {
+  &__header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding-bottom: 22px; border-bottom: 1px solid #e5eef2; }
+  &__eyebrow { margin: 0 0 5px; color: #087ba2; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  &__title { margin: 0; font-size: 24px; line-height: 1.25; }
+  &__subtitle { margin: 7px 0 0; color: #647580; font-size: 14px; line-height: 1.5; }
+  &__close {
+    display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px;
+    padding: 0; border: 0; border-radius: 50%; background: #f1f6f8; cursor: pointer;
+    img { width: 12px; height: 12px; }
+    &:hover { background: #e3f1f6; }
+  }
+  &__body { padding-top: 22px; }
+  &__list { max-height: 300px; overflow-y: auto; border: 1px solid #e0eaee; border-radius: 10px; background: #f8fbfc; }
+  &__state { margin: 0; padding: 28px 16px; color: #647580; font-size: 14px; text-align: center; &--error { color: #a63c3c; } }
+  &__empty {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 30px 20px;
+    color: #647580; font-size: 14px; line-height: 1.5; text-align: center;
+    p { margin: 4px 0 0; color: #233747; font-size: 16px; font-weight: 700; }
+  }
+  &__icon {
+    display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px;
+    border-radius: 12px; background: #e1f5fc; color: #087ba2;
+    svg { width: 21px; height: 21px; }
+  }
+  &__item {
+    display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px;
+    border: 0; border-bottom: 1px solid #e7eff2; background: #fff; color: inherit; text-align: left; font: inherit; cursor: pointer;
+    &:last-child { border-bottom: 0; }
+    &:hover { background: #eef9fd; }
+  }
+  &__details { display: grid; flex: 1; min-width: 0; gap: 4px; overflow-wrap: anywhere; }
+  &__item-label { font-weight: 700; }
+  &__date { color: #647580; font-size: 13px; }
+  &__arrow { color: #61818f; font-size: 26px; line-height: 1; }
+  &__footer { display: flex; justify-content: flex-end; padding-top: 20px; }
+  &__create {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 18px;
+    border: 0; border-radius: 8px; background: $color-primary; color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+    span { font-size: 22px; line-height: 1; }
+    &:hover { background: #008bbc; }
+  }
+  button:focus-visible { outline: 2px solid #087ba2; outline-offset: 2px; }
 }
-.heeader {
-    opacity: 0.6;
-    font-size: 12px;
-    line-height: 18px;
-    font-weight: 700;
-    letter-spacing: 2px;
-}
- .list-header{
-    display: flex;
-    p{
-        flex:1;
-    }
- }
-
- .form-wrap{
-    display: grid;
-    gap: 10px;
- }
-
- .user-list{
-    max-height: 300px;
-    overflow-y: auto;
-    border-radius: 5px;
-    display: grid;
-    border: 1px solid #ccc;
-    justify-items: center;
- }
-
-
-.users{
-    display: flex;
-    gap: 30px;
-    
-    p{
-        flex: 1;
-    }
-}
-
-.buttons{
-    display: flex;
-    padding-top: 20px;
-    justify-content: center;
-}
-
-#lista:hover{
-    cursor: pointer;
+@media (max-width: 480px) {
+  .appointments {
+    &__title { font-size: 21px; }
+    &__footer, &__create { width: 100%; }
+  }
 }

@@ -1,8 +1,8 @@
 <div class="page">
     <div class="page__container">
-      <i (click)="close()" class="page__container__close">
-        <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
-      </i>
+      <button type="button" (click)="close()" class="page__container__close" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+        <img src="assets/icons/svg/icon-close.svg" alt="" />
+      </button>
       <div class="page__container__content">
         <h1>{{ data.title }}</h1>
         <mat-dialog-content

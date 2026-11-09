@@ -1,0 +1,9 @@
+@import "src/assets/theme/dialog";
+
+.subtitle { margin: 8px 0 0; color: #647580; line-height: 1.5; }
+.empty { padding: 24px; text-align: center; color: #647580; background: #f8fbfc; border-radius: 10px; }
+.error { color: #a63c3c; }
+.retry { border: 1px solid #cfe0e7; border-radius: 8px; background: #fff; color: #087ba2; font-weight: 700; padding: 9px 13px; cursor: pointer; }
+.list { display: grid; gap: 10px; max-height: 50vh; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+.list li { display: grid; gap: 5px; padding: 15px; border: 1px solid #e0eaee; border-left: 4px solid #01abe6; border-radius: 8px; background: #f8fbfc; }
+.list span { color: #647580; font-size: 14px; }

@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  color: #233747;
+  font-family: Karla, Arial, sans-serif;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5eef2;
+}
+
+.header {
+  margin: 0;
+  color: #233747;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f6f8;
+  cursor: pointer;
+  img { width: 12px; height: 12px; }
+  &:hover { background: #e3f1f6; }
+}
+
+.container { margin-top: 22px; }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid #087ba2;
+  outline-offset: 2px;
+}

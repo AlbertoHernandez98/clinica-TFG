@@ -1,0 +1,31 @@
+<div class="my-appointments">
+  <header class="head">
+    <div>
+      <h2 class="header">{{ 'MIS_CITAS.TITULO' | translate }}</h2>
+      <p class="subtitle">{{ 'MIS_CITAS.DESCRIPCION' | translate }}</p>
+    </div>
+    <button type="button" class="close" (click)="dialogRef.close()" [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+      <img src="assets/icons/svg/icon-close.svg" alt="" />
+    </button>
+  </header>
+  <div class="container" aria-live="polite">
+    <p *ngIf="loading" role="status">{{ 'MIS_CITAS.CARGANDO' | translate }}</p>
+    <div *ngIf="error" class="error" role="alert">
+      <p>{{ 'MIS_CITAS.ERROR' | translate }}</p>
+      <button type="button" class="retry" (click)="load()">{{ 'MIS_CITAS.REINTENTAR' | translate }}</button>
+    </div>
+    <p *ngIf="!loading && !error && !appointments.length" class="empty">{{ 'MIS_CITAS.VACIO' | translate }}</p>
+    <ul *ngIf="!loading && !error && appointments.length" class="list">
+      <li *ngFor="let appointment of appointments">
+        <strong>{{ appointment.servicio || ('MIS_CITAS.SERVICIO_DESCONOCIDO' | translate) }}</strong>
+        <span>{{ appointment.fecha ? (appointment.fecha | date:'dd/MM/yyyy') : ('MIS_CITAS.FECHA_DESCONOCIDA' | translate) }}
+          · {{ appointment.hora || ('MIS_CITAS.HORA_DESCONOCIDA' | translate) }}</span>
+        <span>{{ 'MIS_CITAS.PROFESIONAL' | translate }}:
+          <ng-container *ngIf="appointment.medicoNombre; else unknownDoctor">{{ appointment.medicoNombre }} {{ appointment.medicoApellidos }}</ng-container>
+          <ng-template #unknownDoctor>{{ 'MIS_CITAS.PROFESIONAL_DESCONOCIDO' | translate }}</ng-template>
+        </span>
+        <span>{{ appointment.duracion !== null ? ('MIS_CITAS.DURACION' | translate:{ minutes: appointment.duracion }) : ('MIS_CITAS.DURACION_DESCONOCIDA' | translate) }}</span>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+@import "src/assets/theme/_variables.scss";
+@import "src/assets/theme/dialog";
+
+.subtitle { margin: 8px 0 0; color: #647580; font-size: 14px; line-height: 1.5; }
+.error { color: #a63c3c; }
+.warning { padding: 12px; border-radius: 8px; background: #fff5dc; color: #704b00; }
+ul { max-height: 200px; overflow-y: auto; margin: 0 0 20px; padding: 0; list-style: none; }
+li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border-bottom: 1px solid #e0eaee; }
+form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+label { display: grid; gap: 8px; font-size: 13px; font-weight: 700; }
+input { box-sizing: border-box; width: 100%; min-width: 0; padding: 10px; border: 1px solid #cbd9df; border-radius: 8px; font: inherit; }
+.save, .remove { min-height: 40px; padding: 8px 16px; border: 0; border-radius: 8px; font: inherit; font-weight: 700; cursor: pointer; }
+.save { grid-column: 1 / -1; justify-self: end; background: $color-primary; color: #fff; }
+.remove { background: #fff2f2; color: #a63c3c; }
+@media (max-width: 480px) { form { grid-template-columns: 1fr; } }

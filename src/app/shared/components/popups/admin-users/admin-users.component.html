@@ -1,34 +1,45 @@
-
-<div class="head">
-  <h2 class="header">
-    {{ 'SHARED.POPUPS.ADMIN_USERS.TITLE' | translate }}
-  </h2>
-  <i (click)="close()" class="close" style="cursor: pointer;">
-    <img src="../../../assets/icons/svg/icon-close.svg" alt="" />
-  </i>
-</div>
-
-<div class="container">
-  <form action="" [formGroup]="form">
-    <div class="form-wrap">
-      <div class="list-header">
-          <app-input-text
-          id="filtro"
-          formControlName="nombre"
-          label="{{ 'SHARED.POPUPS.ADMIN_USERS.NOMBRE' | translate }}"
-          ></app-input-text>
-      </div>
-      <div class="user-list">
-        <div class="users" *ngFor="let user of userList" (click)="userDetail(user)">
-          <p id="lista">{{user.username.toUpperCase()}}</p>
-        </div>
-      </div>
+<div class="admin-users">
+  <header class="admin-users__header">
+    <div>
+      <p class="admin-users__eyebrow">{{ (data.patientAppointments ? 'PACIENTES.EYEBROW' : 'SHARED.POPUPS.ADMIN_USERS.EYEBROW') | translate }}</p>
+      <h2 class="admin-users__title">{{ (data.patientAppointments ? 'PACIENTES.TITULO' : 'SHARED.POPUPS.ADMIN_USERS.TITLE') | translate }}</h2>
+      <p class="admin-users__subtitle">{{ (data.patientAppointments ? (staff?.idRolNativo === 2 ? 'PACIENTES.DESCRIPCION' : 'PACIENTES.DESCRIPCION_ADMIN') : 'SHARED.POPUPS.ADMIN_USERS.SUBTITLE') | translate }}</p>
     </div>
-  </form>
-  <div class="buttons">
-    <app-button-base
-    label="{{ 'SHARED.POPUPS.ADMIN_USERS.CREAR' | translate }}"
-    (click)="userDetail()"
-    ></app-button-base>
+    <button type="button" class="admin-users__close" (click)="close()"
+      [attr.aria-label]="'SHARED.POPUPS.CHANGE_PASSWORD.CERRAR' | translate">
+      <img src="assets/icons/svg/icon-close.svg" alt="" />
+    </button>
+  </header>
+
+  <div class="admin-users__body">
+    <form [formGroup]="form" class="admin-users__search">
+      <label for="admin-user-search">{{ 'SHARED.POPUPS.ADMIN_USERS.NOMBRE' | translate }}</label>
+      <input id="admin-user-search" type="search" formControlName="nombre"
+        [placeholder]="'SHARED.POPUPS.ADMIN_USERS.SEARCH_PLACEHOLDER' | translate" />
+    </form>
+
+    <div class="admin-users__list" aria-live="polite">
+      <p class="admin-users__state" *ngIf="loading">{{ 'SHARED.POPUPS.ADMIN_USERS.LOADING' | translate }}</p>
+      <p class="admin-users__state admin-users__state--error" *ngIf="loadError" role="alert">
+        {{ (data.patientAppointments ? 'PACIENTES.ERROR' : 'SHARED.POPUPS.ADMIN_USERS.LOAD_ERROR') | translate }}
+      </p>
+      <p class="admin-users__state" *ngIf="!loading && !loadError && userList.length === 0">
+        {{ (data.patientAppointments ? 'PACIENTES.VACIO' : 'SHARED.POPUPS.ADMIN_USERS.EMPTY') | translate }}
+      </p>
+      <ng-container *ngIf="!loading && !loadError">
+        <button type="button" class="admin-users__user" *ngFor="let user of userList" (click)="userDetail(user)">
+          <span class="admin-users__avatar" aria-hidden="true">{{ user.nombre.charAt(0).toUpperCase() }}</span>
+          <span class="admin-users__name">{{ user.nombre }} {{ user.apellidos }}</span>
+          <span class="admin-users__arrow" aria-hidden="true">›</span>
+        </button>
+      </ng-container>
+    </div>
   </div>
+
+  <footer class="admin-users__footer" *ngIf="!data.patientAppointments || (staff && !loading && !loadError)">
+    <button type="button" class="admin-users__create" (click)="data.patientAppointments ? createPatient() : userDetail()">
+      <span aria-hidden="true">+</span>
+      {{ (data.patientAppointments ? 'PACIENTES.CREAR' : 'SHARED.POPUPS.ADMIN_USERS.CREAR') | translate }}
+    </button>
+  </footer>
 </div>

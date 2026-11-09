@@ -1,270 +1,183 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, FormBuilder, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialog,
-} from '@angular/material/dialog';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConfigService } from '../../../../services/config/config.service';
-import { AdminUsersComponent } from '../admin-users/admin-users.component';
-import { UserDetailComponent } from '../user-detail/user-detail.component';
-import { ErrorSuccessComponent } from '../error-success/error-success.component';
+import { merge, of, Subject, timer } from 'rxjs';
+import { catchError, distinctUntilChanged, map, startWith, switchMap, takeUntil } from 'rxjs/operators';
+
+interface Appointment {
+  idCita: number;
+  idServicio: number;
+  idCliente: number;
+  idMedico: number;
+  fechaInicio: string | null;
+  duracion: number | null;
+}
 
 @Component({
   selector: 'app-admin-citas',
   templateUrl: './admin-citas.component.html',
   styleUrls: ['./admin-citas.component.scss'],
 })
-export class AdminCitasComponent implements OnInit {
-  userList: any[] = [];
-  servicios: any;
-  listaMedicos: any[] = [];
-  listaFiltrada: any[] = [];
-
-  duraciones: number[] = [15, 30, 45, 60, 75, 90];
-
+export class AdminCitasComponent implements OnInit, OnDestroy {
+  servicios: { idServicio: number; servicio: string }[] = [];
+  listaMedicos: { idPersona: number; nombre: string; apellidos: string; idRolNativo: number }[] = [];
+  pacientes: { idPersona: number; nombre: string; apellidos: string; idRolNativo: number }[] = [];
+  duraciones = [15, 30, 45, 60, 75, 90];
+  saving = false;
+  loadError = false;
+  errorKey = '';
+  availability: 'idle' | 'checking' | 'available' | 'unavailable' | 'outside' | 'error' = 'idle';
+  slotsState: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
+  slots: string[] = [];
+  dateControl = new FormControl('');
+  patientControl = new FormControl(null, Validators.required);
+  private destroyed$ = new Subject<void>();
+  private refreshSlots$ = new Subject<void>();
   form = this.formBuilder.group({
-    idServicio: new FormControl(null),
-    idMedico: new FormControl(null),
-    fechaInicio: new FormControl(null),
-    fechaFin: new FormControl(null),
-    duracion: new FormControl(null),
+    idServicio: [null, Validators.required],
+    idMedico: [null, Validators.required],
+    fechaInicio: ['', Validators.required],
+    duracion: [null, Validators.required],
   });
 
   constructor(
-    public dialogRef: MatDialogRef<AdminUsersComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    public formBuilder: FormBuilder,
-    public matDialog: MatDialog,
+    public dialogRef: MatDialogRef<AdminCitasComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      selectedUser?: { idPersona: number; nombre?: string; apellidos?: string };
+      appointment?: Appointment;
+      fixedDoctor?: { idPersona: number; nombre: string; apellidos: string };
+      initialSlot?: { fechaInicio: string; idMedico: number };
+    },
+    private formBuilder: FormBuilder,
     private http: HttpClient,
-    private translate: TranslateService,
     private configService: ConfigService
   ) {}
 
-  success = './assets/icons/svg/icon-save.svg';
-  error = './assets/icons/svg/icon-close.svg';
-  user: any;
-
   ngOnInit(): void {
-    this.chargeUser();
-    this.loadServices();
-    this.loadMedicos();
-  }
-
-  // private chargeAdminCita() {
-  //   this.user = this.data.selectedUser;
-
-  //   if(this.user) {
-  //     this.form = this.formBuilder.group({
-  //       usuario: [this.user.username, Validators.required],
-  //       newUsuario: [this.user.username, Validators.required],
-  //       password: [this.user.password, Validators.required],
-  //       idRolNativo: [this.user.idRolNativo, Validators.required],
-  //       dni:[this.user.dni, Validators.required],
-  //       telefono:[this.user.telefono, Validators.required],
-  //       domicilio:[this.user.domicilio, Validators.required],
-  //       email:[this.user.email, Validators.required]
-  //     });
-  //   } else {
-  //     this.modifyUser = false;
-  //     this.form = this.formBuilder.group({
-  //       usuario: [''],
-  //       newUsuario: ['', Validators.required],
-  //       password: ['', Validators.required],
-  //       idRolNativo: [null, Validators.required],
-  //       dni:['', Validators.required],
-  //       telefono:['', Validators.required],
-  //       domicilio:['', Validators.required],
-  //       email:['', Validators.required]
-  //     });
-  //   }
-  // }
-
-  private chargeUser() {
-    this.user = this.data.selectedUser;
-
-    if (this.user) {
-      this.form = this.formBuilder.group({
-        idServicio: new FormControl(this.user.idServicio, Validators.required),
-        idMedico: new FormControl(this.user.idMedico, Validators.required),
-        fechaInicio: new FormControl(
-          this.user.fechaInicio,
-          Validators.required
-        ),
-        duracion: new FormControl(this.user.duracion, Validators.required),
+    if (this.data.selectedUser) this.patientControl.setValue(this.data.selectedUser.idPersona);
+    this.patientControl.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => this.form.updateValueAndValidity());
+    this.dateControl.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(date => {
+      const current = this.form.controls.fechaInicio.value || '';
+      this.form.controls.fechaInicio.setValue(date && current ? `${date}T${current.slice(11, 16)}` : '');
+    });
+    this.form.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(value => {
+      if (value.fechaInicio) this.dateControl.setValue(value.fechaInicio.slice(0, 10), { emitEvent: false });
+      if (this.errorKey === 'ADMIN_CITA.NO_DISPONIBLE' || this.errorKey === 'ADMIN_CITA.REQUERIDOS') this.errorKey = '';
+    });
+    const slotKey = () => {
+      const value = this.form.value;
+      return { fecha: this.dateControl.value || '', idMedico: value.idMedico, duracion: value.duracion };
+    };
+    merge(
+      this.form.valueChanges.pipe(startWith(null), map(slotKey), distinctUntilChanged((a, b) =>
+        a.fecha === b.fecha && a.idMedico === b.idMedico && a.duracion === b.duracion)),
+      this.refreshSlots$.pipe(map(slotKey))
+    ).pipe(
+      switchMap(key => {
+        this.slots = [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(key.fecha) || key.idMedico === null || key.idMedico === '' || !key.duracion) {
+          this.slotsState = 'idle';
+          return of(null);
+        }
+        this.slotsState = 'loading';
+        return timer(300).pipe(
+          switchMap(() => this.http.post<{ huecos: string[] }>(this.configService.getApiUrl('/citas/huecos'), {
+            ...key, ...(this.data.appointment ? { idCita: this.data.appointment.idCita } : {})
+          })),
+          catchError(error => {
+            console.error('Error al cargar los huecos:', error);
+            this.slotsState = 'error';
+            return of(null);
+          })
+        );
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe(result => {
+      if (result) { this.slots = result.huecos; this.slotsState = 'ready'; }
+    });
+    this.form.valueChanges.pipe(
+      switchMap(value => {
+        if (this.form.invalid || this.patientControl.invalid) { this.availability = 'idle'; return of(null); }
+        this.availability = 'checking';
+        return timer(300).pipe(
+          switchMap(() => this.http.post<{ disponible: boolean; motivo?: string }>(this.configService.getApiUrl('/citas/disponibilidad'), {
+            ...value, idCliente: this.patientControl.value,
+            ...(this.data.appointment ? { idCita: this.data.appointment.idCita } : {})
+          })),
+          catchError(error => {
+            console.error('Error al comprobar disponibilidad:', error);
+            this.availability = 'error';
+            return of(null);
+          })
+        );
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe(result => {
+      if (result) this.availability = result.disponible ? 'available' : result.motivo === 'fuera_horario' ? 'outside' : 'unavailable';
+    });
+    if (this.data.appointment) {
+      const cita = this.data.appointment;
+      this.form.patchValue({ idServicio: cita.idServicio, idMedico: cita.idMedico, fechaInicio: cita.fechaInicio ? cita.fechaInicio.slice(0, 16) : '', duracion: cita.duracion });
+    }
+    if (this.data.initialSlot) {
+      this.form.patchValue({ idMedico: this.data.initialSlot.idMedico, fechaInicio: this.data.initialSlot.fechaInicio, duracion: 30 });
+    }
+    if (this.data.fixedDoctor) this.form.patchValue({ idMedico: this.data.fixedDoctor.idPersona });
+    this.http.get<typeof this.servicios>(this.configService.getApiUrl('/servicio')).subscribe({
+      next: items => this.servicios = items,
+      error: error => { console.error('Error al cargar servicios:', error); this.loadError = true; }
+    });
+    if (!this.data.fixedDoctor || !this.data.selectedUser) {
+      this.http.get<typeof this.listaMedicos>(this.configService.getApiUrl('/persona')).subscribe({
+        next: users => {
+          if (!this.data.fixedDoctor) this.listaMedicos = users.filter(user => user.idRolNativo === 2);
+          if (!this.data.selectedUser) this.pacientes = users.filter(user => user.idRolNativo === 4);
+        },
+        error: error => { console.error('Error al cargar personas:', error); this.loadError = true; }
       });
     }
   }
 
-  public loadServices() {
-    const url = this.configService.getClinicalApiUrl('/servicio');
+  selectSlot(time: string): void {
+    const date = this.dateControl.value;
+    if (this.slotsState !== 'ready' || !this.slots.includes(time) || !date) return;
+    this.form.controls.fechaInicio.setValue(`${date}T${time}`);
+  }
 
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        this.servicios = data;
-      },
-      (error) => {
-        console.error('Error:', error);
+  refreshSlots(): void { this.refreshSlots$.next(); }
+
+  onSubmit(): void {
+    if (this.saving || this.loadError || this.availability === 'checking' || this.availability === 'unavailable' || this.availability === 'outside' || this.availability === 'error') return;
+    if (this.form.invalid || this.patientControl.invalid) { this.form.markAllAsTouched(); this.patientControl.markAsTouched(); this.errorKey = 'ADMIN_CITA.REQUERIDOS'; return; }
+    const body = { ...this.form.value, idCliente: this.patientControl.value };
+    const id = this.data.appointment?.idCita;
+    const url = this.configService.getApiUrl(id === undefined ? '/citas' : `/citas/${id}`);
+    this.saving = true;
+    this.errorKey = '';
+    const request = id === undefined ? this.http.post(url, body) : this.http.put(url, body);
+    request.subscribe({
+      next: () => { this.saving = false; this.dialogRef.close(true); },
+      error: (error: HttpErrorResponse) => {
+        console.error('Error al guardar la cita:', error);
+        this.saving = false;
+        this.errorKey = error.status === 409 ? 'ADMIN_CITA.NO_DISPONIBLE' : 'ADMIN_CITA.ERROR';
+        if (error.status === 409) { this.availability = 'unavailable'; this.refreshSlots(); }
       }
-    );
+    });
   }
 
-  private loadMedicos() {
-    const url = this.configService.getClinicalApiUrl('/persona');
-
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        this.loadMedicoHasServicio();
-        this.listaMedicos = data.filter(
-          (elemento: { idRolNativo: any }) => elemento.idRolNativo === 2
-        );
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
+  onDelete(): void {
+    if (!this.data.appointment || this.saving) return;
+    this.saving = true;
+    this.http.delete(this.configService.getApiUrl(`/citas/${this.data.appointment.idCita}`)).subscribe({
+      next: () => { this.saving = false; this.dialogRef.close(true); },
+      error: error => { console.error('Error al eliminar la cita:', error); this.saving = false; this.errorKey = 'ADMIN_CITA.ERROR'; }
+    });
   }
 
-  private loadMedicoHasServicio() {
-    const url = this.configService.getClinicalApiUrl('/medico_has_servicio');
+  close(): void { this.dialogRef.close(); }
 
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        this.form.get('idServicio')?.valueChanges.subscribe((value) => {
-          const listaMedicoHasServ = data;
-          listaMedicoHasServ.filter((medico: { idServicio: string }) => {
-            const ids = medico.idServicio.split(',');
-            ids.filter((lista: string | any[]) => {
-              if (lista.includes(value)) {
-                this.listaFiltrada.push(medico);
-              }
-            });
-          });
-          console.log(this.listaFiltrada);
-        });
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-  }
-
-  public onDelete() {
-    const url = this.configService.getClinicalApiUrl(`/citas/${this.user.idPersona}`);
-    console.log(url);
-
-    this.http.delete<any>(url).subscribe(
-      (data) => {
-        try {
-          const dialog = this.matDialog.open(ErrorSuccessComponent, {
-            data: {
-              icon: this.success,
-              text: this.translate.instant(
-                'SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'
-              ),
-              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-            },
-          });
-        } catch (error) {
-          console.error('Error al procesar respuesta:', error);
-        }
-        this.close();
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-  }
-
-  public onChange() {
-    const credentials = {
-      idServicio: this.form.controls.idServicio.value,
-      idMedico: this.form.controls.idMedico.value,
-      idCliente: this.user.idPersona,
-      fechaInicio: this.form.controls.fechaInicio.value,
-      duracion: this.form.controls.duracion.value,
-    };
-
-    const url = this.configService.getClinicalApiUrl('/citas/changeCita');
-
-    this.http.put<any>(url, credentials).subscribe(
-      (data) => {
-        try {
-          const dialog = this.matDialog.open(ErrorSuccessComponent, {
-            data: {
-              icon: this.success,
-              text: this.translate.instant(
-                'SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'
-              ),
-              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-            },
-          });
-        } catch (error) {
-          console.error('Error al procesar respuesta:', error);
-        }
-        this.close();
-      },
-      (error) => {
-        const dialog = this.matDialog.open(ErrorSuccessComponent, {
-          data: {
-            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-          },
-        });
-        console.error('Error:', error);
-      }
-    );
-  }
-
-  public onSubmit() {
-    const credentials = {
-      idServicio: this.form.controls.idServicio.value,
-      idMedico: this.form.controls.idMedico.value,
-      idCliente: this.user.idPersona,
-      fechaInicio: this.form.controls.fechaInicio.value,
-      duracion: this.form.controls.duracion.value,
-    };
-
-    console.log(credentials);
-
-    const url = this.configService.getClinicalApiUrl('/citas');
-
-    this.http.post<any>(url, credentials).subscribe(
-      (data) => {
-        try {
-          const dialog = this.matDialog.open(ErrorSuccessComponent, {
-            data: {
-              icon: this.success,
-              text: this.translate.instant(
-                'SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'
-              ),
-              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-            },
-          });
-        } catch (error) {
-          console.error('Error al analizar la respuesta JSON:', error);
-        }
-      },
-      (error) => {
-        const dialog = this.matDialog.open(ErrorSuccessComponent, {
-          data: {
-            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-          },
-        });
-        console.error('Error:', error);
-      }
-    );
-    this.close();
-  }
-
-  close(user?: any) {
-    if (user) {
-      this.dialogRef.close(user);
-    } else {
-      this.dialogRef.close();
-    }
-  }
+  ngOnDestroy(): void { this.destroyed$.next(); this.destroyed$.complete(); }
 }

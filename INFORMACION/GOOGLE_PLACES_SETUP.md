@@ -1,4 +1,10 @@
-# Google Places Autocomplete - Guía de Implementación
+# Google Places Autocomplete - Guía histórica
+
+> **Obsoleta:** La aplicación actual no incluye un buscador de domicilios,
+> no almacena domicilios en el modelo de persona y no integra Google Places.
+> El contenido siguiente describe una propuesta antigua y no es una guía de
+> instalación vigente. No debe conectarse Nominatim público para autocompletar
+> ni para enviar datos personales.
 
 ## ¿Qué se ha implementado?
 

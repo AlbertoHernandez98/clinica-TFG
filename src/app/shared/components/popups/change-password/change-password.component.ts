@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { Component, Inject } from '@angular/core';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import {
   MAT_DIALOG_DATA,
@@ -9,15 +9,16 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from '../../../../services/config/config.service';
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
+import { getSessionUser } from 'src/app/shared/classes/session-user';
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss'],
 })
-export class ChangePasswordComponent implements OnInit {
+export class ChangePasswordComponent {
   public static readonly id = 'change-password';
-  buttonDisabled: boolean = true;
+  submitting = false;
 
   constructor(
     public dialogRef: MatDialogRef<ChangePasswordComponent>,
@@ -30,24 +31,14 @@ export class ChangePasswordComponent implements OnInit {
   ) {}
 
   form = this.formBuilder.group({
-    password: new FormControl(''),
-    newPassword: new FormControl(''),
-    newPasswordSecure: new FormControl(''),
+    password: new FormControl('', Validators.required),
+    newPassword: new FormControl('', Validators.required),
+    newPasswordSecure: new FormControl('', Validators.required),
   });
 
   success = './assets/icons/svg/icon-save.svg';
   error = './assets/icons/svg/icon-close.svg';
 
-
-  ngOnInit(): void {
-    this.subscribeForm();
-  }
-
-  subscribeForm(){
-    this.form.valueChanges.subscribe(valid => {
-      const validator = this.form.valid ? this.buttonDisabled = false : this.buttonDisabled = true;
-    });
-  }
 
   getTouchedAndError(key: string) {
     return this.form.get(key)?.touched && this.form.get(key)?.errors?.required;
@@ -80,63 +71,48 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   onSubmit() {
-    const inputString = document.cookie;
+    const dni = getSessionUser();
+    if (!dni || this.form.invalid || this.comparePasswords() || this.equalPasswords() || this.submitting) {
+      this.form.markAllAsTouched();
+      if (!dni) {
+        this.matDialog.open(ErrorSuccessComponent, {
+          data: {
+            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
+            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+          },
+        });
+      }
+      return;
+    }
 
-    // Buscamos el índice del '=' en la cadena
-    const indexOfEqualSign = inputString.indexOf('user=');
-
-    // Extraemos el substring que sigue después del '=' y el espacio
-    const userSubstring = inputString.substring(indexOfEqualSign + 5);
-
-    const credentials = {
-      username: userSubstring,
+    this.submitting = true;
+    this.http.put(this.configService.getApiUrl('/persona/changePassword'), {
+      dni,
       password: this.form.controls.password.value,
       newPassword: this.form.controls.newPassword.value,
-    };
-
-    if(credentials.newPassword === '' && credentials.password === ''
-    && this.form.controls.newPasswordSecure.value === '') {
-      const dialog = this.matDialog.open(ErrorSuccessComponent, {
-        data: {
-          text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-          buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-        },
-      });
-    } else {
-      const url = this.configService.getClinicalApiUrl('/persona/changePassword');
-
-      const credentials = {
-        username: userSubstring,
-        password: this.form.controls.password.value,
-        newPassword: this.form.controls.newPassword.value,
-      };
-
-      this.http.put<any>(url, credentials).subscribe(
-        (data) => {
-          try {
-            const dialog = this.matDialog.open(ErrorSuccessComponent, {
-              data: {
-                icon: this.success,
-                text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
-                buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-              },
-            });
-          } catch (error) {
-            console.error('Error al procesar respuesta:', error);
-          }
-          this.dialogRef.close();
-        },
-        (error) => {
-          const dialog = this.matDialog.open(ErrorSuccessComponent, {
-            data: {
-              text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-            },
-          });
-          console.error('Error:', error);
-        }
-      );
-    }
+    }).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.matDialog.open(ErrorSuccessComponent, {
+          data: {
+            icon: this.success,
+            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
+            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+          },
+        });
+        this.dialogRef.close();
+      },
+      error: error => {
+        this.submitting = false;
+        console.error('Error al cambiar la contraseña:', error);
+        this.matDialog.open(ErrorSuccessComponent, {
+          data: {
+            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
+            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+          },
+        });
+      }
+    });
   }
 
   close() {

@@ -1,81 +1,61 @@
-<div class="content">
-  <div class="wrap">
-    <div class="form-wrap">
-      <form class="form" action="" [formGroup]="form">
-        <div class="label">{{ "PERFIL.PERFIL" | translate }}</div>
-        <div style="display: none" class="form-column">
-          <input type="text" formControlName="usuario" />
-        </div>
-        <div class="form-column">
-          <p>USUARIO</p>
-          <input type="text" formControlName="newUsuario" />
-          <p class="form-error" *ngIf="getTouchedAndError('newUsuario')">
-            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
-          </p>
-        </div>
-        <div class="form-column">
-          <p>DNI</p>
-          <input type="text" formControlName="dni" />
+<main class="profile">
+  <div class="profile__heading">
+    <p class="profile__eyebrow">{{ 'PERFIL.CUENTA' | translate }}</p>
+    <h1>{{ 'PERFIL.PERFIL' | translate }}</h1>
+    <p>{{ 'PERFIL.DESCRIPCION' | translate }}</p>
+  </div>
 
-          <p class="form-error" *ngIf="getTouchedAndError('dni')">
-            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
-          </p>
-        </div>
-        <div class="form-column">
-          <p>EMAIL</p>
-          <input type="text" formControlName="email" />
-          <p class="form-error" *ngIf="getTouchedAndError('email')">
-            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
-          </p>
-        </div>
-        <div class="form-column">
-          <p>TELEFONO</p>
-          <input type="text" formControlName="telefono" />
-          <p class="form-error" *ngIf="getTouchedAndError('telefono')">
-            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
-          </p>
-        </div>
-        <div class="form-column">
-          <p>DOMICILIO</p>
-          <input type="text" formControlName="domicilio" />
-          <p class="form-error" *ngIf="getTouchedAndError('domicilio')">
-            {{ "ERRORS_MENSAJE.REQUIRED" | translate }}
-          </p>
-        </div>
-        <!-- <div class="label-text__tag">
-            <span>Foto de perfil</span>
-        </div>
-        <div>
-            <div *ngIf="selectedFile">
-                <h3>Preview:</h3>
-                <img [src]="imageUrl" class="img">
-                </div>
-            <form (ngSubmit)="uploadPhoto()">
-                <input type="file" (change)="onFileSelected($event)">
-                <button type="submit">Upload</button>
-            </form>
-        </div> -->
-        <div class="button-form">
-          <app-button-base
-            label="{{ 'PERFIL.MODIFICAR' | translate }}"
-            (click)="pruebas()"
-          ></app-button-base>
+  <div class="profile__layout">
+    <section class="profile__card">
+      <h2>{{ 'PERFIL.DATOS' | translate }}</h2>
+      <p class="profile__hint">{{ 'PERFIL.EDITAR' | translate }}</p>
+      <p class="profile__notice" *ngIf="loading" role="status">{{ 'PERFIL.CARGANDO' | translate }}</p>
+      <p class="profile__notice profile__notice--error" *ngIf="loadError" role="alert">{{ 'PERFIL.ERROR_CARGA' | translate }}</p>
+
+      <form class="profile__form" [formGroup]="form" (ngSubmit)="guardarPerfil()">
+        <label>{{ 'PERFIL.NOMBRE' | translate }}
+          <input type="text" formControlName="nombre" autocomplete="given-name" [readonly]="!usuarioEncontrado" />
+          <span class="profile__error" *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">{{ 'ERRORS_MENSAJE.REQUIRED' | translate }}</span>
+        </label>
+        <label>{{ 'PERFIL.APELLIDOS' | translate }}
+          <input type="text" formControlName="apellidos" autocomplete="family-name" [readonly]="!usuarioEncontrado" />
+          <span class="profile__error" *ngIf="form.controls.apellidos.touched && form.controls.apellidos.invalid">{{ 'ERRORS_MENSAJE.REQUIRED' | translate }}</span>
+        </label>
+        <label>DNI
+          <input type="text" formControlName="dni" [readonly]="!usuarioEncontrado" />
+          <span class="profile__error" *ngIf="form.controls.dni.touched && form.controls.dni.invalid">{{ 'ERRORS_MENSAJE.REQUIRED' | translate }}</span>
+        </label>
+        <label>{{ 'PERFIL.TELEFONO' | translate }}
+          <input type="tel" formControlName="telefono" autocomplete="tel" [readonly]="!usuarioEncontrado" />
+          <span class="profile__error" *ngIf="form.controls.telefono.touched && form.controls.telefono.invalid">{{ 'PERFIL.TELEFONO_INVALIDO' | translate }}</span>
+        </label>
+        <label>Email
+          <input type="email" formControlName="email" autocomplete="email" maxlength="254" [readonly]="!usuarioEncontrado" />
+          <span class="profile__error" *ngIf="form.controls.email.touched && form.controls.email.invalid">{{ 'PERFIL.EMAIL_INVALIDO' | translate }}</span>
+        </label>
+        <div class="profile__actions profile__full">
+          <button type="submit" class="profile__primary" [disabled]="!usuarioEncontrado || saving">
+            {{ 'PERFIL.MODIFICAR' | translate }}
+          </button>
         </div>
       </form>
-    </div>
-    <div class="contact">
-      <div class="button">
-        <app-button-base
-          label="{{ 'SHARED.POPUPS.CHANGE_PASSWORD.TITLE' | translate }}"
-          (click)="changePassword()"
-        ></app-button-base>
-      </div>
-      <div class="button">
-        <app-button-base
-          label="{{ 'PERFIL.HISTORIAL' | translate }}"
-          (click)="redirectToHistorial()"
-        ></app-button-base>
-      </div>
-    </div>
+    </section>
+
+    <aside class="profile__card profile__account">
+      <h2>{{ 'PERFIL.CUENTA' | translate }}</h2>
+      <p class="profile__hint">{{ 'PERFIL.ACCIONES' | translate }}</p>
+      <button type="button" class="profile__secondary" (click)="changePassword()" [disabled]="!usuarioEncontrado">
+        {{ 'SHARED.POPUPS.CHANGE_PASSWORD.TITLE' | translate }}
+      </button>
+      <button type="button" class="profile__secondary" *ngIf="usuarioEncontrado?.idRolNativo === 2" (click)="openVacaciones()">
+        {{ 'VACACIONES.TITULO' | translate }}
+      </button>
+      <button type="button" class="profile__secondary" *ngIf="usuarioEncontrado?.idRolNativo === 4" (click)="openMisCitas()">
+        {{ 'MIS_CITAS.TITULO' | translate }}
+      </button>
+      <button type="button" class="profile__secondary" *ngIf="usuarioEncontrado?.idRolNativo === 4" (click)="redirectToHistorial()">
+        {{ 'PERFIL.HISTORIAL' | translate }}
+      </button>
+    </aside>
   </div>
-</div>
+</main>

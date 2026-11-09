@@ -1,194 +1,167 @@
-import { Component, Input, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { ConfigService } from 'src/app/services/config/config.service';
-import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
-import { Backend } from 'src/app/JSON-Model/backend';
-import { ModalController } from '@ionic/angular';
-import { ChangePasswordComponent } from 'src/app/shared/components/popups/change-password/change-password.component';
-import { LangService } from 'src/app/services/lang/lang';
-import { AdminUsersComponent } from 'src/app/shared/components/popups/admin-users/admin-users.component';
 import { Router } from '@angular/router';
+import { ConfigService } from 'src/app/services/config/config.service';
+import { getSessionUser } from 'src/app/shared/classes/session-user';
+import { ChangePasswordComponent } from 'src/app/shared/components/popups/change-password/change-password.component';
+import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
+import { emailValidator } from 'src/app/shared/validators/custom.validators';
+import { VacacionesComponent } from 'src/app/shared/components/popups/vacaciones/vacaciones.component';
+import { MisCitasComponent } from 'src/app/shared/components/popups/mis-citas/mis-citas.component';
+
+interface PerfilUsuario {
+  idPersona: number;
+  dni: string;
+  nombre: string;
+  apellidos: string;
+  telefono: number | null;
+  email: string | null;
+  idRolNativo: number;
+}
+
 @Component({
   selector: 'app-perfil-usuario',
   templateUrl: './perfil-usuario.component.html',
   styleUrls: ['./perfil-usuario.component.scss'],
 })
 export class PerfilUsuarioComponent implements OnInit {
-  selectedFile!: File;
-  imageUrl!: string;
-  form!: FormGroup;
+  usuarioEncontrado?: PerfilUsuario;
+  loading = true;
+  loadError = false;
+  saving = false;
 
-  usuarioEncontrado!: any;
+  form = this.formBuilder.group({
+    nombre: ['', Validators.required],
+    apellidos: ['', Validators.required],
+    dni: ['', Validators.required],
+    telefono: ['', Validators.pattern(/^\d{1,15}$/)],
+    email: ['', [emailValidator(), Validators.maxLength(254)]],
+  });
 
-  user: string = '';
-
-  success = './assets/icons/svg/icon-save.svg';
-  error = './assets/icons/svg/icon-close.svg';
-
-  
   constructor(
     public formBuilder: FormBuilder,
     public matDialog: MatDialog,
     private translate: TranslateService,
-    private urls: Backend,
     private http: HttpClient,
     private configService: ConfigService,
     public router: Router
   ) {}
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      usuario: new FormControl(''),
-      newUsuario: new FormControl(''),
-      email: new FormControl(''),
-      telefono: new FormControl(''),
-      domicilio: new FormControl(''),
-      img: new FormControl(null),
-      dni: new FormControl(''),
-    });
-    this.loadForm();
-  }
-
-  private loadForm() {
-    const inputString = document.cookie;
-
-    const indexOfEqualSign = inputString.indexOf('user=');
-
-    const userToDepure = inputString.substring(indexOfEqualSign + 5);
-    var newUsuario = userToDepure.split(';')[0];
-
-
-    const url = this.configService.getClinicalApiUrl('/persona');
-
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        this.usuarioEncontrado = data.find((user: { username: any; }) => user.username === newUsuario);
-
-        this.form.controls.usuario.patchValue(newUsuario);
-        this.form.controls.newUsuario.patchValue(this.usuarioEncontrado.username);
-        this.form.controls.email.patchValue(this.usuarioEncontrado.email);
-        this.form.controls.telefono.patchValue(this.usuarioEncontrado.telefono);
-        this.form.controls.domicilio.patchValue(this.usuarioEncontrado.domicilio);
-        this.form.controls.dni.patchValue(this.usuarioEncontrado.dni);
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-
-  }
-
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-    this.previewImage();
-  }
-
-  previewImage() {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imageUrl = reader.result as string;
-    };
-    reader.readAsDataURL(this.selectedFile);
-    console.log(this.selectedFile);
-  }
-
-  uploadPhoto() {
-    if (!this.selectedFile) {
+    const dni = getSessionUser();
+    if (!dni) {
+      this.loading = false;
+      this.loadError = true;
       return;
     }
 
-    const formData = new FormData();
-    formData.append('photo', this.selectedFile);
-    const url = this.configService.getClinicalApiUrl('/upload');
-
-    this.http.post<any>(url, formData).subscribe(
-      (data) => {
-        console.log('Respuesta del servidor:', data);
-      },
-      (error) => {
-        console.error('Error al subir la foto:', error);
-      }
-    );
-  }
-
-  getTouchedAndError(key: string) {
-    return this.form.get(key)?.touched && this.form.get(key)?.errors?.required;
-  }
-
-  historial(): void {
-    
-  }
-
-  public async changePassword() {
-     const dialog = this.matDialog.open(ChangePasswordComponent, {
-      data: {
-        title: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.TITLE'),
-        buttonLabel: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.TITLE'),
-        edit: true,
-      },
-      width: '940px'
-    });
-  }
-
-  pruebas(){
-    const credentials = {
-      oldUsername: this.form.controls.usuario.value,
-      username: this.form.controls.newUsuario.value,
-      dni: this.form.controls.dni.value,
-      telefono: this.form.controls.telefono.value,
-      domicilio: this.form.controls.domicilio.value,
-      email: this.form.controls.email.value
-    };
-
-    const url = this.configService.getClinicalApiUrl('/persona/changeUser');
-
-    this.http.put<any>(url, credentials).subscribe(
-      (data) => {
-        try {
-          const dialog = this.matDialog.open(ErrorSuccessComponent, {
-            data: {
-              icon: this.success,
-              text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.SUCCESS'),
-              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-            },
-          });
-        } catch (error) {
-          console.error('Error:', error);
+    this.http.get<PerfilUsuario[]>(this.configService.getApiUrl('/persona')).subscribe({
+      next: users => {
+        const user = users.find(item => item.dni === dni);
+        this.loading = false;
+        if (!user) {
+          this.loadError = true;
+          return;
         }
-      },
-      (error) => {
-        const dialog = this.matDialog.open(ErrorSuccessComponent, {
-          data: {
-            text: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.ERROR'),
-            buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-          },
+        this.usuarioEncontrado = user;
+        this.form.patchValue({
+          nombre: user.nombre,
+          apellidos: user.apellidos,
+          dni: user.dni,
+          telefono: user.telefono === null ? '' : String(user.telefono),
+          email: user.email || '',
         });
-        console.error('Error:', error);
-      }
-    );
-  }
-
-  admin(){
-    const dialog = this.matDialog.open(AdminUsersComponent, {
-      data: {
-        title: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.TITLE'),
-        buttonLabel: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.TITLE'),
-        edit: true
+      },
+      error: error => {
+        console.error('Error al cargar el perfil:', error);
+        this.loading = false;
+        this.loadError = true;
       }
     });
   }
 
-  redirectToHistorial(){
+  changePassword(): void {
+    this.matDialog.open(ChangePasswordComponent, {
+      data: { title: this.translate.instant('SHARED.POPUPS.CHANGE_PASSWORD.TITLE') },
+      width: '560px',
+      maxWidth: '95vw'
+    });
+  }
+
+  openVacaciones(): void {
+    if (!this.usuarioEncontrado || this.usuarioEncontrado.idRolNativo !== 2) return;
+    this.matDialog.open(VacacionesComponent, {
+      data: { idMedico: this.usuarioEncontrado.idPersona, nombre: `${this.usuarioEncontrado.nombre} ${this.usuarioEncontrado.apellidos}` },
+      width: '560px', maxWidth: '95vw'
+    });
+  }
+
+  openMisCitas(): void {
+    if (this.usuarioEncontrado?.idRolNativo !== 4) return;
+    this.matDialog.open(MisCitasComponent, { width: '600px', maxWidth: '95vw' });
+  }
+
+  guardarPerfil(): void {
+    if (!this.usuarioEncontrado || this.saving) {
+      return;
+    }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const values = this.form.value;
+    const oldDni = this.usuarioEncontrado.dni;
+    const payload = {
+      oldDni,
+      dni: values.dni,
+      nombre: values.nombre,
+      apellidos: values.apellidos,
+      telefono: values.telefono === '' ? null : values.telefono,
+      email: values.email.trim() || null,
+      idRolNativo: this.usuarioEncontrado.idRolNativo,
+    };
+    this.saving = true;
+    this.http.put(this.configService.getApiUrl('/persona/changeUser'), payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.usuarioEncontrado = {
+          ...this.usuarioEncontrado!,
+          dni: values.dni,
+          nombre: values.nombre,
+          apellidos: values.apellidos,
+          telefono: values.telefono === '' ? null : Number(values.telefono),
+          email: values.email.trim() || null,
+        };
+        document.cookie = `user=${encodeURIComponent(values.dni)}; path=/`;
+        this.showMessage('PERFIL.GUARDADO');
+      },
+      error: error => {
+        console.error('Error al guardar el perfil:', error);
+        this.saving = false;
+        this.showMessage('PERFIL.ERROR_GUARDAR');
+      }
+    });
+  }
+
+  redirectToHistorial(): void {
+    if (!this.usuarioEncontrado) {
+      return;
+    }
     this.router.navigate(['/historial', { dato: this.usuarioEncontrado.idPersona }]).then(() => {
       window.location.reload();
-    });;
+    });
+  }
+
+  private showMessage(key: string): void {
+    this.matDialog.open(ErrorSuccessComponent, {
+      data: {
+        text: this.translate.instant(key),
+        buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
+      },
+    });
   }
 }

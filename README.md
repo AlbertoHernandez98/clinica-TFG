@@ -6,6 +6,40 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Citas de pacientes
+
+Tras iniciar sesión, el acceso «Citas de pacientes» permite buscar pacientes.
+El médico puede crear citas para sí mismo; administración y recepción pueden
+consultar, crear y modificar citas con cualquier médico. En todos los casos,
+el servidor comprueba los solapamientos y las vacaciones antes de guardar.
+Las citas deben comenzar y terminar dentro del horario de apertura: lunes,
+miércoles y viernes de 16:00 a 20:00; martes y jueves de 09:30 a 13:30.
+Sábados y domingos están cerrados. Las vacaciones solo afectan a días
+laborables, aunque su periodo pueda atravesar un fin de semana.
+El formulario muestra horas de inicio libres cada 30 minutos para el médico,
+el día y la duración elegidos. La disponibilidad se vuelve a validar al guardar.
+Desde «Administrar citas» se accede a una agenda semanal interactiva: el médico
+consulta únicamente su propia agenda; administración y recepción seleccionan el
+profesional. Se puede crear una cita pulsando un hueco libre de 30 minutos o
+abrir una cita existente para modificarla. El formulario permite elegir otra
+duración y vuelve a comprobar la disponibilidad.
+Desde esta pantalla, administración, médicos y recepción también pueden
+añadir pacientes. Médicos y recepción no pueden crear usuarios de otros roles.
+
+Al abrir una cita existente, «Abrir historial clínico» muestra las anotaciones
+del paciente y permite vincular una nueva anotación a esa cita. Médicos y
+administración pueden añadirlas; recepción puede consultarlas. El paciente
+puede consultar su propio historial desde el perfil. El acceso se comprueba en
+el servidor.
+
+La agenda permite navegar entre semanas y muestra las vacaciones. Las citas
+antiguas sin hora o duración se identifican como incompletas; las que no tienen
+fecha se indican sin asignarlas a un día.
+
+Los pacientes pueden consultar sus propias citas, incluidas las pasadas, desde
+«Mis citas» en su perfil. Esta vista es de consulta y no permite modificar ni
+cancelar citas.
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.

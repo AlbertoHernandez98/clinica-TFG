@@ -1,281 +1,147 @@
-import { Component, Input, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { DatabaseService } from 'src/app/services/database/database';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { combineLatest, forkJoin, of, Subject } from 'rxjs';
+import { catchError, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfigService } from 'src/app/services/config/config.service';
-import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
+
+interface Session { idRolNativo: number; }
+interface Patient { idPersona: number; nombre: string; apellidos: string; }
+interface Service { idServicio: number; servicio: string; }
+interface Appointment { idCita: number; idCliente: number; idServicio: number; }
+interface Entry {
+  idHistorialClinico: number; comentarios: string; fecha: string; hora: string;
+  autorNombre: string | null; autorApellidos: string | null; servicio: string | null; idCita: number | null;
+  idServicio: number; idMedico: number;
+}
+interface History { paciente: Patient; entradas: Entry[]; }
 
 @Component({
   selector: 'app-historial',
   templateUrl: './historial.component.html',
   styleUrls: ['./historial.component.scss'],
 })
-export class HistorialComponent implements OnInit {
-  historialClinico: any;
-  servicios: any;
-  clienteSeleccionado: any;
-
-  error = '../../../../assets/icons/svg/report_problem.svg';
-  success = '../../../../assets/icons/svg/green_check.svg';
-
+export class HistorialComponent implements OnInit, OnDestroy {
+  patient?: Patient;
+  entries: Entry[] = [];
+  services: Service[] = [];
+  appointment: Appointment | null = null;
+  role = 0;
+  loading = true;
+  loadError = false;
+  saving = false;
+  saveError = false;
+  saved = false;
+  private readonly destroyed = new Subject<void>();
+  private readonly reload = new Subject<void>();
   form = this.formBuilder.group({
-    comentarios: new FormControl('', Validators.required),
-    fecha: new FormControl(new Date()),
-    idCliente: new FormControl(),
-    idMedico: new FormControl(),
-    idServicio: new FormControl(Validators.required),
+    idServicio: [null, Validators.required],
+    comentarios: ['', [Validators.required, Validators.maxLength(10000)]]
   });
-
-  filtros = this.formBuilder.group({
-    medico: new FormControl(),
-    servicio: new FormControl(),
-  });
-  listaFiltrada!: any[];
-  listaMedicos!: any[];
-
-  idPersona!: number;
-  rol!: number;
-  listaLength!: boolean;
-  fechaFormateada: any;
+  filters = this.formBuilder.group({ servicio: [''], medico: [''] });
+  newestFirst = true;
 
   constructor(
-    public formBuilder: FormBuilder,
-    public database: DatabaseService,
+    private formBuilder: FormBuilder,
     private http: HttpClient,
-    private translate: TranslateService,
-    public matDialog: MatDialog,
-    public route: ActivatedRoute,
-    private configService: ConfigService
+    private route: ActivatedRoute,
+    private config: ConfigService
   ) {}
 
-  ngOnInit() {
-    this.loadUser();
-    this.getHistorial();
-    this.loadServices();
-
-
-    this.route.params.subscribe((params) => {
-      this.clienteSeleccionado = params['dato'];
+  ngOnInit(): void {
+    combineLatest([this.route.paramMap, this.route.queryParamMap, this.reload.pipe(startWith(undefined))]).pipe(
+      switchMap(([params, query]) => {
+        this.loading = true;
+        this.loadError = false;
+        this.patient = undefined;
+        this.entries = [];
+        this.appointment = null;
+        const patientId = params.get('dato');
+        const appointmentId = query.get('cita');
+        if (!patientId || !/^[1-9]\d*$/.test(patientId) || (appointmentId !== null && !/^[1-9]\d*$/.test(appointmentId))) {
+          this.loading = false;
+          this.loadError = true;
+          return of(null);
+        }
+        return forkJoin({
+          session: this.http.get<Session>(this.config.getApiUrl('/auth/me')),
+          history: this.http.get<History>(this.config.getApiUrl(`/historialclinico/paciente/${patientId}`)),
+          services: this.http.get<Service[]>(this.config.getApiUrl('/servicio')),
+          appointment: appointmentId
+            ? this.http.get<Appointment>(this.config.getApiUrl(`/historialclinico/cita/${appointmentId}`))
+            : of(null)
+        }).pipe(catchError(error => {
+          console.error('Error al cargar el historial:', error.status);
+          this.loadError = true;
+          this.loading = false;
+          return of(null);
+        }));
+      }),
+      takeUntil(this.destroyed)
+    ).subscribe(result => {
+      if (!result) return;
+      if (result.appointment && result.appointment.idCliente !== result.history.paciente.idPersona) {
+        this.loadError = true;
+        this.loading = false;
+        return;
+      }
+      this.role = result.session.idRolNativo;
+      this.patient = result.history.paciente;
+      this.entries = result.history.entradas;
+      this.services = result.services;
+      this.appointment = result.appointment;
+      this.form.controls.idServicio.setValue(this.appointment ? this.appointment.idServicio : null);
+      this.loading = false;
     });
   }
 
-  currentPage = 1;
-  pageSize = 5;
-  totalItems!: number;
+  retry(): void { this.reload.next(); }
 
-  loadItems(): void {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.listaFiltrada = this.getPaginatedData(startIndex, this.pageSize);
+  get doctors(): { id: number; name: string }[] {
+    const seen = new Map<number, string>();
+    this.entries.forEach(entry => {
+      if (entry.autorNombre) seen.set(entry.idMedico, `${entry.autorNombre} ${entry.autorApellidos || ''}`.trim());
+    });
+    return Array.from(seen, ([id, name]) => ({ id, name }));
   }
 
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadItems();
-  }
-
-  private getPaginatedData(startIndex: number, pageSize: number): string[] {
-    return this.listaFiltrada.slice(startIndex, startIndex + pageSize);
-  }
-
-  hasNextPage(): boolean {
-    const lastItemIndexOnPage = this.currentPage * this.pageSize;
-    return lastItemIndexOnPage < this.totalItems;
-  }
-
-  private loadUser() {
-    const str = document.cookie;
-    const match: any = str.match(/user=([^;]*)/);
-    const userLogged = match ? match[1].trim() : '';
-    const url = this.configService.getClinicalApiUrl('/persona');
-
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        const usuarioEncontrado = data.find(
-          (user: { username: any }) => user.username === userLogged
-        );
-
-        if (usuarioEncontrado) {
-          this.idPersona = usuarioEncontrado.idPersona;
-          this.form.get('idCliente')?.setValue(this.clienteSeleccionado);
-          this.form.get('idMedico')?.setValue(usuarioEncontrado.idPersona);
-          this.rol = usuarioEncontrado.idRolNativo;
-        }
-
-        const clienteEncontrado = data.find(
-          (cliente: { idPersona: any }) =>
-            cliente.idPersona == this.clienteSeleccionado
-        );
-
-        this.clienteSeleccionado = clienteEncontrado;
-
-        this.listaMedicos = data.filter(
-          (elemento: { idRolNativo: any }) => elemento.idRolNativo === 2
-        );
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-  }
-
-  private getHistorial() {
-    const url = this.configService.getClinicalApiUrl('/historialclinico');
-
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        try {
-          this.historialClinico = data.filter(
-            (historial: { idCliente: number }) =>
-              historial.idCliente === this.clienteSeleccionado.idPersona
-          );
-
-          this.dateConverter(this.historialClinico);
-          this.listaLength = this.historialClinico.length === 0;
-          this.listaFiltrada = this.historialClinico;
-          this.totalItems = this.listaFiltrada.length;
-        } catch (error) {
-          console.error('Error al procesar respuesta:', error);
-        }
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-  }
-
-  private dateConverter(historial: any) {
-    historial.forEach((item: { fecha: string | number | Date }) => {
-      item.fecha = new Date(item.fecha);
-      var dia: any = item.fecha.getDate();
-      var mes: any = item.fecha.getMonth() + 1; // Nota: los meses en JavaScript van de 0 a 11
-      var año = item.fecha.getFullYear();
-
-      // Asegurarse de que el día y el mes tengan dos dígitos
-      dia = dia < 10 ? '0' + dia : dia;
-      mes = mes < 10 ? '0' + mes : mes;
-
-      this.fechaFormateada = dia + '/' + mes + '/' + año;
+  get filteredEntries(): Entry[] {
+    const { servicio, medico } = this.filters.value;
+    return this.entries.filter(entry =>
+      (!servicio || String(entry.idServicio) === servicio) && (!medico || String(entry.idMedico) === medico)
+    ).slice().sort((a, b) => {
+      const order = `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`) || a.idHistorialClinico - b.idHistorialClinico;
+      return this.newestFirst ? -order : order;
     });
   }
 
-  public loadServices() {
-    const url = this.configService.getClinicalApiUrl('/servicio');
-
-    this.http.get<any[]>(url).subscribe(
-      (data: any[]) => {
-        this.servicios = data;
+  save(): void {
+    if (this.saving || !this.patient || ![1, 2].includes(this.role)) return;
+    const comments = (this.form.controls.comentarios.value || '').trim();
+    if (this.form.invalid || !comments) { this.form.markAllAsTouched(); this.saveError = true; return; }
+    this.saving = true;
+    this.saveError = false;
+    this.saved = false;
+    this.http.post(this.config.getApiUrl('/historialclinico'), {
+      idCliente: this.patient.idPersona,
+      idServicio: this.form.controls.idServicio.value,
+      comentarios: comments,
+      ...(this.appointment ? { idCita: this.appointment.idCita } : {})
+    }).pipe(takeUntil(this.destroyed)).subscribe({
+      next: () => {
+        this.saving = false;
+        this.saved = true;
+        this.form.controls.comentarios.reset('');
+        this.reload.next();
       },
-      (error) => {
-        console.error('Error:', error);
+      error: error => {
+        console.error('Error al guardar la anotación:', error.status);
+        this.saving = false;
+        this.saveError = true;
       }
-    );
+    });
   }
 
-  public postHistorial() {
-    const url = this.configService.getClinicalApiUrl('/historialclinico');
-
-    const servicioEncontrado = this.servicios.find(
-      (servicio: { servicio: any }) =>
-        servicio.servicio === this.form.controls.idServicio.value
-    );
-
-    if (this.form.valid) {
-      const credentials = {
-        comentarios: this.form.controls.comentarios.value,
-        fecha: this.form.controls.fecha.value,
-        idCliente: this.form.controls.idCliente.value,
-        idMedico: this.form.controls.idMedico.value,
-        idServicio: servicioEncontrado.idServicio,
-      };
-
-      this.http.post<any>(url, credentials).subscribe(
-        (data) => {
-          try {
-            const dialog = this.matDialog.open(ErrorSuccessComponent, {
-              data: {
-                icon: this.success,
-                text: this.translate.instant('HISTORIAL.SUCCESS'),
-                buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-              },
-            });
-
-            this.form.get('comentarios')?.patchValue('');
-            this.form.get('idServicio')?.patchValue(null);
-            this.getHistorial();
-          } catch (error) {
-            console.error('Error al procesar respuesta:', error);
-          }
-        },
-        (error) => {
-          const dialog = this.matDialog.open(ErrorSuccessComponent, {
-            data: {
-              text: this.translate.instant('HISTORIAL.ERROR'),
-              buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-            },
-          });
-          console.error('Error:', error);
-        }
-      );
-    } else {
-      const dialog = this.matDialog.open(ErrorSuccessComponent, {
-        data: {
-          text: this.translate.instant('HISTORIAL.ERROR'),
-          buttonLabel: this.translate.instant('LOGIN.POPUP_BUTTON_LABEL'),
-        },
-      });
-    }
-  }
-
-  public sortByDate() {
-    this.historialClinico.sort(
-      (
-        a: { fecha: { getTime: () => number } },
-        b: { fecha: { getTime: () => number } }
-      ) => a.fecha.getTime() - b.fecha.getTime()
-    );
-  }
-
-  public sortByServicio() {
-    const servicioEncontrado = this.servicios.find(
-      (servicio: { servicio: any }) =>
-        servicio.servicio === this.filtros.controls.servicio.value
-    );
-
-    this.listaFiltrada = this.historialClinico.filter(
-      (elemento: { idServicio: any }) =>
-        elemento.idServicio == servicioEncontrado.idServicio
-    );
-
-    if (this.filtros.controls.medico.value != undefined) {
-      this.listaFiltrada = this.listaFiltrada.filter(
-        (elemento: any) => elemento == this.filtros.controls.medico.value
-      );
-    }
-  }
-
-  public sortByMedico() {
-    this.listaFiltrada = this.historialClinico.filter(
-      (elemento: any) => elemento == this.filtros.controls.medico.value
-    );
-
-    if (this.filtros.controls.servicio.value != undefined) {
-      this.listaFiltrada = this.listaFiltrada.filter(
-        (elemento: any) => elemento == this.filtros.controls.servicio.value
-      );
-    }
-  }
-
-  public borrarFiltros() {
-    this.listaFiltrada = this.historialClinico;
-    this.filtros.get('servicio')?.setValue('');
-    this.filtros.get('medico')?.setValue('');
-  }
+  ngOnDestroy(): void { this.destroyed.next(); this.destroyed.complete(); }
 }

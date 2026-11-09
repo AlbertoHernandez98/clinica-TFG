@@ -1,0 +1,29 @@
+@import '../../../../../assets/theme/dialog';
+
+.agenda__subtitle { margin: 8px 0 0; color: #647988; }
+.agenda__doctor { margin-top: 16px; color: #315267; }
+.agenda__doctor label { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-weight: 700; }
+.agenda__doctor select { min-height: 42px; padding: 8px; border: 1px solid #cfe0e7; border-radius: 8px; background: white; font: inherit; }
+.agenda__navigation { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.agenda__period { align-self: center; margin-left: auto; color: #315267; }
+.agenda__navigation button, .agenda__error button {
+  border: 1px solid #cfe0e7; border-radius: 8px; background: #fff;
+  color: #087ba2; font-weight: 700; padding: 9px 13px; cursor: pointer;
+}
+.agenda__error, .agenda__notice { padding: 12px; border-radius: 8px; background: #fff4e7; color: #805121; }
+.agenda__scroll { overflow: auto; max-height: 65vh; border: 1px solid #dfe9ed; border-radius: 10px; }
+.agenda__table { width: 100%; min-width: 900px; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+.agenda__table th, .agenda__table td { border: 1px solid #e5eef2; padding: 6px; vertical-align: top; }
+.agenda__table thead th { position: sticky; top: 0; z-index: 1; background: #f3f8fa; color: #315267; text-align: left; }
+.agenda__table th:first-child { width: 75px; }
+.agenda__table tbody th { color: #647988; font-weight: 600; }
+.agenda__table td { height: 45px; }
+.agenda__table .agenda__holiday { background: #fff5e8; }
+.agenda__table .agenda__closed { background: #eef1f3; }
+.agenda__holiday-label { display: block; color: #9a5c1e; font-size: 11px; margin-top: 3px; }
+.agenda__appointment { display: grid; width: 100%; gap: 3px; border: 0; background: #e6f5fb; border-left: 3px solid #01abe6; border-radius: 5px; padding: 7px; overflow-wrap: anywhere; text-align: left; font: inherit; cursor: pointer; }
+.agenda__appointment:disabled { cursor: not-allowed; }
+.agenda__appointment + .agenda__appointment { margin-top: 5px; }
+.agenda__free { width: 100%; padding: 8px; border: 1px solid #9ed8bd; border-radius: 6px; background: #f0fbf5; color: #216b46; cursor: pointer; font: inherit; }
+.agenda__free:hover, .agenda__free:focus-visible { background: #d7f3e3; }
+.agenda__unavailable { display: block; color: #7a858a; font-size: 12px; }
