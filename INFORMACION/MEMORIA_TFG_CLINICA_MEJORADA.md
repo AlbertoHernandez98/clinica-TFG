@@ -141,6 +141,9 @@ This thesis documents requirements, design, implementation and proposed validati
 - El horario de citas es lunes, miércoles y viernes de 16:00 a 20:00, y martes y jueves de 09:30 a 13:30; sábados y domingos la clínica está cerrada. La cita debe finalizar dentro de la franja. La agenda muestra el horario en intervalos de media hora.
 - La creación de usuarios incluye correo electrónico; los registros antiguos pueden tenerlo vacío. No hay envío de correo implementado. El domicilio no forma parte del modelo actual y se ha retirado de los formularios y del buscador.
 - El menú de servicios conserva las categorías de quiropodia y biomecánica y muestra directamente el contenido de otras categorías sin la opción «Atrás» que no tenía efecto. El servicio a domicilio puede figurar como información de la clínica, sin que ello suponga almacenar la dirección del paciente.
+- Los detalles de servicios utilizan fotografías locales estáticas en lugar de los antiguos vídeos incrustados. Un componente compartido presenta las imágenes con marco centrado, anchura máxima de 560 píxeles y proporción 16:9; se adapta a pantallas estrechas y recorta la imagen cuando es necesario. El contenido textual de la ficha de vendaje sigue pendiente de completar.
+- La página «Contacto» incluye la dirección de la clínica y un mapa de Google Maps a todo el ancho disponible, con filtro de escala de grises. El mapa se carga desde un servicio externo y puede no aparecer si el navegador o la red lo bloquean; la dirección sigue siendo visible como texto.
+- Se han incorporado ajustes de diseño adaptable en el encabezado, pie, contacto, inicio, clínica, personal y servicios. El encabezado usa una distribución adaptable hasta 1024 píxeles y conserva su diseño original por encima de ese umbral. La agenda mantiene desplazamiento horizontal para mostrar la semana en pantallas estrechas. Estas mejoras no acreditan una validación responsive completa de toda la aplicación.
 - Las migraciones del backend `001-persona-auto-increment.sql`, `002-persona-email.sql`, `003-disponibilidad.sql` y `004-historial-clinico.sql` incorporan respectivamente la generación de identificadores, el correo, la disponibilidad y el texto ampliado y vínculo opcional de las anotaciones. Deben revisarse y aplicarse de forma controlada a cada base existente.
 - El almacenamiento actual de contraseñas en texto plano es una limitación grave. No debe considerarse que el sistema está preparado para producción; se requieren hashing seguro, revisión integral de autorización y protección de datos clínicos.
 - Los ejemplos y datos cuantitativos históricos de pruebas y rendimiento requieren evidencias reproducibles; no se acredita el porcentaje de éxito indicado en tablas antiguas. Docker se presenta como propuesta, no como despliegue validado.
@@ -528,6 +531,7 @@ La solución se concibe como una aplicación web independiente que no requiere i
 
 3. **Servicios**
    - Consultar el catálogo y la información disponible.
+   - Visualizar fotografías locales con un marco y proporción comunes en los detalles de servicios, sin controles de vídeo.
    - La administración completa del catálogo y de las especialidades no está acreditada como implementada.
 
 4. **Gestión de Disponibilidad (Médico/Recepción/Administrador)**
@@ -553,6 +557,10 @@ La solución se concibe como una aplicación web independiente que no requiere i
    - Recepción puede crear, modificar y eliminar médicos y pacientes, pero no administrar cuentas de administrador.
    - El paciente no administra usuarios y puede editar sus propios datos desde el perfil.
    - Eliminar usuarios o cambiar contraseñas requiere confirmación en la interfaz; no hay baja lógica acreditada.
+
+9. **Información de contacto y adaptación de pantalla**
+   - Consultar la dirección de la clínica y su ubicación en un mapa de Google Maps integrado en la página de contacto.
+   - Adaptar la distribución de varias páginas y del encabezado a pantallas estrechas; la agenda permite desplazarse horizontalmente.
 
 #### 4.2.3 Características de los Usuarios
 
@@ -627,6 +635,8 @@ La solución se concibe como una aplicación web independiente que no requiere i
 | **RF-027** | Navegar y actualizar agenda | **MEDIA** | Selección directa de semana mediante fecha y actualización automática de profesionales, conservando la selección si sigue siendo válida. |
 | **RF-028** | Confirmar acciones sensibles | **ALTA** | Confirmación previa a la eliminación de usuarios, citas y vacaciones y al cambio de contraseña; cancelar no envía la petición. |
 | **RF-029** | Formato de fecha | **MEDIA** | Los selectores presentan `DD/MM/AAAA`; los formularios y la API intercambian fechas ISO. |
+| **RF-030** | Fotografías de servicios | **MEDIA** | Los detalles muestran imágenes locales estáticas con marco centrado y proporción 16:9, sin reproductor de vídeo. |
+| **RF-031** | Consultar ubicación | **MEDIA** | La página de contacto muestra la dirección de la clínica y un mapa externo a todo el ancho disponible, en escala de grises. |
 
 ### 4.4 Requisitos No Funcionales
 
@@ -864,10 +874,10 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Descripción** | Consulta del catálogo de servicios clínicos. |
 | **Actores** | Usuarios con acceso a la aplicación |
 | **Precondiciones** | El catálogo contiene servicios. |
-| **Flujo Principal** | 1. El usuario abre la sección de servicios o un formulario que necesita seleccionar uno.<br/>2. La aplicación consulta los servicios y presenta las opciones disponibles. |
-| **Flujos Alternativos** | Si la consulta falla o no hay datos se muestra el estado correspondiente. |
+| **Flujo Principal** | 1. El usuario abre la sección pública de servicios y selecciona una categoría o un detalle.<br/>2. La aplicación muestra el contenido disponible y una fotografía local enmarcada.<br/>3. En los formularios de gestión que requieren un servicio se presentan las opciones para seleccionarlo. |
+| **Flujos Alternativos** | El detalle puede mostrarse directamente en algunas categorías o abrirse desde la lista. Si falla la consulta de servicios de un formulario, se informa según la pantalla correspondiente. |
 | **Postcondiciones** | El usuario puede consultar o seleccionar un servicio. |
-| **Observaciones** | El controlador consultado expone lectura; no se acredita creación, edición ni borrado de servicios. |
+| **Observaciones** | Las fichas públicas usan contenido e imágenes locales, no reproductores de vídeo. El texto de vendaje sigue pendiente. El controlador consultado expone lectura; no se acredita creación, edición ni borrado de servicios. |
 
 ### 5.15 Asignar y Gestionar Especialidades de Médicos
 
@@ -994,6 +1004,19 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Postcondiciones** | La semana seleccionada queda visible sin recorrer manualmente las semanas intermedias. |
 | **Observaciones** | La selección de profesional se mantiene al actualizar la lista siempre que dicho profesional siga disponible. |
 
+### 5.24 Consultar la ubicación de la clínica
+
+| Atributo | Valor |
+|----------|-------|
+| **Código** | CU-024 |
+| **Nombre** | Consultar ubicación y contacto |
+| **Actores** | Visitante o usuario autenticado |
+| **Precondiciones** | La aplicación está disponible; para cargar el mapa se requiere acceso a Google Maps. |
+| **Flujo principal** | 1. El usuario abre «Contacto».<br/>2. Consulta la dirección en texto.<br/>3. Si el servicio externo se carga correctamente, visualiza el mapa integrado y puede interactuar con él. |
+| **Flujos alternativos** | Si la red, el navegador o Google impiden cargar el mapa, la dirección continúa visible; la aplicación no detecta de forma fiable todos los fallos del contenido externo. |
+| **Postcondiciones** | El usuario ha podido consultar la dirección y, si está disponible, su ubicación en el mapa. |
+| **Observaciones** | El mapa ocupa el ancho disponible y se presenta en escala de grises. La dirección mostrada es la de la clínica, no un domicilio de paciente. |
+
 ---
 
 ## 6. DISEÑO
@@ -1038,6 +1061,7 @@ graph TB
     
     subgraph External["SISTEMAS EXTERNOS"]
         DB["🗄️ MariaDB<br/>Base de datos"]
+        MAPS["Google Maps<br/>Mapa de contacto"]
         style DB fill:#039BE5,stroke:#0277BD,stroke-width:2px,color:#fff
     end
     
@@ -1047,6 +1071,7 @@ graph TB
     ADM -->|HTTP/REST| FRONTEND
     
     FRONTEND -->|API Calls| BACKEND
+    FRONTEND -->|Mapa incrustado| MAPS
     BACKEND -->|Query| AUTH
     
     BACKEND -->|Consultas| DB
@@ -1067,13 +1092,14 @@ graph TB
   - **Administrador:** Administra usuarios, gestiona citas de cualquier médico y consulta o registra historiales; la gestión de vacaciones de terceros no está disponible.
 
 - **Sistema Central:**
-  - Aplicación web responsiva construida con Angular 13.3 e Ionic 6.7 para el cliente
+  - Aplicación web con ajustes de diseño adaptable, construida con Angular 13.3 e Ionic 6.7 para el cliente; su validación integral en dispositivos está pendiente.
   - Backend modular desarrollado en NestJS 9.4 con TypeORM
   - Autenticación mediante JWT y comprobaciones de rol en determinadas operaciones; la autorización requiere una revisión integral.
   - Exposición de una API HTTP por el backend principal.
 
 - **Sistemas Externos:**
   - **MariaDB:** base de datos relacional utilizada por el backend en el entorno comprobado.
+  - **Google Maps:** servicio externo utilizado por el navegador para mostrar el mapa de contacto; su carga depende del proveedor y del entorno.
   - Al guardar citas, el backend comprueba los conflictos en una transacción con bloqueo de las filas del médico y del paciente; al modificar una cita también bloquea su registro.
 
 El frontend se comunica con el backend mediante HTTP; las operaciones protegidas adjuntan el JWT. El inicio de sesión no requiere un token previo. Las comprobaciones de permisos varían por operación y no constituyen una garantía integral de seguridad.
@@ -2359,6 +2385,12 @@ El servicio público de Nominatim prohíbe el autocompletado y solicita no envia
 
 **Verificaciones posteriores de los cambios de citas y confirmación:** se registró la ejecución satisfactoria de 10 suites y 83 pruebas backend con `npm test -- --runInBand citas`, además de `npm run build` en el backend. En el frontend se completaron `npm run build -- --configuration development` y la comprobación de tipos `npx tsc --noEmit -p tsconfig.spec.json`. Las pruebas frontend nuevas de confirmación se comprobaron a nivel de tipos, pero **no se ejecutaron**. En el navegador se comprobó que cancelar las confirmaciones de eliminación de usuario, eliminación de cita y cambio de contraseña no realizaba la operación, sin modificar datos reales. Estas comprobaciones corresponden al trabajo previo, no a una nueva ejecución al actualizar esta memoria.
 
+**Verificaciones posteriores de presentación y contacto:** durante la implementación se completó la compilación de desarrollo del frontend y pasó la prueba focalizada del componente de imagen en Brave Headless, que comprueba la imagen, su texto alternativo y la ausencia de reproductor. Se verificó la existencia de las 19 imágenes locales de los detalles y, en una comprobación de navegador, los marcos presentaron el mismo ancho por tamaño de pantalla.
+
+Se revisaron las páginas principales y una muestra de detalles a 320, 375, 768 y 1280 píxeles, corrigiendo desbordamientos observados. La tabla semanal de la agenda conserva desplazamiento horizontal deliberado. Esta revisión no cubre todas las pantallas, estados, roles, idiomas o navegadores: después de restaurar el encabezado original de escritorio se observaron elementos que excedían su altura disponible en una comprobación con sesión de personal a 1280 píxeles; queda pendiente revisar ese caso sin modificar el diseño de escritorio no autorizado.
+
+Google devolvió la ubicación de la dirección configurada y se observó el mapa en escala de grises y a ancho completo en una ejecución local de Brave. En el navegador integrado de VS Code la solicitud del iframe se abortó y el mapa quedó en blanco. La carga no está garantizada si el navegador, la red o el servicio externo la bloquean. Estas verificaciones son anteriores a la presente actualización documental.
+
 | Escenario de validación | Estado de la evidencia |
 |---|---|
 | Reglas backend de citas, disponibilidad y conflictos | Ejecución focalizada de 83 pruebas de citas registrada; no equivale a cobertura integral. |
@@ -2367,10 +2399,13 @@ El servicio público de Nominatim prohíbe el autocompletado y solicita no envia
 | Editar o eliminar citas propias y ajenas para cada rol; impedir reasignación por médico | Escenario de regresión por rol pendiente de validación integral de extremo a extremo. |
 | Vacaciones propias de médico y recepción, periodos con fines de semana y citas afectadas | Escenario de regresión funcional por rol pendiente de validación integral. |
 | Salto directo de semana, actualización automática de profesionales y formato de fecha | Escenario de regresión visual y funcional pendiente de ejecución completa. |
+| Fotografías de servicios y ausencia de reproductor | Prueba focalizada del componente aprobada; archivos locales y dimensiones comunes comprobados. |
+| Diseño adaptable en páginas principales y agenda | Comprobación focalizada en cuatro anchos; regresión integral en roles, idiomas, dispositivos y el encabezado de escritorio pendiente. |
+| Ubicación y presentación del mapa | Dirección y visualización comprobadas en Brave local; el visor integrado abortó la carga. |
 
 **Nota sobre el contenido histórico:** las cifras, ejemplos y supuesta cobertura completa de los apartados siguientes son propuestas o resultados sin evidencia reproducible asociada. En particular, el ejemplo de bcrypt no describe la implementación actual. No se acredita un porcentaje global de éxito ni la ejecución de todos los casos PF.
 
-Los casos de prueba funcionales históricos se conservan como material de revisión, no como prueba de cobertura completa de los 23 casos de uso actuales. La consulta de historiales requiere autenticación y comprueba el rol y, para el paciente, la identidad. El almacenamiento de contraseñas sigue requiriendo una solución segura.
+Los casos de prueba funcionales históricos se conservan como material de revisión, no como prueba de cobertura completa de las 24 fichas de casos de uso, algunas de ellas propuestas pendientes. La consulta de historiales requiere autenticación y comprueba el rol y, para el paciente, la identidad. El almacenamiento de contraseñas sigue requiriendo una solución segura.
 
 ### 9.1 Estrategia de Pruebas
 
@@ -2575,13 +2610,12 @@ Se han ejecutado **10 casos de prueba funcionales** cubriendo los flujos crític
 | Atributo | Valor |
 |----------|-------|
 | **ID** | PF-10 |
-| **Descripción** | Validar que interfaz es completamente funcional en dispositivos móviles |
-| **Precondición** | Aplicación abierta en dispositivo móvil o viewport 375px (iPhone SE) |
-| **Pasos de Ejecución** | 1. Abrir en Safari/Chrome móvil (viewport 375x667)<br/>2. Navegar por todas las páginas principales<br/>3. Interactuar con formularios<br/>4. Realizar reserva de cita<br/>5. Verificar no hay scroll horizontal |
-| **Resultado Esperado** | • Layout 100% responsivo: sin scroll horizontal<br/>• Botones y campos legibles y tapeable<br/>• Navbar se pliega a hamburger menu<br/>• Formularios optimizados para móvil<br/>• Todas las funciones operativas<br/>• Rendimiento: < 3s para carga de página |
-| **Resultado Actual** | ✅ PASSED |
-| **Tiempo de Ejecución** | 1850 ms (load time en red 3G) |
-| **Notas** | Ionic 6.7.5 + Tailwind CSS garantizan responsividad |
+| **Descripción** | Comprobar la adaptación de la interfaz y el acceso a sus controles en pantallas estrechas. |
+| **Precondición** | Aplicación disponible y viewport o dispositivo móvil. |
+| **Pasos de ejecución** | 1. Revisar inicio, contacto, clínica, personal y servicios.<br/>2. Comprobar encabezado, menús y formularios.<br/>3. Con una sesión autorizada, abrir la agenda y recorrer sus días mediante desplazamiento horizontal. |
+| **Resultado esperado** | Contenido legible y controles accesibles; desplazamiento horizontal limitado a componentes que lo necesitan, como la agenda semanal. |
+| **Resultado actual** | Comprobación focalizada de páginas y anchos descrita en 9.0; validación integral pendiente. |
+| **Notas** | El encabezado adaptable no implementa necesariamente un menú hamburguesa. No se acredita tiempo de carga ni compatibilidad completa entre navegadores. |
 
 #### Resumen de Pruebas Funcionales
 
@@ -3052,6 +3086,8 @@ BACKUP_DIR=/data/backups
 - Permisos por rol para gestionar usuarios y citas, vacaciones propias desde el perfil y consulta de citas propias del paciente.
 - Confirmaciones antes de operaciones sensibles y selectores de fecha con formato `DD/MM/AAAA`.
 - Acceso al historial desde una cita y creación de anotaciones vinculadas, con permisos comprobados en el servidor.
+- Fotografías locales de servicios con presentación uniforme y mapa de ubicación de la clínica en la página de contacto.
+- Ajustes de diseño adaptable para las páginas principales, con revisión focalizada en distintos anchos de pantalla.
 - Archivos de traducción para español, inglés y portugués.
 - Pruebas automatizadas focalizadas; no se acredita cobertura completa.
 
@@ -3066,6 +3102,9 @@ BACKUP_DIR=/data/backups
 - El historial funciona con la API principal; quedan pendientes una revisión integral de seguridad y validaciones adicionales de protección de datos antes de su uso real.
 - Reserva pública de citas pendiente y despliegue Docker no validado.
 - Sin almacenamiento de domicilio ni buscador de direcciones.
+- El mapa de contacto depende de Google Maps y puede no cargar en determinados navegadores o redes; la dirección permanece visible.
+- La validación responsive completa está pendiente, incluido el encabezado original en escritorio con numerosos accesos y la revisión de todas las pantallas y roles.
+- El detalle de vendaje dispone de fotografía, pero su contenido textual es todavía provisional.
 
 ### 11.3 Propuestas de Evolución Futura
 
