@@ -76,28 +76,50 @@ que implementan funciones recientes no están confirmados en Git y
    abre y ejecuta **una sola vez** el archivo
    `clinica-TFG\instalacion\CODIGO OK SQL SCRIPT BBDD.sql`.
 
-   **Aviso: este script borra por completo la base de datos `test` si ya
-   existe y la vuelve a crear.** No lo ejecutes sobre una base existente ni
-   en un servidor compartido; usa una instalación local aislada y comprueba
-   primero que `test` no contiene información que quieras conservar. El script
-   incluye una cuenta de prueba con contraseña en texto plano: no lo uses
-   con datos reales ni expongas el servicio a Internet.
+   **Aviso:** este script es solo para una base nueva `test`. No lo ejecutes
+   sobre una base existente ni en un servidor compartido. No elimina el esquema
+   anterior: si ya existe, detén la ejecución ante el primer error. Incluye
+   el esquema actualizado hasta la migración 010 y no crea cuentas.
 
-4. Selecciona la base `test` en el cliente SQL y ejecuta, en este orden y una
-   sola vez cada uno, los archivos del backend:
+4. Si has creado la base con este script actualizado, **no ejecutes de nuevo
+   las migraciones 001 a 010**, pues sus cambios ya están incorporados. Si
+   partes de un esquema antiguo, revisa qué cambios tiene y aplica solamente
+   las migraciones pendientes del backend, en orden y una sola vez:
 
    - `migrations\001-persona-auto-increment.sql`
    - `migrations\002-persona-email.sql`
    - `migrations\003-disponibilidad.sql`
    - `migrations\004-historial-clinico.sql`
+   - `migrations\005-historial-versiones-y-anulacion.sql`
+   - `migrations\006-password-hash.sql`
+   - `migrations\007-refresh-sessions.sql`
+   - `migrations\008-auditoria-historial.sql`
+   - `migrations\009-rotacion-refresh.sql`
+   - `migrations\010-refresh-margen.sql`
 
    Estos archivos parten del esquema inicial; no deben repetirse a ciegas
    porque crean columnas e índices. Si restauras una copia de una base ya
    migrada, revisa su esquema y las migraciones aplicadas antes de ejecutar
    ninguna. Haz una copia de seguridad antes de modificar datos existentes.
    Las citas antiguas pueden necesitar una duración manual tras la migración
-   003. El archivo SQL incluido en el frontend es un esquema inicial, no una
-   garantía de compatibilidad con cualquier versión del backend.
+   003. La migración 005 no se aplica automáticamente.
+
+5. En una instalación nueva, crea una primera cuenta de administración mediante
+   el cliente SQL local, introduciendo un documento y una contraseña propios:
+
+   ```sql
+   INSERT INTO persona (dni, nombre, apellidos, idRolNativo, password)
+   VALUES ('DOCUMENTO', 'Admin', 'Local', 1, 'CONTRASENA_LOCAL');
+   ```
+
+   Sustituye los valores de ejemplo; no compartas ni subas la contraseña.
+   Esta contraseña inicial se almacena temporalmente en texto plano y se
+   transforma en hash al iniciar sesión por primera vez. Usa una contraseña
+   temporal local y cámbiala después; no expongas el servidor a Internet ni
+   utilices datos reales sin una revisión de seguridad. Las cuentas nuevas creadas
+   en la aplicación guardan directamente un hash. Desde esa cuenta podrás crear
+   usuarios y asignar servicios a cada médico; sin servicios asignados no se
+   pueden guardar citas para él.
 
 Para llevar los datos existentes al otro ordenador se necesita una copia de
 seguridad compatible con esa versión del backend, no solo el script inicial.
@@ -178,8 +200,8 @@ terminales mientras utilices la aplicación. Para detener cada proceso, pulsa
   automáticamente; no lo uses como única configuración de la API.
 - **Error de autenticación de base de datos:** verifica credenciales, permisos
   y compatibilidad del servidor y del controlador configurado en el backend.
-- **Faltan columnas o tablas:** comprueba que aplicaste las cuatro migraciones
-  correctas sobre el esquema inicial, sin repetirlas.
+- **Faltan columnas o tablas:** comprueba el esquema y las migraciones 001 a
+  010 pendientes, sin volver a aplicar las ya incorporadas.
 - **Errores de CORS:** abre la interfaz con `localhost:4200`, comprueba el
   origen permitido por el backend y revisa la consola del navegador.
 

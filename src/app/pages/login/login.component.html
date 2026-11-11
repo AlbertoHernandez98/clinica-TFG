@@ -25,6 +25,7 @@
       </div>
       <p class="login__error login__alert" *ngIf="loginError" role="alert">{{ 'LOGIN.POPUP_ERROR_TEXT' | translate }}</p>
       <p class="login__error login__alert" *ngIf="apiError" role="alert">{{ 'LOGIN.API_ERROR_TEXT' | translate }}</p>
+      <p class="login__error login__alert" *ngIf="rateLimited" role="alert">{{ 'LOGIN.RATE_LIMIT' | translate }}</p>
       <button class="login__submit" type="submit">{{ 'LOGIN.INICIAR_SESION' | translate }}</button>
     </form>
   </section>

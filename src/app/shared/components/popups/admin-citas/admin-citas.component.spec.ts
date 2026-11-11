@@ -31,6 +31,7 @@ describe('AdminCitasComponent', () => {
     http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
     http.expectOne('http://localhost:3000/servicio').flush([{ idServicio: 1, servicio: 'Servicio' }]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([{ idPersona: 2, idServicio: 1 }]);
     http.expectOne('http://localhost:3000/persona').flush([{ idPersona: 2, idRolNativo: 2, nombre: 'A', apellidos: 'B' }]);
   });
 
@@ -46,6 +47,19 @@ describe('AdminCitasComponent', () => {
     component.onSubmit();
     http.expectNone('http://localhost:3000/citas');
   }));
+
+  it('filters services by doctor and prevents saving an unassigned service', () => {
+    component.asignaciones = [{ idPersona: 2, idServicio: 1 }, { idPersona: 3, idServicio: 2 }];
+    component.servicios = [{ idServicio: 1, servicio: 'Uno' }, { idServicio: 2, servicio: 'Dos' }];
+    component.form.patchValue({ idMedico: 2, idServicio: 1 });
+    expect(component.serviciosDisponibles.map(item => item.idServicio)).toEqual([1]);
+    component.form.patchValue({ idMedico: 3, fechaInicio: '2031-02-03T16:00', duracion: 30 });
+    expect(component.serviciosDisponibles.map(item => item.idServicio)).toEqual([2]);
+    component.availability = 'idle';
+    component.onSubmit();
+    expect(component.errorKey).toBe('SPECIALTIES.SERVICE_REQUIRED');
+    http.expectNone('http://localhost:3000/citas');
+  });
 
   it('explains a patient conflict and blocks saving', fakeAsync(() => {
     component.form.patchValue({ idServicio: 1, idMedico: 2, fechaInicio: '2031-02-03T16:00', duracion: 30 });
@@ -209,6 +223,7 @@ describe('AdminCitasComponent editing an appointment', () => {
     const link: HTMLAnchorElement = fixture.nativeElement.querySelector('.history-link');
     expect(link.getAttribute('href')).toBe('/historial;dato=4?cita=9');
     http.expectOne('http://localhost:3000/servicio').flush([]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([]);
     http.expectOne('http://localhost:3000/persona').flush([]);
     tick(300);
     const slots = http.expectOne('http://localhost:3000/citas/huecos');
@@ -229,6 +244,7 @@ describe('AdminCitasComponent editing an appointment', () => {
     confirm.and.returnValue(confirmation.asObservable());
     fixture.detectChanges();
     http.expectOne('http://localhost:3000/servicio').flush([]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([]);
     http.expectOne('http://localhost:3000/persona').flush([]);
     fixture.nativeElement.querySelector('button.delete').click();
     fixture.componentInstance.onDelete();
@@ -252,6 +268,7 @@ describe('AdminCitasComponent editing an appointment', () => {
     confirm.and.returnValue(of(false));
     fixture.detectChanges();
     http.expectOne('http://localhost:3000/servicio').flush([]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([]);
     http.expectOne('http://localhost:3000/persona').flush([]);
     fixture.componentInstance.onDelete();
     http.expectNone('http://localhost:3000/citas/9');
@@ -284,6 +301,7 @@ describe('AdminCitasComponent from a free agenda slot', () => {
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
     http.expectOne('http://localhost:3000/servicio').flush([{ idServicio: 1, servicio: 'Consulta' }]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([{ idPersona: 2, idServicio: 1 }]);
     http.expectOne('http://localhost:3000/persona').flush([
       { idPersona: 4, nombre: 'Ana', apellidos: 'Pérez', idRolNativo: 4 },
       { idPersona: 3, nombre: 'Otro', apellidos: 'Médico', idRolNativo: 2 }
@@ -333,6 +351,7 @@ describe('AdminCitasComponent for a doctor', () => {
     http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
     http.expectOne('http://localhost:3000/servicio').flush([{ idServicio: 1, servicio: 'Servicio' }]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([{ idPersona: 2, idServicio: 1 }]);
   });
 
   afterEach(() => { fixture.destroy(); http.verify(); });

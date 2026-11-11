@@ -70,13 +70,16 @@
             <button type="button" (click)="openAgenda()" *ngIf="isAdmin || isDoctor || isReceptionist" class="dropbtn">
                 {{ 'AGENDA.ADMINISTRAR' | translate }}
             </button>
+            <button type="button" (click)="openAudit()" *ngIf="isAdmin" class="dropbtn">
+                {{ 'AUDIT.TITLE' | translate }}
+            </button>
 
             <button *ngIf="isLogged" (click)="redirectToProfile()" class="dropbtn">
                 <a>{{ 'SHARED.HEADER.PERFIL' | translate }}</a>
             </button>
 
             <button *ngIf="isLogged" (click)="logout()" class="dropbtn">
-                <a href="/access-menu">{{ 'SHARED.HEADER.LOGOUT' | translate }}</a>
+                {{ 'SHARED.HEADER.LOGOUT' | translate }}
             </button>
         </div>
     </div>

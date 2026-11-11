@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-access-menu',
@@ -14,18 +16,16 @@ export class AccessMenuComponent implements OnInit{
   access: any;
 
   isLogged: boolean = false;
-  constructor(route: ActivatedRoute) {
+  constructor(route: ActivatedRoute, private auth: AuthService, private translate: TranslateService) {
   }
 
   ngOnInit() {
   }
 
   logout(): void {
-    sessionStorage.removeItem('accessToken');
-    // Delete sessionToken cookie
-    document.cookie = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
-    // Redirect to login page
-    window.location.href = '/login';
+    this.auth.logout().subscribe({
+      next: () => { window.location.href = '/login'; },
+      error: error => { console.error('Error al cerrar sesión:', error); alert(this.translate.instant('LOGIN.LOGOUT_ERROR')); }
+    });
   }
 }

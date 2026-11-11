@@ -30,6 +30,7 @@ import { AgendaMedicoComponent } from './components/popups/agenda-medico/agenda-
 import { MisCitasComponent } from './components/popups/mis-citas/mis-citas.component';
 import { ClinicDatePickerModule } from './components/forms/clinic-date-picker/clinic-date-picker.module';
 import { ConfirmActionComponent } from './components/popups/confirm-action/confirm-action.component';
+import { AuditoriaHistorialComponent } from './components/popups/auditoria-historial/auditoria-historial.component';
 
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -58,7 +59,8 @@ export function httpLoaderFactory(httpClient: HttpClient) {
         VacacionesComponent,
         AgendaMedicoComponent,
         MisCitasComponent,
-        ConfirmActionComponent
+        ConfirmActionComponent,
+        AuditoriaHistorialComponent
     ],
     imports: [
         CommonModule,

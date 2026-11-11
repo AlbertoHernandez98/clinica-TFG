@@ -1,4 +1,7 @@
--- MySQL Workbench Forward Engineering
+-- Esquema completo para una instalación nueva, incluidas las migraciones 001-010.
+-- No ejecutar sobre una base existente: este archivo NO es una migración.
+-- Detener la ejecución ante cualquier error y crear una copia de seguridad antes
+-- de modificar una base con datos. No incluye usuarios ni contraseñas.
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -7,28 +10,22 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema test
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `test`;
-
--- -----------------------------------------------------
--- Schema test
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `test` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA `test` DEFAULT CHARACTER SET utf8 ;
 USE `test`;
 
 -- -----------------------------------------------------
 -- Table `test`.`persona`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`persona` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`persona` (
-  `idPersona` INT(10) UNSIGNED NOT NULL,
+CREATE TABLE `test`.`persona` (
+  `idPersona` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `dni` VARCHAR(9) NOT NULL,
   `nombre` VARCHAR(32) NOT NULL,
   `apellidos` VARCHAR(45) NOT NULL,
   `telefono` INT(11) NULL DEFAULT NULL,
-  `contraseña` VARCHAR(45) NULL DEFAULT NULL,
+  `password` VARCHAR(255) NULL DEFAULT NULL,
   `idRolNativo` INT(11) NOT NULL,
   `fotoPerfil` VARCHAR(250) NULL,
+  `email` VARCHAR(254) NULL DEFAULT NULL,
   PRIMARY KEY (`idPersona`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -37,9 +34,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `test`.`servicio`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`servicio` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`servicio` (
+CREATE TABLE `test`.`servicio` (
   `idServicio` INT(10) UNSIGNED NOT NULL,
   `servicio` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`idServicio`))
@@ -50,9 +45,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `test`.`cita`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`cita` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`cita` (
+CREATE TABLE `test`.`cita` (
   `idCita` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `fecha` DATE NULL DEFAULT NULL,
   `hora` TIME NULL DEFAULT NULL,
@@ -60,29 +53,29 @@ CREATE TABLE IF NOT EXISTS `test`.`cita` (
   `historial` VARCHAR(250) NULL DEFAULT NULL,
   `idCliente` INT(10) UNSIGNED NOT NULL,
   `idMedico` INT(10) UNSIGNED NOT NULL,
+  `duracion` INT NULL DEFAULT NULL,
   PRIMARY KEY (`idCita`)
   )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE UNIQUE INDEX `idServicio_UNIQUE` ON `test`.`cita` (`idServicio` ASC);
-
 CREATE UNIQUE INDEX `idCita_UNIQUE` ON `test`.`cita` (`idCita` ASC);
+CREATE INDEX `idx_cita_medico_fecha` ON `test`.`cita` (`idMedico`, `fecha`, `hora`);
 
 
 -- -----------------------------------------------------
 -- Table `test`.`historialclinico`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`historialclinico` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`historialclinico` (
+CREATE TABLE `test`.`historialclinico` (
   `idHistorialClinico` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `comentarios` VARCHAR(45) NOT NULL,
+  `comentarios` TEXT NOT NULL,
   `fecha` VARCHAR(45) NOT NULL,
   `hora` VARCHAR(45) NOT NULL,
   `idCliente` INT(10) UNSIGNED NOT NULL,
   `idMedico` INT(10) UNSIGNED NOT NULL,
   `idServicio` INT(10) UNSIGNED NOT NULL,
+  `idCita` INT(10) UNSIGNED NULL,
+  `anulada` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`idHistorialClinico`)
   )
 ENGINE = InnoDB
@@ -93,9 +86,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `test`.`medico_has_servicio`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`medico_has_servicio` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`medico_has_servicio` (
+CREATE TABLE `test`.`medico_has_servicio` (
   `idPersona` INT(10) UNSIGNED NOT NULL,
   `idServicio` INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`idPersona`, `idServicio`)
@@ -108,9 +99,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `test`.`rol`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`rol` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`rol` (
+CREATE TABLE `test`.`rol` (
   `idRol` INT(11) NOT NULL,
   `descripcion` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idRol`))
@@ -121,9 +110,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `test`.`persona_has_rol`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `test`.`persona_has_rol` ;
-
-CREATE TABLE IF NOT EXISTS `test`.`persona_has_rol` (
+CREATE TABLE `test`.`persona_has_rol` (
   `idPersona` INT(10) UNSIGNED NOT NULL,
   `idRol` INT(11) NOT NULL,
   PRIMARY KEY (`idPersona`, `idRol`)
@@ -132,18 +119,75 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
+CREATE TABLE `test`.`vacaciones_medico` (
+  `idVacacion` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idMedico` INT UNSIGNED NOT NULL,
+  `fechaInicio` DATE NOT NULL,
+  `fechaFin` DATE NOT NULL,
+  PRIMARY KEY (`idVacacion`),
+  KEY `idx_vacaciones_medico_fechas` (`idMedico`, `fechaInicio`, `fechaFin`),
+  CONSTRAINT `fk_vacaciones_medico` FOREIGN KEY (`idMedico`) REFERENCES `persona` (`idPersona`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+CREATE TABLE `test`.`historialclinicohistorico` (
+  `idVersionHistorial` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idHistorialClinico` INT UNSIGNED NOT NULL,
+  `comentarios` TEXT NOT NULL,
+  `fecha` VARCHAR(45) NULL,
+  `hora` VARCHAR(45) NULL,
+  `idMedico` INT UNSIGNED NULL,
+  `idServicio` INT UNSIGNED NOT NULL,
+  `idCita` INT UNSIGNED NULL,
+  `tipoOperacion` ENUM('EDICION', 'ANULACION') NOT NULL,
+  `motivo` VARCHAR(1000) NOT NULL,
+  `idUsuario` INT UNSIGNED NOT NULL,
+  `fechaOperacion` DATETIME NOT NULL,
+  PRIMARY KEY (`idVersionHistorial`),
+  INDEX `idx_historial_historico_entrada` (`idHistorialClinico`, `idVersionHistorial`),
+  INDEX `idx_historial_historico_usuario` (`idUsuario`, `fechaOperacion`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+CREATE TABLE `test`.`auth_refresh_session` (
+  `idSesion` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idPersona` INT UNSIGNED NOT NULL,
+  `tokenHash` CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiresAt` DATETIME NOT NULL,
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `revokedAt` DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (`idSesion`),
+  UNIQUE KEY `uq_refresh_token` (`tokenHash`),
+  KEY `idx_refresh_persona` (`idPersona`),
+  KEY `idx_refresh_expiry` (`expiresAt`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+CREATE TABLE `test`.`auth_refresh_used_token` (
+  `tokenHash` CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `idSesion` BIGINT UNSIGNED NOT NULL,
+  `usedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`tokenHash`),
+  KEY `idx_refresh_used_session` (`idSesion`),
+  CONSTRAINT `fk_refresh_used_session` FOREIGN KEY (`idSesion`)
+    REFERENCES `test`.`auth_refresh_session` (`idSesion`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+CREATE TABLE `test`.`auditoria_historial` (
+  `idAuditoria` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `fecha` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `idUsuario` INT UNSIGNED NOT NULL,
+  `rolUsuario` INT NOT NULL,
+  `operacion` ENUM('CONSULTA', 'ALTA', 'EDICION', 'ANULACION') NOT NULL,
+  `resultado` ENUM('PERMITIDO', 'DENEGADO') NOT NULL,
+  `idPaciente` INT UNSIGNED NULL,
+  `idHistorialClinico` INT UNSIGNED NULL,
+  PRIMARY KEY (`idAuditoria`),
+  KEY `idx_auditoria_fecha` (`fecha`, `idAuditoria`),
+  KEY `idx_auditoria_paciente` (`idPaciente`, `idAuditoria`),
+  KEY `idx_auditoria_usuario` (`idUsuario`, `idAuditoria`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
--- -----------------------------------------------------
--- Data for table `test`.`persona`
--- -----------------------------------------------------
-START TRANSACTION;
-USE `test`;
-INSERT INTO `test`.`persona` (`idPersona`, `dni`, `nombre`, `apellidos`, `telefono`, `contraseña`, `idRolNativo`, `fotoPerfil`) VALUES (0, '12345678', 'root', 'root', 123456789, 'root', 1, NULL);
-
-COMMIT;
 
 
 -- -----------------------------------------------------
@@ -174,4 +218,3 @@ INSERT INTO `test`.`rol` (`idRol`, `descripcion`) VALUES (3, 'Recepcionista');
 INSERT INTO `test`.`rol` (`idRol`, `descripcion`) VALUES (4, 'Cliente');
 
 COMMIT;
-

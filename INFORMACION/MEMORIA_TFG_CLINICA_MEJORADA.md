@@ -55,6 +55,8 @@ This thesis documents requirements, design, implementation and proposed validati
 3. [Metodología](#3-metodología)
 4. [Análisis y Especificación de Requisitos](#4-análisis-y-especificación-de-requisitos)
 5. [Casos de Uso](#5-casos-de-uso)
+   - [Permisos por rol en cada caso de uso](#permisos-por-rol-en-los-casos-de-uso)
+   - [Matriz de trazabilidad y estado de validación](#526-matriz-de-trazabilidad-y-estado-de-validación)
 6. [Diseño](#6-diseño)
 7. [Tecnologías y Herramientas](#7-tecnologías-y-herramientas)
 8. [Implementación](#8-implementación)
@@ -569,7 +571,7 @@ La solución se concibe como una aplicación web independiente que no requiere i
 | **Cliente (Paciente)** | Consultar sus citas e historial y editar perfil | Uso básico de aplicaciones web | Autenticado |
 | **Médico** | Consultar agenda, registrar historial, editar perfil | Conocimiento del proceso asistencial | Autenticado |
 | **Recepcionista** | Gestionar citas, atienden clientes | Conocimiento operativo del centro | Autenticado |
-| **Administrador** | Gestionar usuarios, servicios, disponibilidad | Conocimiento operativo y técnico | Autenticado |
+| **Administrador** | Gestionar usuarios y citas, y consultar o registrar historial; consultar servicios | Conocimiento operativo y técnico | Autenticado |
 | **Usuario No Autenticado** | Consultar información pública e iniciar sesión | Mínimo | Público |
 
 #### 4.2.4 Restricciones y Suposiciones
@@ -630,7 +632,7 @@ La solución se concibe como una aplicación web independiente que no requiere i
 | **RF-022** | Eliminar historial | **BAJA** | Pendiente: no hay eliminación de anotaciones implementada. |
 | **RF-023** | Crear usuario | **ALTA** | Administrador: todos los roles; médico: pacientes; recepción: médicos y pacientes. |
 | **RF-024** | Listar usuarios | **ALTA** | El personal autorizado consulta la lista y busca por nombre; el alcance depende del rol y la pantalla. |
-| **RF-025** | Editar usuario | **MEDIA** | Administración edita todos los roles; médico edita pacientes y su perfil; recepción edita médicos y pacientes. Los cambios de contraseña requieren confirmación. |
+| **RF-025** | Editar usuario | **MEDIA** | Administración edita todos los roles; médico edita pacientes; recepción edita médicos y pacientes. Todos pueden editar sus propios datos desde el perfil. Los cambios de contraseña requieren confirmación. |
 | **RF-026** | Eliminar usuario | **MEDIA** | Administración elimina cualquier usuario y recepción médicos o pacientes, previa confirmación. No se acredita baja lógica ni auditoría completa. |
 | **RF-027** | Navegar y actualizar agenda | **MEDIA** | Selección directa de semana mediante fecha y actualización automática de profesionales, conservando la selección si sigue siendo válida. |
 | **RF-028** | Confirmar acciones sensibles | **ALTA** | Confirmación previa a la eliminación de usuarios, citas y vacaciones y al cambio de contraseña; cancelar no envía la petición. |
@@ -678,10 +680,46 @@ Los requisitos de esta tabla son objetivos, no garantías alcanzadas: en particu
 |---|---|---|---|
 | Administrador | Crear, modificar y eliminar cualquier rol | Gestionar las de cualquier médico | No administra vacaciones de terceros mediante los endpoints actuales |
 | Médico | Crear y modificar pacientes; modificar su propio perfil; no eliminar usuarios | Gestionar únicamente las asignadas a él, sin reasignarlas | Gestionar exclusivamente las propias desde el perfil |
-| Recepcionista | Crear, modificar y eliminar médicos y pacientes, no administradores | Gestionar las de cualquier médico | Gestionar exclusivamente las propias desde el perfil |
+| Recepcionista | Crear, modificar y eliminar médicos y pacientes; editar su propio perfil, no administrar otras cuentas de administrador o recepción | Gestionar las de cualquier médico | Gestionar exclusivamente las propias desde el perfil |
 | Paciente | Sin administración de usuarios; acceso a su perfil | Consultar únicamente sus propias citas | Sin gestión de vacaciones |
 
 Los casos de uso describen la interacción entre actores y el sistema. Se aplica plantilla uniforme basada en especificación formal.
+
+#### Permisos por rol en los casos de uso
+
+La siguiente tabla indica los actores de cada caso y las restricciones sobre la persona, cita o historial afectado. **Propio** significa que el recurso pertenece a la sesión autenticada. «No» se refiere a ese caso concreto, no impide otras funciones del rol. Los casos pendientes no atribuyen permisos efectivos. Esta tabla documenta el alcance de las fichas y no acredita que todas las combinaciones se hayan probado de extremo a extremo.
+
+| Caso de uso | Administrador | Médico | Recepcionista | Paciente |
+|---|---|---|---|---|
+| CU-001 Alta de persona | Crea cualquier rol | Crea pacientes | Crea médicos y pacientes | No |
+| CU-002 Iniciar sesión | Sí, con su cuenta | Sí, con su cuenta | Sí, con su cuenta | Sí, con su cuenta |
+| CU-003 Cambiar contraseña propia | Sí | Sí | Sí | Sí |
+| CU-004 Editar perfil propio | Sí | Sí | Sí | Sí |
+| CU-005 Subir foto de perfil | Pendiente | Pendiente | Pendiente | Pendiente |
+| CU-006 Crear cita | Para cualquier médico | Solo asignada a sí mismo | Para cualquier médico | No |
+| CU-007 Ver «Mis citas» | No es la vista de este rol | No es la vista de este rol | No es la vista de este rol | Solo citas propias, en consulta |
+| CU-008 Modificar cita | De cualquier médico | Solo asignada a sí mismo; no reasigna médico | De cualquier médico | No |
+| CU-009 Eliminar cita | De cualquier médico | Solo asignada a sí mismo | De cualquier médico | No |
+| CU-010 Gestionar vacaciones | No por los endpoints actuales | Solo las propias | Solo las propias | No |
+| CU-011 Registrar anotación | Sí | Sí | No | No |
+| CU-012 Consultar historial | De pacientes | De pacientes | De pacientes, solo lectura | Solo el suyo |
+| CU-013 Administrar usuarios | Crea, modifica y elimina todos los roles | Crea y modifica pacientes; no elimina | Crea, modifica y elimina médicos y pacientes | No administra usuarios |
+| CU-014 Consultar servicios | Sí | Sí | Sí | Sí |
+| CU-015 Asignar especialidades | Pendiente | Pendiente | Pendiente | Pendiente |
+| CU-016 Consultar y filtrar historial | De pacientes | De pacientes | De pacientes, solo lectura | Solo el suyo |
+| CU-017 Editar anotación | Pendiente | Pendiente | Pendiente | Pendiente |
+| CU-018 Eliminar anotación | Pendiente | Pendiente | Pendiente | Pendiente |
+| CU-019 Consultar agenda | Elige médico | Solo agenda propia | Elige médico | No |
+| CU-020 Gestionar foto de perfil | Pendiente | Pendiente | Pendiente | Pendiente |
+| CU-021 Consultar huecos para una cita | De cualquier médico | Solo los de su agenda | De cualquier médico | No |
+| CU-022 Confirmar operación | Si tiene permiso para la operación | Si tiene permiso para la operación | Si tiene permiso para la operación | Para su propio cambio de contraseña |
+| CU-023 Seleccionar semana de agenda | Elige médico | Solo agenda propia | Elige médico | No |
+| CU-024 Consultar ubicación | Sí | Sí | Sí | Sí |
+| CU-025 Editar otra persona | Cualquier rol | Solo pacientes, sin cambiar su rol | Médicos y pacientes; puede cambiar entre esos dos roles | No |
+
+CU-014 y CU-024 también son accesibles a visitantes sin iniciar sesión. CU-013 agrupa la administración; CU-025 detalla la modificación **de otra persona**, mientras que CU-004 describe el perfil propio. Así, que el paciente no pueda editar a otra persona no significa que no pueda actualizar sus propios datos. El cambio de contraseña propia se describe en CU-003; una contraseña modificada desde la ficha de otra persona está sujeta a los permisos de CU-025 y a la confirmación de CU-022.
+
+En cada ficha, «Justificación por rol» explica la relación entre el alcance funcional y los permisos descritos; es una interpretación del diseño actual, no una acreditación de cumplimiento normativo ni de una validación de seguridad completa. Las referencias de código y pruebas, junto con sus limitaciones, se recogen en la sección 5.26. Cuando una funcionalidad o sus permisos están pendientes, no se presupone que ningún rol pueda utilizarla.
 
 ### 5.1 Alta de usuarios y pacientes
 
@@ -691,6 +729,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Alta de usuarios y pacientes |
 | **Descripción** | El personal autorizado crea una persona en el sistema. |
 | **Actores** | Administrador, médico o recepcionista autenticado |
+| **Justificación por rol** | **Administrador:** puede crear cualquier rol por su función de administración general. **Médico:** crea solo pacientes para incorporar personas a la atención, sin administrar personal. **Recepcionista:** crea médicos y pacientes para la gestión operativa, sin crear administradores ni recepcionistas. **Paciente:** no crea cuentas porque la aplicación no ofrece registro autónomo ni administración de usuarios para este rol. |
 | **Precondiciones** | Sesión válida; DNI no existente; acceso al formulario de alta. |
 | **Flujo Principal** | 1. El personal abre «Administrar usuarios».<br/>2. Selecciona la creación de usuario.<br/>3. Introduce los datos y selecciona un rol permitido.<br/>4. El servidor comprueba el rol y los datos admitidos.<br/>5. Se guarda la persona y se comunica el resultado. |
 | **Flujos Alternativos** | DNI duplicado, correo inválido, datos incompletos, fallo de conexión o falta de permiso: se muestra el error y no se completa el alta. |
@@ -705,6 +744,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Iniciar Sesión |
 | **Descripción** | Autenticar usuario y crear sesión mediante JWT. |
 | **Actores** | Usuario registrado |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** todos necesitan identificarse con su propia cuenta para acceder a las funciones protegidas correspondientes; iniciar sesión no concede por sí mismo permisos de los demás roles. Un visitante sin cuenta puede consultar contenido público, pero no completar este caso. |
 | **Precondiciones** | Usuario registrado y servidor disponible. |
 | **Flujo Principal** | 1. El usuario abre el inicio de sesión.<br/>2. Introduce DNI y contraseña.<br/>3. El servidor valida las credenciales y devuelve un JWT.<br/>4. El cliente guarda el token en `sessionStorage` y accede al menú principal. |
 | **Flujos Alternativos** | Credenciales inválidas o fallo de conexión: se informa del error sin iniciar sesión. |
@@ -719,6 +759,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Cambiar Contraseña |
 | **Descripción** | Permitir a usuario autenticado cambiar su contraseña. |
 | **Actores** | Usuario autenticado (cualquier rol) |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** cada titular puede actualizar la contraseña de su propia cuenta para mantener su acceso, previa comprobación de la contraseña actual y confirmación. El cambio desde la ficha de otra persona se rige por CU-025, no por este flujo de contraseña propia. |
 | **Precondiciones** | Usuario debe estar autenticado. Sessionactiva. |
 | **Flujo Principal** | 1. El usuario abre «Cambiar contraseña» desde el perfil.<br/>2. Introduce la contraseña actual y la nueva repetida.<br/>3. El cliente valida los campos y solicita una segunda confirmación.<br/>4. Tras confirmarla, el servidor comprueba la contraseña actual.<br/>5. Se guarda el cambio y se informa del resultado. |
 | **Flujos Alternativos** | Cancelar o cerrar la confirmación no envía la petición. Contraseña actual incorrecta, nueva contraseña igual a la actual o repetición distinta: se muestra el error correspondiente. |
@@ -733,11 +774,12 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Editar Perfil |
 | **Descripción** | Usuario autenticado puede actualizar sus datos personales. |
 | **Actores** | Usuario autenticado (cualquier rol) |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** pueden mantener actualizados los datos de su propia cuenta. **Paciente:** esta facultad no le permite modificar a terceros; para el personal, la edición de otras cuentas depende de CU-025. Los no administradores no pueden cambiar su propio rol por esta vía. |
 | **Precondiciones** | Usuario autenticado. Datos actuales cargados del servidor. |
 | **Flujo Principal** | 1. Usuario accede a Perfil<br/>2. El sistema obtiene sus datos<br/>3. Modifica nombre, apellidos, DNI, teléfono o correo<br/>4. Guarda los cambios<br/>5. El sistema valida y muestra el resultado |
 | **Flujos Alternativos** | Correo o teléfono inválido, DNI duplicado o fallo del servidor: se informa del problema sin confirmar el cambio. |
 | **Postcondiciones** | Datos de usuario actualizados en BD. Cambios reflejados en sesión actual. |
-| **Observaciones** | El formulario de perfil no almacena domicilio ni ofrece autocompletado de direcciones. |
+| **Observaciones** | Los cuatro roles pueden editar su propio perfil; el paciente no puede administrar ni editar a otras personas. Para los roles no administradores esta vía no permite cambiar el rol propio ni modificar la contraseña como dato de perfil; el cambio de contraseña propio se realiza según CU-003. El formulario no almacena domicilio ni ofrece autocompletado de direcciones. |
 
 ### 5.5 Subir Foto de Perfil
 
@@ -747,6 +789,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Subir Foto de Perfil |
 | **Descripción** | Propuesta de selección y vinculación de una imagen al perfil. |
 | **Actores** | Usuario autenticado, sujeto a diseño futuro. |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** los permisos están pendientes para todos, pues no se ha acreditado la integración de subida con el perfil. La existencia de un endpoint de archivos no demuestra que cualquiera de ellos pueda completar este caso. |
 | **Precondiciones** | Implementar y validar la interfaz y sus controles de seguridad. |
 | **Flujo Principal** | No se ha acreditado el flujo de subida y vinculación de una foto desde el perfil. |
 | **Flujos Alternativos** | Las restricciones de formato, tamaño y gestión de errores quedan pendientes de definición y prueba. |
@@ -761,6 +804,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Buscar disponibilidad y crear cita |
 | **Descripción** | El personal consulta la agenda y crea una cita para un paciente. |
 | **Actores** | Administrador, médico y recepcionista autenticados |
+| **Justificación por rol** | **Administrador y recepcionista:** pueden coordinar citas de cualquier médico. **Médico:** puede crear citas para su propia agenda, sin asignarlas a otro profesional. **Paciente:** no crea citas porque la reserva autónoma no está implementada; solo consulta las asignadas. |
 | **Precondiciones** | Hay sesión válida, paciente, médico y servicio disponibles. |
 | **Flujo Principal** | 1. El usuario abre «Administrar citas» desde el encabezado.<br/>2. El médico ve su agenda; administración y recepción seleccionan profesional.<br/>3. Navega por semanas o elige una fecha y pulsa un hueco de hoy en adelante.<br/>4. Selecciona paciente, servicio y duración de 30, 60 o 90 minutos.<br/>5. El formulario muestra inicios disponibles para médico y paciente.<br/>6. El servidor comprueba horario, vacaciones y solapamientos de ambos y guarda la cita. |
 | **Flujos Alternativos** | Fecha anterior a hoy, duración no admitida, citas solapadas o fuera del horario: se rechaza. Si cambia la disponibilidad antes de guardar se informa y se recargan los huecos; ante fallo de red se muestra un error. |
@@ -775,6 +819,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Ver Mis Citas |
 | **Descripción** | El paciente consulta sus citas asignadas, incluidas las pasadas. |
 | **Actores** | Paciente autenticado |
+| **Justificación por rol** | **Paciente:** necesita consultar sus citas y la API limita esta vista a su identidad. **Administrador, médico y recepcionista:** no utilizan esta vista exclusiva del paciente; consultan las citas mediante las pantallas de gestión autorizadas según CU-019 y CU-008. |
 | **Precondiciones** | Sesión válida con rol paciente. |
 | **Flujo Principal** | 1. Desde su perfil pulsa «Mis citas».<br/>2. El servidor filtra por el identificador de la sesión.<br/>3. Se muestran fecha, hora, profesional, servicio y duración cuando están disponibles. |
 | **Flujos Alternativos** | Si no existen citas se muestra un estado vacío; ante fallo se informa y se ofrece reintento. Los datos incompletos se indican expresamente. |
@@ -789,6 +834,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Modificar Cita |
 | **Descripción** | Usuario autorizado puede cambiar fecha/hora de cita si hay disponibilidad. |
 | **Actores** | Administrador, médico y recepcionista |
+| **Justificación por rol** | **Administrador y recepcionista:** pueden reorganizar citas de cualquier médico. **Médico:** modifica solo las asignadas a su agenda y no puede reasignarlas a otro profesional. **Paciente:** su vista es de consulta y no permite modificar citas. |
 | **Precondiciones** | Cita existente y sesión de personal válida. |
 | **Flujo Principal** | 1. Se abre una cita desde la agenda o «Citas de pacientes».<br/>2. Se modifican los datos permitidos.<br/>3. Se consultan huecos para el día, médico, paciente y duración.<br/>4. El servidor excluye la propia cita y valida de nuevo al guardar.<br/>5. Se actualiza la cita y se refresca la vista. |
 | **Flujos Alternativos** | Conflicto de disponibilidad, horario fuera de apertura o fallo de conexión: se informa y no se guarda. |
@@ -803,6 +849,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Eliminar cita |
 | **Descripción** | El personal elimina una cita existente desde su formulario. |
 | **Actores** | Administrador, médico y recepcionista |
+| **Justificación por rol** | **Administrador y recepcionista:** pueden retirar citas de cualquier médico para gestionar la agenda. **Médico:** puede retirar solo las asignadas a él, dentro de su ámbito de gestión. **Paciente:** no puede eliminar ni cancelar citas desde su vista. Todos los actores autorizados deben confirmar la eliminación. |
 | **Precondiciones** | Sesión de personal válida y cita existente. |
 | **Flujo Principal** | 1. El usuario abre la cita desde agenda o lista.<br/>2. Pulsa «Eliminar» y confirma la acción.<br/>3. El servidor comprueba permisos y elimina el registro.<br/>4. Se actualiza la vista al cerrarse el formulario. |
 | **Flujos Alternativos** | Cancelar o cerrar la confirmación no envía la petición. Si falla la operación se muestra un error. |
@@ -817,6 +864,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Gestionar Disponibilidad |
 | **Descripción** | Consulta de disponibilidad y gestión de vacaciones dentro del horario común de la clínica. |
 | **Actores** | Médico o recepcionista autenticado |
+| **Justificación por rol** | **Médico:** gestiona exclusivamente sus vacaciones, que afectan a sus huecos. **Recepcionista:** gestiona exclusivamente las propias, que no bloquean la agenda médica. **Administrador y paciente:** los endpoints actuales no permiten a estos roles gestionar periodos; en particular, administración no gestiona vacaciones de terceros por esta vía. |
 | **Precondiciones** | Sesión válida y acceso al propio perfil. |
 | **Flujo Principal** | 1. El médico o recepcionista abre «Mis vacaciones» desde su perfil.<br/>2. Indica un periodo y lo guarda.<br/>3. El servidor comprueba identidad, días laborables y solapamientos.<br/>4. Las vacaciones médicas se reflejan en la agenda y en los huecos. Para eliminar un periodo, el titular confirma la operación. |
 | **Flujos Alternativos** | Periodo inválido, sin días laborables o solapado: se rechaza. Si existen citas afectadas se informa de ellas sin cancelarlas. |
@@ -831,6 +879,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Registrar Historial Clínico |
 | **Descripción** | Médico o administrador añade una anotación clínica, opcionalmente vinculada a una cita. |
 | **Actores** | Médico y administrador autenticados |
+| **Justificación por rol** | **Médico:** puede documentar la atención clínica. **Administrador:** la implementación también le permite registrar anotaciones. **Recepcionista:** dispone de consulta, pero no de escritura clínica. **Paciente:** consulta su propio historial y no añade anotaciones mediante esta funcionalidad. La autorización del administrador para escribir es una capacidad actual, no una valoración de su conveniencia clínica. |
 | **Precondiciones** | Paciente existente y acceso autorizado al historial. |
 | **Flujo Principal** | 1. El usuario abre una cita existente y pulsa «Abrir historial clínico».<br/>2. Consulta la identidad del paciente y el servicio de la cita.<br/>3. Introduce los comentarios y envía el formulario.<br/>4. El servidor comprueba la correspondencia de cita, paciente y servicio y registra autor, fecha y hora.<br/>5. Se actualiza el listado de anotaciones. |
 | **Flujos Alternativos** | Comentarios vacíos o demasiado largos, cita inconsistente o error de servidor: se informa y se conserva el texto introducido. |
@@ -845,6 +894,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Consultar Historial Clínico |
 | **Descripción** | Consulta de las anotaciones clínicas de un paciente. |
 | **Actores** | Médico, administrador, recepcionista y paciente titular |
+| **Justificación por rol** | **Médico:** consulta historiales para la atención. **Administrador y recepcionista:** el sistema permite la consulta de historiales de pacientes para la operativa, sin conceder escritura a recepción. **Paciente:** accede solo al historial asociado a su identidad. El alcance del personal es el implementado y requiere revisión específica de privacidad y necesidad de acceso. |
 | **Precondiciones** | Sesión válida y paciente existente. |
 | **Flujo Principal** | 1. El personal abre el historial desde una cita existente; el paciente accede al suyo desde el perfil.<br/>2. El servidor comprueba el rol y restringe al paciente a su propio identificador.<br/>3. La pantalla muestra fecha, autor, servicio, comentarios y, si existe, la cita vinculada.<br/>4. Se puede filtrar por servicio y profesional y ordenar por fecha. |
 | **Flujos Alternativos** | Historial vacío, error de carga o acceso denegado: se muestra el estado correspondiente. |
@@ -859,11 +909,12 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Administrar usuarios |
 | **Descripción** | El personal autorizado crea, modifica o elimina personas según su rol. |
 | **Actores** | Administrador, médico y recepcionista autenticados |
+| **Justificación por rol** | **Administrador:** administra cuentas de todos los roles. **Médico:** crea y modifica pacientes para su actividad, pero no elimina usuarios ni administra otras cuentas de personal. **Recepcionista:** gestiona médicos y pacientes, incluida su eliminación, pero no administra cuentas de administración ni de otros recepcionistas. **Paciente:** carece de acceso a la administración de usuarios; conserva la edición de su propio perfil en CU-004. |
 | **Precondiciones** | Sesión válida y acceso a la gestión de usuarios. |
 | **Flujo Principal** | 1. Abre la gestión de usuarios.<br/>2. Busca una persona o abre el formulario de alta.<br/>3. Crea o edita según sus permisos, o confirma la eliminación de un usuario permitido.<br/>4. El servidor valida y comunica el resultado. |
 | **Flujos Alternativos** | Cancelar la confirmación no envía cambios. DNI duplicado, correo inválido, falta de permiso o error del servidor: se informa del problema. |
 | **Postcondiciones** | La persona se crea, modifica o elimina según la operación autorizada. |
-| **Observaciones** | Administración gestiona todos los roles; médico crea y modifica pacientes y su perfil, sin eliminar; recepción crea, modifica o elimina médicos y pacientes. No hay borrado lógico ni auditoría completa acreditados. |
+| **Observaciones** | Administración gestiona todos los roles; médico crea y modifica pacientes, sin eliminar; recepción crea, modifica o elimina médicos y pacientes, no otras cuentas de recepción ni de administración. El paciente no administra personas. Los cuatro roles pueden editar su propio perfil según CU-004. La edición de otras personas se detalla en CU-025. No hay borrado lógico ni auditoría completa acreditados. |
 
 ### 5.14 Gestionar Servicios Médicos
 
@@ -873,6 +924,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Consultar servicios |
 | **Descripción** | Consulta del catálogo de servicios clínicos. |
 | **Actores** | Usuarios con acceso a la aplicación |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** pueden consultar la información de servicios; **visitante:** también puede ver las fichas públicas para conocer la oferta. Esta consulta no atribuye a ningún rol permisos de creación, modificación o eliminación del catálogo. |
 | **Precondiciones** | El catálogo contiene servicios. |
 | **Flujo Principal** | 1. El usuario abre la sección pública de servicios y selecciona una categoría o un detalle.<br/>2. La aplicación muestra el contenido disponible y una fotografía local enmarcada.<br/>3. En los formularios de gestión que requieren un servicio se presentan las opciones para seleccionarlo. |
 | **Flujos Alternativos** | El detalle puede mostrarse directamente en algunas categorías o abrirse desde la lista. Si falla la consulta de servicios de un formulario, se informa según la pantalla correspondiente. |
@@ -887,6 +939,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Asignar especialidades |
 | **Descripción** | Propuesta de gestión de la asociación entre profesionales y servicios. |
 | **Actores** | Pendiente de definición |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** no se atribuyen permisos efectivos de asignación o retirada a ninguno, ya que el flujo de gestión no se ha acreditado. La consulta de asociaciones existentes no justifica afirmar que alguno pueda modificarlas. |
 | **Precondiciones** | Desarrollo futuro de los permisos y de una interfaz de administración. |
 | **Flujo Principal** | La versión actual permite consultar asociaciones existentes; no se ha acreditado un flujo de asignación o retirada. |
 | **Flujos Alternativos** | No aplicables hasta que se implemente la gestión. |
@@ -901,6 +954,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Consultar Historial Médico Completo |
 | **Descripción** | Consulta y filtrado del historial clínico de un paciente. |
 | **Actores** | Médico, administrador, recepción y paciente titular |
+| **Justificación por rol** | **Médico:** consulta y filtra anotaciones para revisar la atención. **Administrador y recepcionista:** pueden consultar historiales de pacientes según la implementación; recepción no puede escribir. **Paciente:** solo puede consultar y filtrar su propio historial. Los filtros no amplían el alcance autorizado y el acceso del personal requiere revisión de privacidad. |
 | **Precondiciones** | Sesión válida y paciente existente. |
 | **Flujo Principal** | 1. Se abre el historial del paciente.<br/>2. El cliente consulta `GET /historialclinico/paciente/:id`.<br/>3. El servidor comprueba los permisos.<br/>4. Se muestran las anotaciones, con filtros por profesional y servicio y ordenación por fecha. |
 | **Flujos Alternativos** | Historial vacío, error de carga o acceso denegado: se informa al usuario. |
@@ -915,6 +969,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Editar Historial Médico |
 | **Descripción** | Propuesta de corrección de anotaciones existentes. |
 | **Actores** | Pendientes de definición y autorización. |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** no se asigna a ninguno permiso de edición, porque el caso no está implementado. Una propuesta futura deberá decidir quién puede corregir anotaciones y cómo conservar su trazabilidad. |
 | **Precondiciones** | Desarrollo futuro de una operación de edición con permisos y trazabilidad. |
 | **Flujo Principal** | No implementado. El historial actual permite consultar y añadir anotaciones. |
 | **Flujos Alternativos** | No aplicables en la versión actual. |
@@ -929,6 +984,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Eliminar Registro de Historial Médico |
 | **Descripción** | Propuesta de gestión de eliminación de anotaciones clínicas. |
 | **Actores** | Pendientes de definición y autorización. |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** no se asigna a ninguno permiso de eliminación mediante este caso, porque no está implementado. Los posibles permisos futuros requieren definir conservación, trazabilidad y autorización. |
 | **Precondiciones** | Desarrollo futuro con políticas de conservación y trazabilidad. |
 | **Flujo Principal** | No implementado. La interfaz actual no ofrece eliminación de anotaciones. |
 | **Flujos Alternativos** | No aplicables en la versión actual. |
@@ -943,6 +999,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Gestionar Disponibilidad Médica |
 | **Descripción** | Visualización de la disponibilidad calculada dentro del horario común. |
 | **Actores** | Médico (su propia agenda), administrador y recepción (selección de médico) |
+| **Justificación por rol** | **Administrador y recepcionista:** seleccionan profesional para coordinar sus agendas. **Médico:** consulta solo su propia agenda, en correspondencia con su ámbito de gestión de citas. **Paciente:** no accede a la agenda de personal; dispone de consulta de sus citas en CU-007. |
 | **Precondiciones** | Usuario autenticado y médico existente en la base de datos. |
 | **Flujo Principal** | 1. Se abre la agenda semanal desde el encabezado.<br/>2. Se selecciona profesional cuando el rol lo permite; la lista se actualiza automáticamente.<br/>3. Se navega por semanas o se elige una fecha directamente.<br/>4. La agenda presenta horario, citas, vacaciones y huecos disponibles.<br/>5. Se selecciona un hueco para abrir el formulario de cita. |
 | **Flujos Alternativos** | Si no hay disponibilidad se muestra el estado correspondiente; un fallo de carga se comunica al usuario. |
@@ -957,6 +1014,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Gestionar fotos de perfil |
 | **Descripción** | Propuesta de incorporar una foto al perfil del usuario. |
 | **Actores** | Usuario autenticado, sujeto a diseño y autorización futuros |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** el acceso para gestionar fotos de perfil está pendiente de definición y validación para todos; no se puede deducir del endpoint de subida un permiso de uso de este flujo. Este caso se solapa con CU-005. |
 | **Precondiciones** | Se requiere completar y validar el flujo de interfaz, almacenamiento y seguridad. |
 | **Flujo Principal** | La API contiene `POST /photos/upload`, que guarda archivos; no se ha acreditado un flujo de selección y vinculación de foto al perfil desde la interfaz actual. |
 | **Flujos Alternativos** | Los fallos del flujo y las restricciones de formato y tamaño deben definirse y probarse. |
@@ -971,6 +1029,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Consultar Disponibilidad de Médicos |
 | **Descripción** | El personal consulta los inicios disponibles para médico, fecha y duración. |
 | **Actores** | Médico, administrador y recepcionista |
+| **Justificación por rol** | **Administrador y recepcionista:** consultan huecos del profesional elegido para gestionar citas. **Médico:** consulta huecos de su propia agenda, ya que solo puede gestionar citas asignadas a él. **Paciente:** no utiliza este flujo porque no existe reserva autónoma. |
 | **Precondiciones** | Sesión de personal válida y médico existente. |
 | **Flujo Principal** | 1. Se abre el formulario de cita desde la agenda.<br/>2. Se seleccionan fecha, médico, duración y paciente cuando corresponda.<br/>3. El cliente solicita `POST /citas/huecos`.<br/>4. El servidor aplica el horario, descuenta vacaciones y comprueba solapamientos del médico y, si se indicó, del paciente.<br/>5. Se presentan los inicios disponibles para seleccionar uno. |
 | **Flujos Alternativos** | Sin huecos o fallo de carga: se comunica el estado; si el hueco deja de estar disponible, el guardado se rechaza y se vuelve a consultar. |
@@ -985,6 +1044,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Nombre** | Confirmar una operación sensible |
 | **Descripción** | Evitar operaciones accidentales mediante una confirmación adicional en la interfaz. |
 | **Actores** | Usuario autenticado con permiso para la operación elegida |
+| **Justificación por rol** | **Administrador:** confirma las operaciones sensibles que tiene permitidas. **Médico:** confirma las correspondientes a sus citas, vacaciones y cambios de contraseña autorizados, sin que ello le permita eliminar usuarios. **Recepcionista:** confirma las operaciones permitidas sobre médicos y pacientes, citas y sus propias vacaciones. **Paciente:** confirma el cambio de su propia contraseña, sin obtener permisos de administración. La confirmación no amplía los permisos del actor. |
 | **Precondiciones** | El usuario ha iniciado la eliminación de una cita, usuario o periodo de vacaciones, o un cambio de contraseña. |
 | **Flujo principal** | 1. El sistema muestra un diálogo que identifica la acción y, cuando corresponde, el elemento afectado.<br/>2. El usuario confirma explícitamente.<br/>3. Se envía la petición y se muestra el resultado. |
 | **Flujos alternativos** | Al cancelar o cerrar el diálogo no se envía la petición. Un error del servidor se comunica sin dar la operación por realizada. |
@@ -998,6 +1058,7 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Código** | CU-023 |
 | **Nombre** | Seleccionar semana de la agenda |
 | **Actores** | Médico, recepcionista y administrador autenticados |
+| **Justificación por rol** | **Administrador y recepcionista:** pueden desplazarse a una semana de la agenda del médico seleccionado para coordinar citas. **Médico:** navega por semanas de su propia agenda. **Paciente:** no accede a esta agenda de gestión; consulta sus citas mediante CU-007. |
 | **Precondiciones** | Acceso a «Administrar citas» desde el encabezado. |
 | **Flujo principal** | 1. El usuario introduce o selecciona una fecha en formato `DD/MM/AAAA`.<br/>2. La agenda calcula el lunes de esa semana y solicita los datos del profesional seleccionado.<br/>3. Se muestran las fechas, citas, vacaciones y huecos correspondientes. |
 | **Flujos alternativos** | Si la fecha es inválida no se navega; si la carga falla, se informa del error. Las fechas pasadas se pueden consultar, pero no se ofrecen para crear citas nuevas. |
@@ -1011,11 +1072,161 @@ Los casos de uso describen la interacción entre actores y el sistema. Se aplica
 | **Código** | CU-024 |
 | **Nombre** | Consultar ubicación y contacto |
 | **Actores** | Visitante o usuario autenticado |
+| **Justificación por rol** | **Administrador, médico, recepcionista y paciente:** pueden consultar la dirección de la clínica. **Visitante:** también puede hacerlo sin cuenta porque se trata de información pública de contacto; la visualización del mapa depende del servicio externo. |
 | **Precondiciones** | La aplicación está disponible; para cargar el mapa se requiere acceso a Google Maps. |
 | **Flujo principal** | 1. El usuario abre «Contacto».<br/>2. Consulta la dirección en texto.<br/>3. Si el servicio externo se carga correctamente, visualiza el mapa integrado y puede interactuar con él. |
 | **Flujos alternativos** | Si la red, el navegador o Google impiden cargar el mapa, la dirección continúa visible; la aplicación no detecta de forma fiable todos los fallos del contenido externo. |
 | **Postcondiciones** | El usuario ha podido consultar la dirección y, si está disponible, su ubicación en el mapa. |
 | **Observaciones** | El mapa ocupa el ancho disponible y se presenta en escala de grises. La dirección mostrada es la de la clínica, no un domicilio de paciente. |
+
+### 5.25 Editar otra persona
+
+| Atributo | Valor |
+|----------|-------|
+| **Código** | CU-025 |
+| **Nombre** | Editar otra persona |
+| **Descripción** | El personal autorizado modifica los datos de una cuenta distinta de la propia desde «Administrar usuarios». |
+| **Actores** | Administrador, médico o recepcionista autenticado; el paciente no puede editar a otras personas. |
+| **Justificación por rol** | **Administrador:** puede editar cualquier cuenta por su alcance de administración general. **Médico:** modifica solo pacientes y debe mantener ese rol, para actualizar datos asistenciales sin administrar cuentas de personal. **Recepcionista:** modifica médicos y pacientes y puede cambiar entre esos dos roles, dentro del alcance operativo implementado; no modifica administradores ni otros recepcionistas. **Paciente:** no edita a terceros; puede actualizar su propio perfil mediante CU-004. |
+| **Precondiciones** | Sesión válida; la persona existe y su rol está comprendido en los permisos del actor. |
+| **Flujo principal** | 1. El actor abre «Administrar usuarios» y selecciona una persona permitida.<br/>2. Modifica los datos necesarios y, cuando está autorizado, el rol o la contraseña.<br/>3. Si modifica la contraseña, confirma la operación.<br/>4. El servidor comprueba los permisos, valida los datos y guarda los cambios.<br/>5. La interfaz comunica el resultado. |
+| **Flujos alternativos** | Si el actor intenta editar una cuenta o asignar un rol no permitido, el servidor rechaza la petición. Si se cancela la confirmación del cambio de contraseña, no se envía la modificación. Un DNI duplicado, correo inválido, usuario inexistente o error de conexión impiden completar la operación y se comunica el error. |
+| **Postcondiciones** | La cuenta seleccionada se actualiza únicamente si se cumplen los permisos y las validaciones. |
+| **Permisos por rol** | **Administrador:** puede modificar usuarios de cualquier rol y asignar cualquiera de los cuatro roles.<br/>**Médico:** puede modificar pacientes; la cuenta debe seguir siendo paciente. No puede modificar cuentas de otros médicos, recepción o administración.<br/>**Recepcionista:** puede modificar médicos y pacientes, incluido el cambio entre esos dos roles; no puede modificar cuentas de administración ni de otros recepcionistas.<br/>**Paciente:** no puede editar a otras personas. |
+| **Observaciones** | Este caso no incluye la edición del perfil propio: los cuatro roles pueden gestionar sus propios datos mediante CU-004. Los roles no administradores no pueden cambiar su propio rol mediante esa operación; el cambio de contraseña propia se describe en CU-003. La modificación no implica permiso para eliminar: véase CU-013. |
+
+### 5.26 Matriz de trazabilidad y estado de validación
+
+Esta matriz relaciona los requisitos de 4.3 y 4.4 con las fichas del capítulo 5, puntos de implementación y pruebas concretas. Se ha contrastado con los archivos disponibles de ambos repositorios el 9 de noviembre de 2026. **La existencia de código o de un test no demuestra que un requisito esté completamente satisfecho**: las ejecuciones, sus resultados y sus límites se indican por separado en 9.0. Las rutas del backend requieren que `clinica-tfg-back` esté situado junto al repositorio frontend.
+
+**Leyenda de estado:** **I** = implementado en el alcance indicado, sin presuponer cobertura completa; **P** = parcial o sin validación suficiente; **N** = no implementado o propuesta pendiente; **R** = requisito retirado. Las pruebas citadas son una selección pertinente, no una afirmación de cobertura integral. «Pendiente» significa que no se ha acreditado la verificación específica. Los casos sin requisito funcional específico se identifican en la tabla inversa.
+
+#### Referencias de implementación
+
+| Clave | Evidencia en el código | Alcance |
+|---|---|---|
+| A | [Autenticación del backend](../../clinica-tfg-back/src/auth/auth.controller.ts), [servicio](../../clinica-tfg-back/src/auth/auth.service.ts) y [cliente de autenticación](../src/app/services/auth/auth.service.ts) | Inicio de sesión, token y sesión. |
+| U | [Controlador de personas](../../clinica-tfg-back/src/persona/persona.controller.ts), [servicio](../../clinica-tfg-back/src/persona/persona.service.ts), [administración de usuarios](../src/app/shared/components/popups/admin-users/admin-users.component.ts) y [perfil](../src/app/pages/perfil-usuario/perfil-usuario.component.ts) | Personas, permisos y datos de perfil. |
+| C | [Controlador de citas](../../clinica-tfg-back/src/citas/citas.controller.ts), [servicio](../../clinica-tfg-back/src/citas/citas.service.ts), [horario](../../clinica-tfg-back/src/citas/horario.ts), [agenda](../src/app/shared/components/popups/agenda-medico/agenda-medico.component.ts) y [formulario de cita](../src/app/shared/components/popups/admin-citas/admin-citas.component.ts) | Agenda, horario, vacaciones, huecos, citas y permisos. |
+| H | [Controlador de historial](../../clinica-tfg-back/src/historialclinico/historial-clinico.controller.ts), [servicio](../../clinica-tfg-back/src/historialclinico/historial-clinico.service.ts) y [pantalla](../src/app/pages/historial/historial.component.ts) | Consulta y creación de anotaciones. |
+| S | [Menú de servicios](../src/app/pages/servicios-menu/servicios-menu.component.ts), [fotografía compartida](../src/app/pages/servicios-menu/components/imagen-servicio/imagen-servicio.component.ts) y [controlador de servicios](../../clinica-tfg-back/src/servicios/servicios.controller.ts) | Catálogo y fotografías; no acredita un CRUD de servicios. |
+| V | [Vacaciones](../src/app/shared/components/popups/vacaciones/vacaciones.component.ts), además de C | Gestión de periodos propios. |
+| D | [Confirmación](../src/app/shared/components/popups/confirm-action/confirm-action.service.ts), [contraseña](../src/app/shared/components/popups/change-password/change-password.component.ts), [detalle de usuario](../src/app/shared/components/popups/user-detail/user-detail.component.ts), además de U, C y V | Confirmación previa; no constituye autenticación adicional. |
+| F | [Selector de fecha](../src/app/shared/components/forms/clinic-date-picker/clinic-date-picker.component.ts) y [fecha de clínica](../src/app/shared/classes/clinic-date.ts) | Presentación y conversión de fechas; véase el fallo de prueba de 9.0. |
+| M | [Contacto HTML](../src/app/pages/contacto/contacto.component.html) y [estilos](../src/app/pages/contacto/contacto.component.scss) | Dirección y mapa externo; depende de Google y de la red. |
+| X | [Subida de fotos](../../clinica-tfg-back/src/photos/photos.controller.ts) y [asociaciones médico-servicio](../../clinica-tfg-back/src/medico-has-servicio/medico-has-servicio.controller.ts) | Endpoints existentes, sin acreditar los flujos de gestión propuestos. |
+
+#### Referencias de pruebas y evidencias
+
+Los grupos siguientes identifican archivos examinados; los resultados actuales de ejecución se detallan en 9.0. Los tests de backend usan principalmente dobles de repositorio y no sustituyen una prueba de concurrencia real con base de datos ni de extremo a extremo.
+
+| Clave | Pruebas o evidencia relacionada | Qué comprueba o limita |
+|---|---|---|
+| T-A | [auth-scheduling.spec.ts](../../clinica-tfg-back/src/auth/auth-scheduling.spec.ts) | Acceso sin autenticar, credenciales incorrectas y respuestas autenticadas; no es una auditoría global. |
+| T-U | [persona.controller.spec.ts](../../clinica-tfg-back/src/persona/persona.controller.spec.ts), [persona.service.spec.ts](../../clinica-tfg-back/src/persona/persona.service.spec.ts), [admin-users.component.spec.ts](../src/app/shared/components/popups/admin-users/admin-users.component.spec.ts) y [perfil-usuario.component.spec.ts](../src/app/pages/perfil-usuario/perfil-usuario.component.spec.ts) | Ejemplos de permisos, datos, búsqueda y perfil; no prueban todas las combinaciones extremo a extremo. |
+| T-C | [citas-doctor.spec.ts](../../clinica-tfg-back/src/citas/citas-doctor.spec.ts), [citas-permisos.spec.ts](../../clinica-tfg-back/src/citas/citas-permisos.spec.ts), [citas-fechas.spec.ts](../../clinica-tfg-back/src/citas/citas-fechas.spec.ts), [citas-solapamiento-paciente.spec.ts](../../clinica-tfg-back/src/citas/citas-solapamiento-paciente.spec.ts), [citas-paciente.spec.ts](../../clinica-tfg-back/src/citas/citas-paciente.spec.ts), [citas-huecos.spec.ts](../../clinica-tfg-back/src/citas/citas-huecos.spec.ts), [horario.spec.ts](../../clinica-tfg-back/src/citas/horario.spec.ts) y [admin-citas.component.spec.ts](../src/app/shared/components/popups/admin-citas/admin-citas.component.spec.ts) | Restricciones de citas, roles, huecos, horario, fechas y conflictos. |
+| T-G | [citas-agenda-gestion.spec.ts](../../clinica-tfg-back/src/citas/citas-agenda-gestion.spec.ts), [citas-agenda.spec.ts](../../clinica-tfg-back/src/citas/citas-agenda.spec.ts) y [agenda-medico.component.spec.ts](../src/app/shared/components/popups/agenda-medico/agenda-medico.component.spec.ts) | Consultas por rol y comportamiento de la agenda. |
+| T-V | [vacaciones-permisos.spec.ts](../../clinica-tfg-back/src/citas/vacaciones-permisos.spec.ts), [horario.spec.ts](../../clinica-tfg-back/src/citas/horario.spec.ts) y [vacaciones.component.spec.ts](../src/app/shared/components/popups/vacaciones/vacaciones.component.spec.ts) | Permisos, días laborables y escenarios de interfaz. |
+| T-H | [historial-clinico.spec.ts](../../clinica-tfg-back/src/historialclinico/historial-clinico.spec.ts) y [historial.component.spec.ts](../src/app/pages/historial/historial.component.spec.ts) | Permisos, asociación de cita y anotaciones. |
+| T-D | [confirm-action.service.spec.ts](../src/app/shared/components/popups/confirm-action/confirm-action.service.spec.ts), [change-password.component.spec.ts](../src/app/shared/components/popups/change-password/change-password.component.spec.ts), y pruebas de U, C y V | Confirmación y cancelación en los escenarios definidos; el caso de destrucción del formulario de contraseña carece de aserciones. |
+| T-F | [clinic-date-picker.component.spec.ts](../src/app/shared/components/forms/clinic-date-picker/clinic-date-picker.component.spec.ts) y [clinic-date.spec.ts](../src/app/shared/classes/clinic-date.spec.ts) | Formato, fecha inválida y zona horaria; una prueba del selector falla en la ejecución actual. |
+| T-S | [imagen-servicio.component.spec.ts](../src/app/pages/servicios-menu/components/imagen-servicio/imagen-servicio.component.spec.ts) | Imagen, texto alternativo y ausencia de reproductor; no verifica todas las fichas ni sus medidas. |
+| T-M | [contacto.component.spec.ts](../src/app/pages/contacto/contacto.component.spec.ts) y observación manual de 9.0 | El test solo comprueba la creación del componente; la carga del mapa se observó manualmente en Brave, no en todos los entornos. |
+
+#### Trazabilidad de requisitos funcionales
+
+| Requisito | Caso de uso | Implementación | Prueba o validación | Estado y límites |
+|---|---|---|---|---|
+| RF-001 Registro | CU-001, CU-013 | U | T-U | I; pendiente regresión completa por rol. |
+| RF-002 Autenticación | CU-002 | A | T-A | I; no demuestra seguridad integral. |
+| RF-003 Renovar sesión | Sin caso específico | A | Pendiente | N; no hay renovación de token acreditada. |
+| RF-004 Perfil | CU-004 | U | T-U | I; pendiente validación integral de campos. |
+| RF-005 Foto de perfil | CU-005, CU-020 | X | Pendiente | P; existe subida, pero no se ha acreditado su integración con el perfil. |
+| RF-006 Contraseña | CU-003, CU-022 | U, D | T-D | P; existe cambio y confirmación; hashing pendiente. |
+| RF-007 Domicilio | Sin caso vigente | U | Pendiente de auditoría integral de datos antiguos | R; domicilio del paciente retirado, distinto de la dirección pública de RF-031. |
+| RF-008 Crear servicio | Sin caso implementado; CU-014 solo consulta | S | Pendiente | N; CRUD no acreditado. |
+| RF-009 Modificar servicio | Sin caso implementado; CU-014 solo consulta | S | Pendiente | N. |
+| RF-010 Eliminar servicio | Sin caso implementado; CU-014 solo consulta | S | Pendiente | N. |
+| RF-011 Asignar especialidad | CU-015 | X | Pendiente | N para asignación; existe lectura de asociaciones. |
+| RF-012 Horario | CU-006, CU-019, CU-021 | C | T-C | I; horario común fijado en código. |
+| RF-013 Vacaciones | CU-010 | C, V | T-V | I; falta regresión integral por rol y datos reales. |
+| RF-014 Disponibilidad | CU-006, CU-019, CU-021 | C | T-C, T-G | I; falta prueba de concurrencia real. |
+| RF-015 Crear cita | CU-006 | C | T-C, T-G | I; no incluye reserva pública. |
+| RF-016 Citas propias | CU-007 | C, U | T-C, T-U | I; consulta sin modificación por paciente. |
+| RF-017 Modificar cita | CU-008 | C | T-C | I; falta validación integral de interfaz y API por rol. |
+| RF-018 Eliminar cita | CU-009, CU-022 | C, D | T-C, T-D | I; falta regresión integral por rol. |
+| RF-019 Crear anotación | CU-011 | H | T-H | I; escritura restringida y vínculo opcional. |
+| RF-020 Consultar historial | CU-012, CU-016 | H | T-H | I; pendiente validación integral de permisos y filtros. |
+| RF-021 Modificar historial | CU-017 | H | Pendiente | N; edición no implementada. |
+| RF-022 Eliminar historial | CU-018 | H | Pendiente | N; eliminación no implementada. |
+| RF-023 Crear usuario por rol | CU-001, CU-013 | U | T-U | I; falta regresión extremo a extremo. |
+| RF-024 Listar usuarios | CU-013 | U | T-U | I; el alcance depende del rol y la pantalla. |
+| RF-025 Editar usuario | CU-004, CU-013, CU-025 | U, D | T-U, T-D | I; pendiente regresión integral por rol. |
+| RF-026 Eliminar usuario | CU-013, CU-022 | U, D | T-U, T-D | I en el alcance descrito; baja lógica y auditoría no acreditadas. |
+| RF-027 Navegar agenda | CU-019, CU-023 | C, F | T-G, T-F | P para validación completa; fallo de T-F y regresión de actualización entre sesiones pendiente. |
+| RF-028 Confirmación | CU-003, CU-009, CU-010, CU-013, CU-022, CU-025 | D | T-D; cancelaciones manuales descritas en 9.0 | I para las acciones descritas; pruebas de todas las pantallas pendientes. |
+| RF-029 Formato de fecha | CU-006, CU-008, CU-010, CU-023 | F | T-F | P; formato implementado, pero falla una prueba focalizada de presentación. |
+| RF-030 Fotografías | CU-014 | S | T-S y observación de 9.0 | I; texto de vendaje pendiente y regresión visual completa no acreditada. |
+| RF-031 Ubicación | CU-024 | M | T-M | I con dependencia externa; sin test automatizado de carga del mapa. |
+
+#### Comprobación inversa de casos de uso
+
+Cada ficha tiene al menos una relación explícita con requisitos funcionales; cuando no existe requisito independiente se indica la carencia en lugar de atribuirle uno artificialmente.
+
+| Caso de uso | Requisitos relacionados | Estado |
+|---|---|---|
+| CU-001 Alta | RF-001, RF-023 | Implementado; T-U. |
+| CU-002 Inicio de sesión | RF-002 | Implementado; T-A. |
+| CU-003 Cambiar contraseña | RF-006, RF-028 | Parcial por almacenamiento inseguro; T-D. |
+| CU-004 Editar perfil | RF-004, RF-025 | Implementado; T-U. |
+| CU-005 Subir foto de perfil | RF-005 | Integración no acreditada; pendiente. |
+| CU-006 Crear cita | RF-012, RF-014, RF-015, RF-029 | Implementado; T-C y T-G; ver fallo T-F. |
+| CU-007 Ver mis citas | RF-016 | Implementado; T-C y T-U. |
+| CU-008 Modificar cita | RF-017, RF-029 | Implementado; T-C; ver fallo T-F. |
+| CU-009 Eliminar cita | RF-018, RF-028 | Implementado; T-C y T-D. |
+| CU-010 Vacaciones propias | RF-013, RF-028, RF-029 | Implementado; T-V; ver fallo T-F. |
+| CU-011 Registrar historial | RF-019 | Implementado; T-H. |
+| CU-012 Consultar historial | RF-020 | Implementado; T-H. |
+| CU-013 Administrar usuarios | RF-001, RF-023 a RF-026, RF-028 | Implementado según matriz de roles; T-U y T-D. |
+| CU-014 Consultar servicios | RF-030 para fotografías; sin RF independiente de consulta | Consulta implementada; T-S solo prueba el componente de imagen. CRUD RF-008 a RF-010 pendiente. |
+| CU-015 Asignar especialidades | RF-011 | Propuesta pendiente. |
+| CU-016 Filtrar historial | RF-020 | Implementado; T-H es pertinente, pero no acredita todos los filtros. |
+| CU-017 Editar historial | RF-021 | Propuesta pendiente. |
+| CU-018 Eliminar historial | RF-022 | Propuesta pendiente. |
+| CU-019 Agenda y disponibilidad | RF-012, RF-014, RF-027 | Implementado; T-C y T-G; regresión integral pendiente. |
+| CU-020 Gestionar foto de perfil | RF-005 | Integración no acreditada; solapa CU-005. |
+| CU-021 Consultar huecos | RF-012, RF-014 | Implementado; T-C. |
+| CU-022 Confirmar operación | RF-028 | Implementado para las acciones descritas; T-D. |
+| CU-023 Seleccionar semana | RF-027, RF-029 | Implementado; T-G; ver fallo T-F. |
+| CU-024 Consultar ubicación | RF-031 | Implementado con dependencia externa; T-M y observación manual. |
+| CU-025 Editar otra persona | RF-025, RF-028 si cambia la contraseña | Implementado según rol y cuenta afectada; T-U y T-D; falta regresión integral. |
+
+#### Trazabilidad de requisitos no funcionales
+
+Los RNF son objetivos transversales y no todos tienen un caso de uso único. Se enlazan los casos afectados cuando procede; «transversal» significa que aplica a varias funcionalidades.
+
+| Requisito | Casos o ámbito | Evidencia y validación | Estado |
+|---|---|---|---|
+| RNF-001 Hash de contraseñas | CU-002, CU-003 | A: comparación en texto plano; no satisface el objetivo de bcrypt. | N |
+| RNF-002 JWT en operaciones protegidas | Transversal | A y T-A; revisar todas las rutas y expiración. | P |
+| RNF-003 Autorización | CU-006 a CU-013, CU-016, CU-025 | U, C, H; T-U, T-C, T-V, T-H; falta auditoría de todos los endpoints. | P |
+| RNF-004 CORS restrictivo | Transversal | [main.ts](../../clinica-tfg-back/src/main.ts) permite orígenes que contienen `localhost`; no acredita lista exacta ni producción. | P |
+| RNF-005 No exposición de secretos | Transversal | T-A y T-U comprueban algunas respuestas; revisión completa pendiente. | P |
+| RNF-006 Rendimiento | Transversal | No hay medición reproducible de los umbrales de 4.4. | P |
+| RNF-007 Índices | Transversal | Verificación de índices en el esquema y base real pendiente. | P |
+| RNF-008 Navegación y errores | CU-006, CU-013, CU-019 a CU-024 | U, C, D, M; pruebas y revisión de usabilidad completas pendientes. | P |
+| RNF-009 Accesibilidad WCAG | Transversal | Evaluación WCAG 2.1 AA pendiente; T-S solo verifica un texto alternativo. | P |
+| RNF-010 Responsive | CU-014, CU-019, CU-024 | S, C, M y comprobaciones parciales en 9.0; sin validación completa a 1920 px y para todos los estados. | P |
+| RNF-011 Organización modular | Transversal | Estructura de módulos y componentes observable en ambos repositorios; revisión sistemática pendiente. | P |
+| RNF-012 Documentación de código y API | Transversal | Tabla actual de 8.3 y referencias de esta sección; revisión de JSDoc/Swagger pendiente. | P |
+| RNF-013 Docker reproducible | Transversal | Configuración del capítulo 10 histórica y no validada. | P |
+| RNF-014 Navegadores | Transversal | Observación en Brave y limitación del visor integrado en 9.0; falta matriz Chrome, Firefox, Safari y Edge. | P |
+| RNF-015 Auditoría de operaciones | CU-011, CU-013 | No se ha acreditado registro completo de usuario, fecha y cambios. | P |
+| RNF-016 Baja lógica y fechas | CU-009, CU-013 | No se ha acreditado baja lógica ni campos de creación y modificación en todas las tablas. | P |
+| RNF-017 Validación en backend mediante DTO | CU-001, CU-006, CU-008, CU-010, CU-011 | U, C, H y T-U, T-C, T-V, T-H verifican reglas seleccionadas; uso uniforme de DTO/decoradores no acreditado. | P |
+| RNF-018 Tratamiento de errores | Transversal | Pruebas de errores seleccionados en T-C y T-H; filtro centralizado y ausencia de detalles sensibles no acreditados globalmente. | P |
+
+**Brechas de trazabilidad:** RF-003 y RF-007 no tienen ficha vigente; la consulta de servicios de CU-014 carece de RF independiente y CU-005/CU-020 se solapan. Para completar la validación se requiere revisar estas fichas y decisiones con el alcance del proyecto, ejecutar regresión por rol y extremos, probar concurrencia real y guardar evidencias reproducibles. Ninguna de estas acciones se considera realizada por figurar en esta matriz.
 
 ---
 
@@ -2381,9 +2592,13 @@ El servicio público de Nominatim prohíbe el autocompletado y solicita no envia
 
 ### 9.0 Actualización de Cobertura de Pruebas
 
+**Ejecución para la matriz de trazabilidad, 9 de noviembre de 2026:** en el repositorio backend se ejecutó `npm test -- --runInBand`. Pasaron 14 de 15 suites y sus 144 pruebas; la suite restante, [app.controller.spec.ts](../../clinica-tfg-back/src/app.controller.spec.ts), no se ejecutó porque TypeScript señala que `getHello` no existe en `AppController`. Por tanto, **el comando global terminó con error**. Entre las suites aprobadas se encuentran las de autenticación, personas, citas, vacaciones e historial citadas en 5.26. Esta ejecución no mide cobertura ni sustituye las pruebas integrales o con concurrencia real.
+
+En el frontend se ejecutaron con Brave Headless las pruebas focalizadas de confirmación, cambio de contraseña, selector de fecha y fotografía, usando el proyecto Angular `clinica-TFG` y los cuatro archivos T-D, T-F y T-S seleccionados en 5.26. El comando `ng test clinica-TFG --watch=false --browsers=ChromeHeadless`, con `CHROME_BIN` apuntando a Brave y cuatro opciones `--include` para esos archivos, terminó con **7 pruebas aprobadas y 1 fallida**. La prueba [del selector de fecha](../src/app/shared/components/forms/clinic-date-picker/clinic-date-picker.component.spec.ts) esperaba `03/02/2031` y recibió una cadena vacía; no se ha determinado aún si el origen está en el componente, la prueba o su entorno. Además, Karma advirtió que la prueba de destrucción del formulario de contraseña carece de aserciones; no acredita ese comportamiento. Las demás pruebas frontend mencionadas en la matriz existen, pero no se ejecutaron en esta comprobación.
+
 **Comprobaciones focalizadas recientes:** en esta sesión se verificaron las compilaciones de frontend y backend; 33 pruebas backend relativas a agenda, disponibilidad, citas y horario; y 27 pruebas frontend de agenda, formulario y selección de pacientes. Después, para el historial, pasaron 18 pruebas backend focalizadas y 20 pruebas frontend de historial, citas y perfil. Las agrupaciones se solapan y no deben sumarse como pruebas distintas ni como cobertura global. Se comprobó también la escritura y lectura de una anotación vinculada en MariaDB dentro de una transacción revertida, así como la respuesta 401 sin autenticación. Estas verificaciones no equivalen a una auditoría de seguridad ni a pruebas funcionales completas de todos los roles.
 
-**Verificaciones posteriores de los cambios de citas y confirmación:** se registró la ejecución satisfactoria de 10 suites y 83 pruebas backend con `npm test -- --runInBand citas`, además de `npm run build` en el backend. En el frontend se completaron `npm run build -- --configuration development` y la comprobación de tipos `npx tsc --noEmit -p tsconfig.spec.json`. Las pruebas frontend nuevas de confirmación se comprobaron a nivel de tipos, pero **no se ejecutaron**. En el navegador se comprobó que cancelar las confirmaciones de eliminación de usuario, eliminación de cita y cambio de contraseña no realizaba la operación, sin modificar datos reales. Estas comprobaciones corresponden al trabajo previo, no a una nueva ejecución al actualizar esta memoria.
+**Verificaciones posteriores de los cambios de citas y confirmación:** se registró la ejecución satisfactoria de 10 suites y 83 pruebas backend con `npm test -- --runInBand citas`, además de `npm run build` en el backend. En el frontend se completaron `npm run build -- --configuration development` y la comprobación de tipos `npx tsc --noEmit -p tsconfig.spec.json`. En aquella verificación anterior, las pruebas frontend nuevas de confirmación se comprobaron a nivel de tipos, pero no se ejecutaron; la ejecución focalizada posterior figura arriba. En el navegador se comprobó que cancelar las confirmaciones de eliminación de usuario, eliminación de cita y cambio de contraseña no realizaba la operación, sin modificar datos reales. Estas comprobaciones corresponden al trabajo previo.
 
 **Verificaciones posteriores de presentación y contacto:** durante la implementación se completó la compilación de desarrollo del frontend y pasó la prueba focalizada del componente de imagen en Brave Headless, que comprueba la imagen, su texto alternativo y la ausencia de reproductor. Se verificó la existencia de las 19 imágenes locales de los detalles y, en una comprobación de navegador, los marcos presentaron el mismo ancho por tamaño de pantalla.
 
@@ -2405,7 +2620,7 @@ Google devolvió la ubicación de la dirección configurada y se observó el map
 
 **Nota sobre el contenido histórico:** las cifras, ejemplos y supuesta cobertura completa de los apartados siguientes son propuestas o resultados sin evidencia reproducible asociada. En particular, el ejemplo de bcrypt no describe la implementación actual. No se acredita un porcentaje global de éxito ni la ejecución de todos los casos PF.
 
-Los casos de prueba funcionales históricos se conservan como material de revisión, no como prueba de cobertura completa de las 24 fichas de casos de uso, algunas de ellas propuestas pendientes. La consulta de historiales requiere autenticación y comprueba el rol y, para el paciente, la identidad. El almacenamiento de contraseñas sigue requiriendo una solución segura.
+Los casos de prueba funcionales históricos se conservan como material de revisión, no como prueba de cobertura completa de las 25 fichas de casos de uso, algunas de ellas propuestas pendientes. La consulta de historiales requiere autenticación y comprueba el rol y, para el paciente, la identidad. El almacenamiento de contraseñas sigue requiriendo una solución segura.
 
 ### 9.1 Estrategia de Pruebas
 
@@ -3277,33 +3492,7 @@ Impacto General:
 
 ### Anexo A.1: Matriz de Validación y Control de Cambios
 
-**Nota:** las declaraciones y porcentajes siguientes pertenecen a una versión anterior. No se acreditan como resultados actuales; las verificaciones confirmadas figuran en 9.0.
-
-**Documento Complementario:** [MATRIZ_VALIDACION.md](MATRIZ_VALIDACION.md)
-
-Para garantizar integridad académica y trazabilidad completa, se proporciona un documento separado de **Matriz de Validación** que detalla:
-
-✅ **Evidencias Verificadas (100% Completadas):**
-- Análisis de código fuente (código real del proyecto)
-- Requisitos con trazabilidad código-requisito
-- Diagramas UML generados dinámicamente
-- Especificación de arquitectura basada en código real
-- ✅ **10 Capturas de Pantalla de ejecución real** (Incluidas en sección 9.4.1)
-
-⏳ **Validaciones Empíricas Pendientes:**
-- ✅ Ejecución de 10 pruebas funcionales (COMPLETADO - evidencia visual)
-- ✅ Captura de screenshots reales del sistema (COMPLETADO - 10 imágenes)
-- ⏳ Medición de performance real con herramientas (DevTools, Lighthouse)
-- ⏳ Validación de despliegue Docker
-- ⏳ Configuración de integraciones externas (Google Places, SMTP)
-
-Este enfoque dual garantiza que:
-1. El 95% del documento está basado en análisis verificables de código
-2. Las especificaciones técnicas son correctas desde perspectiva de ingeniería
-3. Se diferencian claramente lo demostrado vs. lo pendiente de demostración empírica
-4. Todos los elementos con "evidencia pendiente" son fácilmente validables
-
-**Recomendación para Tutor:** Revisar MATRIZ_VALIDACION.md para entender exactamente qué está verificado vs. qué requiere ejecución real.
+La matriz vigente para este documento está en **5.26** y los resultados de ejecución conocidos en **9.0**. El archivo [MATRIZ_VALIDACION.md](MATRIZ_VALIDACION.md) se conserva como documento histórico: utiliza identificadores y afirmaciones de una versión anterior, por lo que no debe emplearse como trazabilidad ni evidencia actual sin revisarlo. No se acreditan sus porcentajes de cobertura, capturas, resultados funcionales ni su descripción de Google Places.
 
 ### Anexo B: Instalación y Configuración Rápida
 

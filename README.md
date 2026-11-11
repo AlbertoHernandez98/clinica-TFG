@@ -11,6 +11,15 @@ para configurar el frontend, el backend separado y la base de datos.
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Sesión
+
+El token de acceso se mantiene únicamente en memoria y se elimina cualquier
+token antiguo de `sessionStorage` al iniciar. Al abrir o recargar la aplicación
+se intenta restaurar la sesión con la cookie de renovación `HttpOnly`. Si no
+es válida, se muestra la aplicación sin iniciar sesión; si el servidor falla,
+se registra el error y se puede volver a intentar recargando. Esto no impide que
+un ataque XSS activo acceda al token en memoria o realice acciones del usuario.
+
 ## Fotografías de servicios
 
 Las fichas de servicios muestran fotografías locales con un marco centrado y
@@ -52,6 +61,15 @@ duración y vuelve a comprobar la disponibilidad.
 El selector «Ir a la fecha» permite navegar directamente a cualquier semana.
 La lista de profesionales se actualiza automáticamente al gestionar usuarios
 y periódicamente para detectar cambios realizados desde otra sesión.
+Administración y recepción pueden asignar servicios a un médico desde su
+ficha en «Administrar usuarios». Una vez creado el médico, hay que abrir su
+ficha y guardar los servicios que realiza. El formulario de citas solo ofrece
+los servicios asignados al profesional seleccionado y el servidor vuelve a
+comprobar la asignación al crear o editar. Si un médico no tiene servicios
+asignados, no se pueden guardar citas nuevas para él. Las citas anteriores se
+conservan al retirar una asignación, pero para editarlas hay que elegir un
+servicio que siga asignado. Conviene revisar las asignaciones existentes antes
+de activar esta versión.
 Los pacientes se crean desde «Administrar usuarios». El médico puede crear y modificar
 pacientes y modificar sus propios datos, sin eliminar usuarios. Recepción puede
 crear, modificar y eliminar médicos y pacientes; administración puede gestionar
@@ -68,9 +86,16 @@ Cancelar la confirmación no realiza ningún cambio.
 
 Al abrir una cita existente, «Abrir historial clínico» muestra las anotaciones
 del paciente y permite vincular una nueva anotación a esa cita. Médicos y
-administración pueden añadirlas; recepción puede consultarlas. El paciente
-puede consultar su propio historial desde el perfil. El acceso se comprueba en
-el servidor.
+administración pueden añadirlas; recepción puede consultarlas. Un médico puede
+corregir o anular únicamente las anotaciones que haya creado; administración
+puede hacerlo con cualquiera. Ambas operaciones requieren motivo y confirmación;
+las versiones anteriores y las anotaciones anuladas se conservan. El paciente
+puede consultar su propio historial desde el perfil. Solo médicos y administración
+pueden consultar versiones anteriores, motivos y anotaciones anuladas; recepción
+y pacientes ven únicamente anotaciones vigentes. El acceso se comprueba en
+el servidor. Para estas funciones es necesario aplicar primero la migración
+`005-historial-versiones-y-anulacion.sql` del backend, tras revisar y respaldar
+la base de datos. No se aplica automáticamente.
 
 La agenda permite navegar entre semanas y muestra las vacaciones. Las citas
 antiguas sin hora o duración se identifican como incompletas; las que no tienen

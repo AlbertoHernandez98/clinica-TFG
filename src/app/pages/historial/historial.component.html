@@ -11,6 +11,9 @@
     {{ 'HISTORIAL.ERROR_CARGA' | translate }}
     <button type="button" class="history__clear" (click)="retry()">{{ 'HISTORIAL.REINTENTAR' | translate }}</button>
   </div>
+  <p *ngIf="operationError" role="alert">{{ 'HISTORIAL.ERROR_OPERACION' | translate }}</p>
+  <p *ngIf="operationSuccess === 'edit'" role="status">{{ 'HISTORIAL.EDICION_EXITOSA' | translate }}</p>
+  <p *ngIf="operationSuccess === 'annul'" role="status">{{ 'HISTORIAL.ANULACION_EXITOSA' | translate }}</p>
   <ng-container *ngIf="!loading && !loadError && patient">
     <section class="history__card" *ngIf="role === 1 || role === 2">
       <h2>{{ 'HISTORIAL.NUEVA_ENTRADA' | translate }}</h2>
@@ -57,8 +60,44 @@
           {{ item.fecha }} {{ item.hora }} · {{ item.servicio || ('HISTORIAL.DESCONOCIDO' | translate) }} ·
           {{ item.autorNombre || ('HISTORIAL.DESCONOCIDO' | translate) }} {{ item.autorApellidos }}
           <span *ngIf="item.idCita"> · {{ 'HISTORIAL.CITA_VINCULADA' | translate }} #{{ item.idCita }}</span>
+          <strong *ngIf="item.anulada" class="history__annulled"> · {{ 'HISTORIAL.ANULADA' | translate }}</strong>
         </p>
         <p class="history__comments">{{ item.comentarios }}</p>
+        <div class="history__entry-actions" *ngIf="canManageEntry(item)">
+          <button type="button" class="history__clear" (click)="startEdit(item)">{{ 'HISTORIAL.EDITAR' | translate }}</button>
+          <button type="button" class="history__danger" (click)="startAnnul(item)">{{ 'HISTORIAL.ANULAR' | translate }}</button>
+        </div>
+        <form *ngIf="editingEntryId === item.idHistorialClinico" class="history__operation-form" [formGroup]="editForm" (ngSubmit)="saveEdit(item)">
+          <label>{{ 'HISTORIAL.COMENTARIOS' | translate }}
+            <textarea formControlName="comentarios" rows="5" maxlength="10000"></textarea>
+          </label>
+          <label>{{ 'HISTORIAL.MOTIVO' | translate }}
+            <textarea formControlName="motivo" rows="3" maxlength="1000" required></textarea>
+          </label>
+          <div class="history__entry-actions">
+            <button type="button" class="history__clear" (click)="cancelEdit()">{{ 'HISTORIAL.CANCELAR' | translate }}</button>
+            <button type="submit" class="history__primary" [disabled]="operatingEntryId !== null">{{ 'HISTORIAL.GUARDAR_EDICION' | translate }}</button>
+          </div>
+        </form>
+        <form *ngIf="annullingEntryId === item.idHistorialClinico" class="history__operation-form" [formGroup]="annulForm" (ngSubmit)="annulEntry(item)">
+          <label>{{ 'HISTORIAL.MOTIVO' | translate }}
+            <textarea formControlName="motivo" rows="3" maxlength="1000" required></textarea>
+          </label>
+          <div class="history__entry-actions">
+            <button type="button" class="history__clear" (click)="cancelAnnul()">{{ 'HISTORIAL.CANCELAR' | translate }}</button>
+            <button type="submit" class="history__danger" [disabled]="operatingEntryId !== null">{{ 'HISTORIAL.CONFIRMAR_ANULAR' | translate }}</button>
+          </div>
+        </form>
+        <section *ngIf="item.versiones && item.versiones.length" class="history__versions" [attr.aria-label]="'HISTORIAL.VERSIONES_ANTERIORES' | translate">
+          <h3>{{ 'HISTORIAL.VERSIONES_ANTERIORES' | translate }}</h3>
+          <article *ngFor="let version of item.versiones" class="history__version">
+            <p class="history__meta">
+              {{ version.fechaOperacion }} · {{ (version.tipoOperacion === 'ANULACION' ? 'HISTORIAL.OPERACION_ANULACION' : 'HISTORIAL.OPERACION_EDICION') | translate }}
+              · {{ version.usuarioNombre }} {{ version.usuarioApellidos }} · {{ 'HISTORIAL.MOTIVO' | translate }}: {{ version.motivo }}
+            </p>
+            <p class="history__comments">{{ version.comentarios }}</p>
+          </article>
+        </section>
       </article>
     </section>
   </ng-container>

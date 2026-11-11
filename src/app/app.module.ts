@@ -13,6 +13,9 @@ import { FormsModule } from '@angular/forms';
 import { ApiInterceptor } from './services/api/api.interceptor';
 import { LangService } from './services/lang/lang';
 import { take } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { AuthService } from './services/auth/auth.service';
 
 export function httpLoaderFactory(httpClient: HttpClient) {
   // Use absolute path to i18n files
@@ -25,6 +28,16 @@ export function initializeApp(translate: TranslateService, langService: LangServ
     translate.setDefaultLang(currentLanguage);
     // Use take(1) to complete the observable and return as promise
     return translate.use(currentLanguage).pipe(take(1)).toPromise();
+  };
+}
+
+export function restoreSession(auth: AuthService) {
+  return () => {
+    return auth.refresh().pipe(catchError(error => {
+      auth.clearSession();
+      if (error.status !== 401) console.error('No se ha podido restaurar la sesión:', error);
+      return of(null);
+    })).toPromise();
   };
 }
 
@@ -54,6 +67,12 @@ export function initializeApp(translate: TranslateService, langService: LangServ
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
       deps: [TranslateService, LangService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: restoreSession,
+      deps: [AuthService],
       multi: true
     },
     {

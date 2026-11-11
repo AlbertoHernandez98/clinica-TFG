@@ -141,6 +141,25 @@
         </div>
       </div>
     </form>
+    <section class="specialties" *ngIf="canManageSpecialties">
+      <h3>{{ 'SPECIALTIES.TITLE' | translate }}</h3>
+      <p>{{ 'SPECIALTIES.HELP' | translate }}</p>
+      <p *ngIf="specialtiesLoading" role="status">{{ 'SPECIALTIES.LOADING' | translate }}</p>
+      <div *ngIf="specialtiesError" role="alert">
+        <p class="form-error">{{ 'SPECIALTIES.ERROR' | translate }}</p>
+        <button type="button" (click)="loadSpecialties()">{{ 'SPECIALTIES.RETRY' | translate }}</button>
+      </div>
+      <div class="specialties__list" *ngIf="!specialtiesLoading && !specialtiesError">
+        <label *ngFor="let item of specialties">
+          <input type="checkbox" [checked]="selectedSpecialties.has(item.idServicio)"
+            [disabled]="specialtiesSaving" (change)="toggleSpecialty(item.idServicio, $event)" />
+          {{ item.servicio }}
+        </label>
+        <p *ngIf="!specialties.length">{{ 'SPECIALTIES.EMPTY' | translate }}</p>
+        <button type="button" [disabled]="specialtiesSaving" (click)="saveSpecialties()">{{ 'SPECIALTIES.SAVE' | translate }}</button>
+        <p *ngIf="specialtiesSaved" role="status">{{ 'SPECIALTIES.SAVED' | translate }}</p>
+      </div>
+    </section>
     <div class="buttons">
       <div class="button" *ngIf="this.modifyUser">
         <app-button-base

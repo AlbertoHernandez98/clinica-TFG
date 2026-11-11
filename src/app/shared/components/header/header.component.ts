@@ -5,6 +5,8 @@ import { LangService } from 'src/app/services/lang/lang';
 import { AdminUsersComponent } from '../popups/admin-users/admin-users.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AgendaMedicoComponent } from '../popups/agenda-medico/agenda-medico.component';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { AuditoriaHistorialComponent } from '../popups/auditoria-historial/auditoria-historial.component';
 
 @Component({
   selector: 'app-header',
@@ -23,7 +25,8 @@ export class HeaderComponent implements OnInit {
   constructor(
     private translate: TranslateService,
     private languageService: LangService,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -32,7 +35,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logFunctions() {
-    if (sessionStorage.getItem('accessToken')) {
+    if (this.auth.getAccessToken()) {
       this.isLogged = true;
     } else {
       this.isLogged = false;
@@ -79,31 +82,15 @@ export class HeaderComponent implements OnInit {
     this.matDialog.open(AgendaMedicoComponent, { width: '1200px', maxWidth: '98vw', maxHeight: '95vh' });
   }
 
+  public openAudit(): void {
+    this.matDialog.open(AuditoriaHistorialComponent, { width: '1100px', maxWidth: '95vw', maxHeight: '90vh' });
+  }
+
   public logout(): void {
-    sessionStorage.removeItem('accessToken');
-    // Delete sessionToken cookie
-    document.cookie = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    var cookies = document.cookie.split(";");
-    for (var i = 0; i < cookies.length; i++)
-      this.eraseCookie(cookies[i].split("=")[0]);
-    // Seteo la variable isLogged
-    this.isLogged = false;
-    // Redirect to login page
-    window.location.href = '/access-menu';
-  }
-
-  private eraseCookie(name: any) {
-    this.createCookie(name,"",-1);
-  }
-
-  private createCookie(name: string,value: string,days: number) {
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime()+(days*24*60*60*1000));
-        var expires = "; expires="+date.toString();
-    }
-    else var expires = "";
-    document.cookie = name+"="+value+expires+"; path=/";
+    this.auth.logout().subscribe({
+      next: () => { window.location.href = '/access-menu'; },
+      error: error => { console.error('Error al cerrar sesión:', error); alert(this.translate.instant('LOGIN.LOGOUT_ERROR')); }
+    });
   }
 
   public useLanguage(language: string) {

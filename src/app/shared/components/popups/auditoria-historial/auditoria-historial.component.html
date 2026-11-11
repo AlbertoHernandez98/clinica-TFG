@@ -1,0 +1,38 @@
+<section class="audit">
+  <header class="audit__header">
+    <h2>{{ 'AUDIT.TITLE' | translate }}</h2>
+    <button type="button" (click)="dialog.close()">{{ 'AUDIT.CLOSE' | translate }}</button>
+  </header>
+  <p>{{ 'AUDIT.DESCRIPTION' | translate }}</p>
+  <p *ngIf="loading" role="status">{{ 'AUDIT.LOADING' | translate }}</p>
+  <div *ngIf="error" role="alert">
+    {{ 'AUDIT.ERROR' | translate }}
+    <button type="button" (click)="load(events.length > 0)">{{ 'AUDIT.RETRY' | translate }}</button>
+  </div>
+  <p *ngIf="!loading && !error && !events.length">{{ 'AUDIT.EMPTY' | translate }}</p>
+  <div class="audit__table" *ngIf="events.length">
+    <table>
+      <thead><tr>
+        <th>{{ 'AUDIT.DATE' | translate }}</th>
+        <th>{{ 'AUDIT.USER' | translate }}</th>
+        <th>{{ 'AUDIT.ROLE' | translate }}</th>
+        <th>{{ 'AUDIT.OPERATION' | translate }}</th>
+        <th>{{ 'AUDIT.RESULT' | translate }}</th>
+        <th>{{ 'AUDIT.PATIENT' | translate }}</th>
+        <th>{{ 'AUDIT.ENTRY' | translate }}</th>
+      </tr></thead>
+      <tbody><tr *ngFor="let event of events">
+        <td>{{ event.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+        <td>{{ event.idUsuario }}</td>
+        <td>{{ ('AUDIT.ROLE_' + event.rolUsuario) | translate }}</td>
+        <td>{{ ('AUDIT.' + event.operacion) | translate }}</td>
+        <td>{{ ('AUDIT.' + event.resultado) | translate }}</td>
+        <td>{{ event.idPaciente === null ? '—' : event.idPaciente }}</td>
+        <td>{{ event.idHistorialClinico === null ? '—' : event.idHistorialClinico }}</td>
+      </tr></tbody>
+    </table>
+  </div>
+  <button *ngIf="cursor && !error" type="button" [disabled]="loading" (click)="load(true)">
+    {{ 'AUDIT.MORE' | translate }}
+  </button>
+</section>

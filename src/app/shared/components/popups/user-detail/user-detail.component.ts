@@ -10,7 +10,7 @@ import { documentValidator, emailValidator, phoneValidator, passwordValidator } 
 import { ErrorSuccessComponent } from '../error-success/error-success.component';
 import { CitasComponent } from '../citas/citas.component';
 import { UserChangesService } from '../../../../services/users/user-changes.service';
-import { Subject } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmActionService } from '../confirm-action/confirm-action.service';
 
@@ -36,6 +36,12 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   isHidden = false;
   modifyUser = false;
   saving = false;
+  specialtiesLoading = false;
+  specialtiesSaving = false;
+  specialtiesError = false;
+  specialtiesSaved = false;
+  specialties: { idServicio: number; servicio: string }[] = [];
+  selectedSpecialties = new Set<number>();
   private readonly destroyed = new Subject<void>();
 
   get availableRoles(): typeof this.roles {
@@ -51,6 +57,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   get canDelete(): boolean {
     return this.data.staff.idRolNativo === 1 ||
       (this.data.staff.idRolNativo === 3 && !!this.user && [2, 4].includes(this.user.idRolNativo));
+  }
+
+  get canManageSpecialties(): boolean {
+    return !!this.user && this.user.idRolNativo === 2 && [1, 3].includes(this.data.staff.idRolNativo);
   }
 
   constructor(
@@ -83,6 +93,41 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       nombre: [this.user?.nombre || '', [Validators.required, Validators.maxLength(32)]],
       apellidos: [this.user?.apellidos || '', [Validators.required, Validators.maxLength(45)]]
     });
+    if (this.canManageSpecialties) this.loadSpecialties();
+  }
+
+  loadSpecialties(): void {
+    this.specialtiesLoading = true;
+    this.specialtiesError = false;
+    forkJoin({
+      services: this.http.get<typeof this.specialties>(this.configService.getApiUrl('/servicio')),
+      assignments: this.http.get<{ idPersona: number; idServicio: number }[]>(this.configService.getApiUrl('/medico_has_servicio'))
+    }).pipe(takeUntil(this.destroyed)).subscribe({
+      next: result => {
+        this.specialties = result.services;
+        this.selectedSpecialties = new Set(result.assignments.filter(item => Number(item.idPersona) === this.user?.idPersona).map(item => Number(item.idServicio)));
+        this.specialtiesLoading = false;
+      },
+      error: error => { console.error('Error al cargar servicios del médico:', error); this.specialtiesError = true; this.specialtiesLoading = false; }
+    });
+  }
+
+  toggleSpecialty(id: number, event: Event): void {
+    if ((event.target as HTMLInputElement).checked) this.selectedSpecialties.add(id);
+    else this.selectedSpecialties.delete(id);
+    this.specialtiesSaved = false;
+  }
+
+  saveSpecialties(): void {
+    if (!this.user || !this.canManageSpecialties || this.specialtiesLoading || this.specialtiesError || this.specialtiesSaving) return;
+    this.specialtiesSaving = true;
+    this.specialtiesSaved = false;
+    this.http.put(this.configService.getApiUrl(`/medico_has_servicio/${this.user.idPersona}`), {
+      servicios: Array.from(this.selectedSpecialties)
+    }).pipe(takeUntil(this.destroyed)).subscribe({
+      next: () => { this.specialtiesSaving = false; this.specialtiesSaved = true; },
+      error: error => { console.error('Error al guardar servicios del médico:', error); this.specialtiesSaving = false; this.specialtiesError = true; }
+    });
   }
 
   getTouchedAndError(key: string): boolean {
@@ -111,7 +156,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       return 'Formato inválido: DNI, NIE o pasaporte';
     }
     if (control.errors.invalidPhone) {
-      return 'Teléfono inválido: solo números (9-15 dígitos)';
+      return 'Teléfono inválido: 9-10 dígitos, máximo 2147483647';
     }
     if (control.errors.invalidPassword) {
       return 'Mínimo 4 caracteres';

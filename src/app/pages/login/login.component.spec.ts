@@ -49,4 +49,14 @@ describe('LoginComponent', () => {
     expect(component.apiError).toBeTrue();
     expect(component.loginError).toBeFalse();
   });
+
+  it('explains that too many login attempts are temporarily blocked', () => {
+    component.form.setValue({ dni: 'TEST', password: 'bad' });
+    component.login();
+    http.expectOne('http://localhost:3000/auth/login').flush({}, { status: 429, statusText: 'Too Many Requests' });
+    fixture.detectChanges();
+    expect(component.rateLimited).toBeTrue();
+    expect(component.apiError).toBeFalse();
+    expect(fixture.nativeElement.textContent).toContain('LOGIN.RATE_LIMIT');
+  });
 });

@@ -8,7 +8,7 @@ import { ConfigService } from 'src/app/services/config/config.service';
 import { getSessionUser } from 'src/app/shared/classes/session-user';
 import { ChangePasswordComponent } from 'src/app/shared/components/popups/change-password/change-password.component';
 import { ErrorSuccessComponent } from 'src/app/shared/components/popups/error-success/error-success.component';
-import { emailValidator } from 'src/app/shared/validators/custom.validators';
+import { emailValidator, storedPhoneValidator } from 'src/app/shared/validators/custom.validators';
 import { VacacionesComponent } from 'src/app/shared/components/popups/vacaciones/vacaciones.component';
 import { MisCitasComponent } from 'src/app/shared/components/popups/mis-citas/mis-citas.component';
 
@@ -37,7 +37,7 @@ export class PerfilUsuarioComponent implements OnInit {
     nombre: ['', Validators.required],
     apellidos: ['', Validators.required],
     dni: ['', Validators.required],
-    telefono: ['', Validators.pattern(/^\d{1,15}$/)],
+    telefono: ['', storedPhoneValidator()],
     email: ['', [emailValidator(), Validators.maxLength(254)]],
   });
 

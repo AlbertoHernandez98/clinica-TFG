@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Backend } from 'src/app/JSON-Model/backend';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ConfigService } from 'src/app/services/config/config.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 interface User {
   dni: string;
@@ -21,11 +22,13 @@ export class LoginComponent {
     private router: Router,
     private urls: Backend,
     public formBuilder: FormBuilder,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private auth: AuthService
   ) { }
 
   loginError: boolean = false;
   apiError = false;
+  rateLimited = false;
   isHidden!: boolean;
   usuarioEncontrado: User | undefined;
   loginBool = false;
@@ -42,6 +45,7 @@ export class LoginComponent {
   login(): void {
     this.loginError = false;
     this.apiError = false;
+    this.rateLimited = false;
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -58,18 +62,15 @@ export class LoginComponent {
   private loadUsername(dni: string) {
     this.http.post<{ access_token: string; user: User }>(this.configService.getApiUrl('/auth/login'), {
       username: dni, password: this.form.controls.password.value
-    }).subscribe(
-      ({ access_token, user }) => {
-        sessionStorage.setItem('accessToken', access_token);
-        document.cookie = `user=${encodeURIComponent(user.dni)}; path=/; SameSite=Lax`;
-        document.cookie = `nombre=${encodeURIComponent(user.nombre)}; path=/; SameSite=Lax`;
-        document.cookie = `idRol=${user.idRolNativo}; path=/; SameSite=Lax`;
-        document.cookie = 'sessionToken=active; path=/; SameSite=Lax';
+    }, { withCredentials: true }).subscribe(
+      result => {
+        this.auth.setSession(result);
         this.loginBool = true;
         window.location.href = '/access-menu';
       },
       error => {
         if (error.status === 401) this.loginFailed();
+        else if (error.status === 429) this.rateLimited = true;
         else this.apiError = true;
       }
     );
@@ -79,6 +80,7 @@ export class LoginComponent {
     this.form.valueChanges.subscribe((res) => {
       this.loginError = false;
       this.apiError = false;
+      this.rateLimited = false;
     });
   }
 

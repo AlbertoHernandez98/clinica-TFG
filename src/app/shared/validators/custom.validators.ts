@@ -42,18 +42,26 @@ export function documentValidator(): ValidatorFn {
   };
 }
 
-/**
- * Validador para teléfono (solo números, 9 dígitos)
- */
+function isStoredPhone(value: string): boolean {
+  return /^\d{1,10}$/.test(value) && Number(value) <= 2147483647;
+}
+
 export function phoneValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     if (!control.value) {
       return null;
     }
     
-    const phonePattern = /^\d{9,15}$/;
-    
-    return phonePattern.test(control.value) ? null : { invalidPhone: true };
+    const value = String(control.value);
+    return value.length >= 9 && isStoredPhone(value) ? null : { invalidPhone: true };
+  };
+}
+
+export function storedPhoneValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control.value === null || control.value === undefined || control.value === '') return null;
+    const value = String(control.value);
+    return isStoredPhone(value) ? null : { invalidPhone: true };
   };
 }
 

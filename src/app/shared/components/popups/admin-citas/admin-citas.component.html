@@ -38,8 +38,11 @@
     </label>
     <label>{{ 'ADMIN_CITA.SERVICIO' | translate }}
       <select formControlName="idServicio">
-        <option *ngFor="let item of servicios" [value]="item.idServicio">{{ item.servicio }}</option>
+        <option [ngValue]="null">{{ 'SPECIALTIES.SELECT_SERVICE' | translate }}</option>
+        <option *ngFor="let item of serviciosDisponibles" [value]="item.idServicio">{{ item.servicio }}</option>
       </select>
+      <span class="appointment-error" *ngIf="form.controls.idMedico.value !== null && !serviciosDisponibles.length">{{ 'SPECIALTIES.NO_SERVICES' | translate }}</span>
+      <span class="appointment-error" *ngIf="form.controls.idServicio.value !== null && !servicioAsignado">{{ 'SPECIALTIES.SERVICE_REQUIRED' | translate }}</span>
     </label>
     <label *ngIf="!data.fixedDoctor">{{ 'ADMIN_CITA.MEDICO' | translate }}
       <select formControlName="idMedico">

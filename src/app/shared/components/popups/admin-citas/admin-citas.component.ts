@@ -32,6 +32,7 @@ function duracionValida(control: AbstractControl): { duracionInvalida: true } | 
 })
 export class AdminCitasComponent implements OnInit, OnDestroy {
   servicios: { idServicio: number; servicio: string }[] = [];
+  asignaciones: { idPersona: number; idServicio: number }[] = [];
   listaMedicos: { idPersona: number; nombre: string; apellidos: string; idRolNativo: number }[] = [];
   pacientes: { idPersona: number; nombre: string; apellidos: string; idRolNativo: number }[] = [];
   readonly duraciones = DURACIONES;
@@ -82,7 +83,7 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
     this.form.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(value => {
       if (value.fechaInicio) this.dateControl.setValue(value.fechaInicio.slice(0, 10), { emitEvent: false });
       if (value.fechaInicio) this.timeControl.setValue(value.fechaInicio.slice(11, 16), { emitEvent: false });
-      if (['ADMIN_CITA.NO_DISPONIBLE', 'ADMIN_CITA.PACIENTE_OCUPADO', 'ADMIN_CITA.REQUERIDOS'].includes(this.errorKey)) this.errorKey = '';
+      if (['ADMIN_CITA.NO_DISPONIBLE', 'ADMIN_CITA.PACIENTE_OCUPADO', 'ADMIN_CITA.REQUERIDOS', 'SPECIALTIES.SERVICE_REQUIRED'].includes(this.errorKey)) this.errorKey = '';
     });
     const slotKey = () => {
       const value = this.form.value;
@@ -151,6 +152,10 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
       next: items => this.servicios = items,
       error: error => { console.error('Error al cargar servicios:', error); this.loadError = true; }
     });
+    this.http.get<typeof this.asignaciones>(this.configService.getApiUrl('/medico_has_servicio')).subscribe({
+      next: items => this.asignaciones = items,
+      error: error => { console.error('Error al cargar asignaciones:', error); this.loadError = true; }
+    });
     if (!this.data.fixedDoctor || !this.data.selectedUser) {
       this.http.get<typeof this.listaMedicos>(this.configService.getApiUrl('/persona')).subscribe({
         next: users => {
@@ -172,10 +177,23 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
 
   get today(): string { return clinicToday(); }
 
+  get serviciosDisponibles(): typeof this.servicios {
+    const value = this.form.controls.idMedico.value;
+    if (value === null || value === '') return [];
+    const doctor = Number(value);
+    const ids = new Set(this.asignaciones.filter(item => Number(item.idPersona) === doctor).map(item => Number(item.idServicio)));
+    return this.servicios.filter(item => ids.has(Number(item.idServicio)));
+  }
+
+  get servicioAsignado(): boolean {
+    return this.serviciosDisponibles.some(item => Number(item.idServicio) === Number(this.form.controls.idServicio.value));
+  }
+
   onSubmit(): void {
     this.form.controls.fechaInicio.updateValueAndValidity({ emitEvent: false });
     if (this.saving || this.loadError || this.availability === 'checking' || this.availability === 'unavailable' || this.availability === 'patient' || this.availability === 'outside' || this.availability === 'error') return;
     if (this.form.invalid || this.patientControl.invalid) { this.form.markAllAsTouched(); this.patientControl.markAsTouched(); this.errorKey = 'ADMIN_CITA.REQUERIDOS'; return; }
+    if (!this.servicioAsignado) { this.errorKey = 'SPECIALTIES.SERVICE_REQUIRED'; return; }
     const body = { ...this.form.value, idCliente: this.patientControl.value };
     const id = this.data.appointment?.idCita;
     const url = this.configService.getApiUrl(id === undefined ? '/citas' : `/citas/${id}`);
@@ -188,8 +206,9 @@ export class AdminCitasComponent implements OnInit, OnDestroy {
         console.error('Error al guardar la cita:', error);
         this.saving = false;
         const patientConflict = error.status === 409 && error.error?.code === 'PATIENT_CONFLICT';
-        this.errorKey = patientConflict ? 'ADMIN_CITA.PACIENTE_OCUPADO' : error.status === 409 ? 'ADMIN_CITA.NO_DISPONIBLE' : 'ADMIN_CITA.ERROR';
-        if (error.status === 409) { this.availability = patientConflict ? 'patient' : 'unavailable'; this.refreshSlots(); }
+        const serviceConflict = error.status === 409 && error.error?.code === 'SERVICE_NOT_ASSIGNED';
+        this.errorKey = serviceConflict ? 'SPECIALTIES.SERVICE_REQUIRED' : patientConflict ? 'ADMIN_CITA.PACIENTE_OCUPADO' : error.status === 409 ? 'ADMIN_CITA.NO_DISPONIBLE' : 'ADMIN_CITA.ERROR';
+        if (error.status === 409 && !serviceConflict) { this.availability = patientConflict ? 'patient' : 'unavailable'; this.refreshSlots(); }
       }
     });
   }

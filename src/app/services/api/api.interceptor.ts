@@ -1,52 +1,42 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpInterceptor,
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpErrorResponse
-} from '@angular/common/http';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { ConfigService } from '../config/config.service';
+import { AuthService } from '../auth/auth.service';
 
-/**
- * API Interceptor - Handles all HTTP requests
- * - Adds base URL to relative requests
- * - Sets default headers
- * - Handles global error responses
- */
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
-  
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService, private auth: AuthService) {}
 
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    const token = sessionStorage.getItem('accessToken');
-    if (token && request.url.startsWith(`${this.configService.getApiBaseUrl()}/`)) {
-      request = request.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
-    }
-    // Don't intercept external URLs, assets, or i18n translation files
-    if (request.url.startsWith('http') || request.url.includes('assets/') || request.url.includes('i18n/')) {
-      return next.handle(request);
-    }
-
-    // Add base URL to relative requests
-    const apiRequest = request.clone({
-      url: this.configService.getApiUrl(request.url),
-      setHeaders: {
-        'Content-Type': 'application/json'
-      }
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (request.url.includes('assets/') || request.url.includes('i18n/')) return next.handle(request);
+    const apiRequest = request.url.startsWith('http') ? request : request.clone({
+      url: this.configService.getApiUrl(request.url)
     });
-
-    return next.handle(apiRequest).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.error('HTTP Error:', error);
-        return throwError(() => error);
-      })
-    );
+    const base = `${this.configService.getApiBaseUrl()}/`;
+    if (!apiRequest.url.startsWith(base)) return next.handle(apiRequest);
+    const token = this.auth.getAccessToken();
+    const authRequest = token ? apiRequest.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : apiRequest;
+    return next.handle(authRequest).pipe(catchError((error: HttpErrorResponse) => {
+      const sessionEndpoint = ['login', 'refresh', 'logout'].some(endpoint => apiRequest.url === `${base}auth/${endpoint}`);
+      if (error.status === 401 && token && !sessionEndpoint) {
+        const currentToken = this.auth.getAccessToken();
+        if (!currentToken) return throwError(() => error);
+        if (currentToken !== token) {
+          return next.handle(apiRequest.clone({ setHeaders: { Authorization: `Bearer ${currentToken}` } }));
+        }
+        return this.auth.refresh().pipe(
+          catchError(refreshError => {
+            if (refreshError.status === 401) this.auth.clearSession();
+            return throwError(() => refreshError);
+          }),
+          switchMap(session => next.handle(apiRequest.clone({
+            setHeaders: { Authorization: `Bearer ${session.access_token}` }
+          })))
+        );
+      }
+      return throwError(() => error);
+    }));
   }
 }

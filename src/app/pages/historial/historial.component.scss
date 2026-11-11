@@ -31,6 +31,15 @@
   &__row { border-top: 1px solid #e7eff2; font-size: 14px; overflow-wrap: anywhere; }
   &__empty { margin: 0; padding: 28px 16px; color: #647580; text-align: center; }
   &__entry { padding: 14px 0; border-top: 1px solid #e7eff2; }
+  &__entry-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  &__operation-form { display: grid; gap: 16px; margin: 16px 0; padding: 18px; border: 1px solid #d5e4e9; border-radius: 10px; background: #f8fbfc; }
+  &__danger { min-height: 40px; padding: 8px 14px; border: 1px solid #a63c3c; border-radius: 8px; background: #fff; color: #a63c3c; font: inherit; font-weight: 700; cursor: pointer; }
+  &__danger:disabled, &__primary:disabled { opacity: .6; cursor: wait; }
+  &__annulled { color: #a63c3c; }
+  &__versions { margin-top: 18px; padding: 14px 18px; border-left: 3px solid #a8cbd8; background: #f5fafc; }
+  &__versions h3 { margin: 0 0 8px; font-size: 15px; }
+  &__version { padding: 8px 0; border-top: 1px solid #e0eaee; }
+  &__version:first-of-type { border-top: 0; }
   &__meta { color: #647580; font-size: 13px; }
   &__comments { white-space: pre-wrap; overflow-wrap: anywhere; }
   button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #087ba2; outline-offset: 2px; }

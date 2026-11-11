@@ -110,8 +110,27 @@ describe('UserDetailComponent', () => {
     TestBed.inject(MAT_DIALOG_DATA).selectedUser = { idPersona: 2, idRolNativo: 2 };
     const component = TestBed.inject(UserDetailComponent);
     component.ngOnInit();
+    http.expectOne('http://localhost:3000/servicio').flush([]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([]);
     expect(component.availableRoles.map(role => role.idRol)).toEqual([2, 4]);
     expect(component.canDelete).toBeTrue();
+  });
+
+  it('lets reception assign services to a doctor', () => {
+    TestBed.inject(MAT_DIALOG_DATA).staff = { idPersona: 3, idRolNativo: 3 };
+    TestBed.inject(MAT_DIALOG_DATA).selectedUser = { idPersona: 2, idRolNativo: 2 };
+    const component = TestBed.inject(UserDetailComponent);
+    component.ngOnInit();
+    http.expectOne('http://localhost:3000/servicio').flush([{ idServicio: 1, servicio: 'Uno' }, { idServicio: 2, servicio: 'Dos' }]);
+    http.expectOne('http://localhost:3000/medico_has_servicio').flush([{ idPersona: 2, idServicio: 1 }]);
+    expect(component.selectedSpecialties.has(1)).toBeTrue();
+    component.selectedSpecialties.add(2);
+    component.saveSpecialties();
+    const request = http.expectOne('http://localhost:3000/medico_has_servicio/2');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body.servicios).toEqual([1, 2]);
+    request.flush({ idPersona: 2, servicios: [1, 2] });
+    expect(component.specialtiesSaved).toBeTrue();
   });
 
   it('notifies open views after reception creates a doctor', () => {
